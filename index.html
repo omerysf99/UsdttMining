@@ -3,252 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stars Miner Arayüzü</title>
+    <title>Stars Miner V2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0a111a;
-            --card-bg: #16212d;
+            --bg-dark: #070b10;
+            --card-bg: #111a24;
             --accent-blue: #2176ff;
-            --green-btn: #28a745;
-            --text-white: #ffffff;
-            --text-gray: #a0aec0;
-            --border-color: #2d3748;
+            --green-success: #2ecc71;
+            --text-gray: #8e9aaf;
+            --danger: #e74c3c;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-white);
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            color: white;
         }
 
-        /* Ana Konteynır */
-        .app-container {
-            width: 100%;
+        /* 9:16 Aspect Ratio Container */
+        .app-frame {
+            width: 100vw;
             max-width: 400px;
+            height: calc(400px * 16 / 9);
+            max-height: 100vh;
             background: linear-gradient(180deg, #0f172a 0%, #050a0f 100%);
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #1e293b;
             position: relative;
-            border: 1px solid var(--border-color);
         }
 
-        /* Üst Header */
-        .header {
+        /* Header */
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-        }
-
-        .balance-badge {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .balance-badge span { color: #4ade80; font-weight: bold; }
-
-        .header-icons { display: flex; gap: 15px; align-items: center; }
-        .flag-icon { width: 24px; border-radius: 3px; }
-
-        /* Miner Bölümü */
-        .miner-section {
-            padding: 10px 20px;
-            text-align: center;
-        }
-
-        .miner-image-container {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
             padding: 20px;
-            margin-bottom: 15px;
-            position: relative;
+            align-items: center;
         }
 
-        .miner-img {
-            width: 80%;
-            filter: drop-shadow(0 0 15px rgba(33, 118, 255, 0.3));
-        }
-
-        .timer-btn {
-            background: linear-gradient(to right, #1d4e89, #2176ff);
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 1.5rem;
+        .balance-box {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
             font-weight: bold;
+        }
+
+        .balance-box span { color: var(--green-success); }
+
+        /* Miner Section */
+        .miner-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .machine-card {
+            background: rgba(255,255,255,0.02);
+            width: 100%;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(33, 118, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .machine-img {
+            width: 150px;
+            filter: drop-shadow(0 0 20px var(--accent-blue));
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, #2176ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Stats & Actions */
+        .action-area {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+        }
+
+        .stat-label { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 5px; }
+
+        .hash-input {
+            background: #0a0f16;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 1px solid #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .btn-sell {
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            border: none;
+            background: var(--green-success);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-sell:disabled { background: #2c3e50; cursor: not-allowed; }
+
+        .info-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-gray);
             margin-top: 10px;
         }
 
-        /* Lottery Bölümü */
-        .lottery-card {
-            background-color: #1b5e4c;
-            margin: 15px 20px;
-            padding: 15px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .lottery-icon {
-            background: white;
-            color: #1b5e4c;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-
-        /* Veri Kartı */
-        .stats-card {
-            background-color: var(--card-bg);
-            margin: 0 20px;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .input-display {
-            background: rgba(0,0,0,0.3);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            margin: 10px 0;
-            border: 1px solid #334155;
-        }
-
-        .sell-btn {
-            background-color: #2fa17e;
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            border: none;
-        }
-
-        /* Alt Navigasyon */
-        .nav-bar {
-            margin-top: auto;
+        /* Nav Bar */
+        .bottom-nav {
             display: flex;
             justify-content: space-around;
-            background-color: #16212d;
-            padding: 10px 0;
-            border-top: 1px solid var(--border-color);
+            padding: 15px 0;
+            background: var(--card-bg);
+            border-top: 1px solid #1e293b;
         }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.7rem;
-            color: var(--text-gray);
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: var(--text-white);
-            background: rgba(255,255,255,0.05);
-            padding: 5px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .nav-item i { font-size: 1.2rem; }
-
-        .footer-text {
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-gray);
-            padding: 10px;
-        }
+        .nav-btn { text-align: center; color: var(--text-gray); font-size: 0.7rem; }
+        .nav-btn.active { color: white; }
+        .nav-btn i { display: block; font-size: 1.4rem; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <div class="balance-badge">
-            <span>$</span> 0.0000 USD
+<div class="app-frame">
+    <div class="top-bar">
+        <div class="balance-box">
+            <i class="fas fa-coins" style="color: #f1c40f;"></i> 
+            <span id="usd-balance">0.00</span> USD
         </div>
-        <div class="header-icons">
-            <img src="https://flagcdn.com/w40/tr.png" class="flag-icon" alt="TR">
-            <i class="fas fa-cog"></i>
+        <i class="fas fa-cog" style="font-size: 1.5rem; color: var(--text-gray);"></i>
+    </div>
+
+    <div class="miner-display">
+        <div class="machine-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/3665/3665923.png" class="machine-img" alt="Miner">
+            <div class="timer" id="timer">12:00:00</div>
+            <p style="color: var(--accent-blue); margin-top: 10px; font-size: 0.8rem;">ÜCRETSİZ MADENCİ AKTİF</p>
         </div>
     </div>
 
-    <div class="miner-section">
-        <div class="miner-image-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/3665/3665923.png" class="miner-img" alt="Miner">
-            <i class="fas fa-chevron-right" style="position: absolute; right: 10px; top: 50%; color: #2176ff;"></i>
-        </div>
-        <div class="timer-btn">11:12:26</div>
-    </div>
-
-    <div class="lottery-card">
-        <div class="lottery-icon">X100</div>
-        <div>
-            <div style="font-weight: bold;">POWER LOTTERY</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">X100'e kadar kazan</div>
-        </div>
-    </div>
-
-    <div class="stats-card">
-        <div style="color: var(--text-gray);">Madenlenen Hash</div>
-        <div class="input-display">0.73403</div>
-        <button class="sell-btn">
-            <i class="fas fa-sync-alt"></i> HASH'LERİ SAT
+    <div class="action-area">
+        <div class="stat-label">Madenlenen Toplam Hash</div>
+        <div class="hash-input" id="hash-count">1009.00</div>
+        
+        <button class="btn-sell" id="sell-btn" onclick="sellHash()">
+            <i class="fas fa-exchange-alt"></i> HASH'LERİ SAT
         </button>
-        <div style="margin-top: 15px; color: var(--text-gray);">Gücünüz (Power)</div>
+        
+        <p class="info-text">Min Satış: 1009 Hash | 100 Hash = 0.01$</p>
+        <p class="info-text" style="color: var(--accent-blue);">Üretim Hızı: 30dk / 1 Hash</p>
     </div>
 
-    <div class="footer-text">@Stars_Miner_bot</div>
+    <div style="text-align: center; padding: 10px; font-size: 0.7rem; color: #334155;">@Stars_Miner_bot</div>
 
-    <nav class="nav-bar">
-        <div class="nav-item">
-            <i class="fas fa-microchip" style="color: #a78bfa;"></i>
-            <span>Yükselt</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-dollar-sign"></i>
-            <span>Kazan</span>
-        </div>
-        <div class="nav-item active">
-            <i class="fas fa-pickaxe"></i>
-            <span>Madenci</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-list-ul"></i>
-            <span>Görev</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-wallet"></i>
-            <span>Ödeme</span>
-        </div>
+    <nav class="bottom-nav">
+        <div class="nav-btn"><i class="fas fa-bolt"></i>Yükselt</div>
+        <div class="nav-btn"><i class="fas fa-gift"></i>Kazan</div>
+        <div class="nav-btn active"><i class="fas fa-hammer"></i>Madenci</div>
+        <div class="nav-btn"><i class="fas fa-tasks"></i>Görev</div>
+        <div class="nav-btn"><i class="fas fa-wallet"></i>Ödeme</div>
     </nav>
 </div>
+
+<script>
+    let currentHash = 1009.00;
+    let balance = 0.00;
+
+    function sellHash() {
+        if (currentHash >= 1009) {
+            // Hesaplama: 100 hash = 0.01$ ise 1 hash = 0.0001$
+            let earnedUSD = currentHash * 0.0001;
+            balance += earnedUSD;
+            
+            // UI Güncelleme
+            document.getElementById('usd-balance').innerText = balance.toFixed(4);
+            currentHash = 0;
+            document.getElementById('hash-count').innerText = "0.00";
+            
+            alert("Başarıyla satıldı! Kazanç: $" + earnedUSD.toFixed(4));
+            checkLimit();
+        }
+    }
+
+    function checkLimit() {
+        const btn = document.getElementById('sell-btn');
+        if (currentHash < 1009) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+        }
+    }
+
+    // Sayfa yüklendiğinde kontrol et
+    checkLimit();
+</script>
 
 </body>
 </html>
