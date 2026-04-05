@@ -71,7 +71,7 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Orta Fan Ünitesi - Tam Oturması İçin Düzenlendi */
+        /* Orta Fan Ünitesi - Siyah Çerçeve Kaldırıldı */
         .fan-frame {
             position: relative;
             width: 340px;
@@ -80,8 +80,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Görselin dışındaki siyahlıklarla birleşmesi için */
-            background: radial-gradient(circle, rgba(255, 0, 21, 0.2) 0%, transparent 75%);
+            background: radial-gradient(circle, rgba(255, 0, 21, 0.25) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -90,15 +89,16 @@
             height: 310px;
             border-radius: 50%;
             overflow: hidden;
-            border: 3px solid #1a0002; /* Görselin içindeki koyu halkayla uyumlu */
-            box-shadow: 0 0 40px rgba(255, 0, 21, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
-            background-color: #000;
+            /* Siyah çerçeve ve arka plan kaldırıldı */
+            border: none; 
+            box-shadow: 0 0 50px rgba(255, 0, 21, 0.6);
+            background-color: transparent;
         }
 
         .fan-image {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Görüntünün yuvayı tam doldurmasını sağlar */
+            object-fit: cover;
             display: block;
         }
 
@@ -306,7 +306,7 @@
         // Madencilik Hesabı: Günde 1 TON
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
-        const TICK_MS = 80; // Akıcılık için 80ms
+        const TICK_MS = 80; 
         const REWARD_PER_TICK = REWARD_PER_SECOND / (1000 / TICK_MS);
 
         let currentSession = 0.0;
