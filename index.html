@@ -7,11 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --tg-viewport-height: 100vh;
-            --tg-viewport-stable-height: 100vh;
-        }
-
         body {
             background-color: #000;
             color: white;
@@ -19,7 +14,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100dvh;
+            /* Telegram viewport yüksekliği için dinamik ayar */
+            height: 100vh;
+            height: -webkit-fill-available;
             margin: 0;
             overflow: hidden;
             user-select: none;
@@ -35,17 +32,9 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            /* Telegram ve iOS alt bar çakışmasını önlemek için safe-area ekliyoruz */
-            padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); 
+            /* Alt kısımda Telegram barı için ekstra boşluk bırakıyoruz */
+            padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom)); 
             box-sizing: border-box;
-        }
-
-        @media (min-height: 750px) and (min-width: 450px) {
-            .app-container {
-                height: 92vh;
-                border-radius: 2.5rem;
-                box-shadow: 0 0 80px rgba(0,0,0,0.9);
-            }
         }
 
         .glass-card {
@@ -58,8 +47,8 @@
 
         .fan-container {
             position: relative;
-            width: min(65vw, 240px);
-            height: min(65vw, 240px);
+            width: min(60vw, 220px);
+            height: min(60vw, 220px);
             margin: auto;
             display: flex;
             align-items: center;
@@ -97,6 +86,7 @@
 
         .nav-item {
             color: #4b5563;
+            transition: color 0.2s;
         }
 
         .nav-item.active {
@@ -117,7 +107,7 @@
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="app-container" id="app">
         <!-- Üst Panel (Bakiyeler) -->
         <div id="header" class="space-y-2 shrink-0">
             <!-- TON Bakiye -->
@@ -154,21 +144,21 @@
         </div>
 
         <!-- ANA SAYFA (Mining) -->
-        <div class="flex-grow flex flex-col justify-around py-4 text-center">
+        <div class="flex-grow flex flex-col justify-around py-2 text-center overflow-hidden">
             <div class="fan-container">
                 <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
             </div>
 
-            <div class="my-2">
+            <div class="my-1">
                 <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
-                <p class="text-xl font-bold text-white/70 mb-3">TON</p>
+                <p class="text-xl font-bold text-white/70 mb-2">TON</p>
                 <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
                     <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
                     <i class="fa-solid fa-bolt text-orange-400"></i>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 px-2 mb-2">
+            <div class="grid grid-cols-2 gap-3 px-2">
                 <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg">
                     <i class="fa-solid fa-coins"></i> Claim
                 </button>
@@ -179,33 +169,44 @@
         </div>
 
         <!-- ALT NAVİGASYON -->
-        <div class="shrink-0 glass-card flex justify-around items-center p-1.5 relative z-50">
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+        <div class="shrink-0 glass-card flex justify-around items-center p-2 mt-4 relative z-50 shadow-2xl">
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
                 <i class="fa-solid fa-wallet text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Wallet</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
                 <i class="fa-solid fa-users text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Friends</span>
             </div>
-            <div class="nav-item active flex flex-col items-center gap-0.5 p-1.5 w-full">
+            <div class="nav-item active flex flex-col items-center gap-0.5 p-1 w-full">
                 <div class="bg-purple-600/20 w-9 h-9 rounded-lg flex items-center justify-center mb-[-2px]">
                      <i class="fa-solid fa-fan text-lg text-purple-400"></i>
                 </div>
                 <span class="text-[8px] font-bold uppercase tracking-tighter mt-1">Home</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
                 <i class="fa-solid fa-bullseye text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Missions</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
                 <i class="fa-solid fa-bars-staggered text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">More</span>
             </div>
         </div>
     </div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        // Telegram WebApp Ayarları
+        const webapp = window.Telegram.WebApp;
+        if (webapp) {
+            webapp.expand();
+            webapp.ready();
+            // Arka plan rengini Telegram temasına göre set et
+            webapp.backgroundColor = '#0f0f0f';
+            webapp.headerColor = '#0f0f0f';
+        }
+
         const DAILY_RATE_PER_GH = 1.0;
         const SECONDS_IN_DAY = 86400;
         const TICK_MS = 100;
@@ -245,7 +246,7 @@
 
         function showToast(msg) {
             const toast = document.createElement('div');
-            toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-xs shadow-2xl z-[100]";
+            toast.className = "toast fixed bottom-32 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-xs shadow-2xl z-[100]";
             toast.innerText = msg;
             document.body.appendChild(toast);
             setTimeout(() => {
@@ -255,13 +256,16 @@
             }, 2000);
         }
 
-        window.onload = startMining;
-
-        // Telegram WebView için bazen gerekli olabilen yükseklik düzeltmesi
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.ready();
-        }
+        window.onload = () => {
+            startMining();
+            
+            // Telegram viewport değiştiğinde boyutu güncelle
+            if (webapp) {
+                webapp.onEvent('viewportChanged', () => {
+                    document.body.style.height = webapp.viewportHeight + 'px';
+                });
+            }
+        };
     </script>
 </body>
 </html>
