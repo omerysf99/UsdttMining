@@ -71,7 +71,7 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Fan Alanı - Orijinal haliyle, kesme işlemi olmadan ekleme */
+        /* Fan Alanı */
         .fan-container {
             display: flex;
             justify-content: center;
@@ -82,7 +82,7 @@
         }
 
         .fan-image {
-            width: 90%; /* Ekran genişliğine göre orantılı */
+            width: 90%;
             height: auto;
             display: block;
             filter: drop-shadow(0 0 25px rgba(255, 0, 21, 0.3));
@@ -222,7 +222,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-black">$DRAGON Balance</p>
-                    <h3 class="text-base font-extrabold">0</h3>
+                    <h3 class="text-base font-extrabold" id="dragon-balance-display">0</h3>
                 </div>
             </div>
             <div class="wallet-btn" style="background: #222; box-shadow: none;">
@@ -250,7 +250,7 @@
 
         <!-- Butonlar -->
         <div class="action-grid">
-            <button class="btn-main btn-claim" onclick="claimRewards()">
+            <button class="btn-main btn-claim" onclick="window.claimRewards()">
                 <span>📥</span> Claim
             </button>
             <button class="btn-main btn-boost">
@@ -286,7 +286,35 @@
         </div>
     </nav>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        /**
+         * KRİTİK DÜZELTME:
+         * El ile girilen config nesnesi, __initial_auth_token ile uyuşmadığında 
+         * 'auth/configuration-not-found' hatası verir. Canvas ortamında 
+         * daima sistemin sağladığı __firebase_config kullanılmalıdır.
+         */
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                // Yerel test için fallback (Opsiyonel)
+                apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
+                authDomain: "asdbn-5dd38.firebaseapp.com",
+                projectId: "asdbn-5dd38",
+                storageBucket: "asdbn-5dd38.firebasestorage.app",
+                messagingSenderId: "852532391581",
+                appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
+            };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
+
+        // Oyun Durumu
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
         const TICK_MS = 80; 
@@ -294,27 +322,98 @@
 
         let currentSession = 0.0;
         let totalBalance = 0.0;
+        let dragonBalance = 0;
+        let userId = null;
 
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
+        const dragonDisplayEl = document.getElementById('dragon-balance-display');
 
+        // Otomatik Giriş (Garantili Akış)
+        const initAuth = async () => {
+            try {
+                // Sistem bir token sağladıysa onu kullan, yoksa anonim giriş yap
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Giriş hatası:", error);
+                // Hata durumunda tekrar dene
+                setTimeout(initAuth, 2000);
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                await loadData();
+            } else {
+                await initAuth();
+            }
+        });
+
+        // Firebase'den Veri Yükle (KURAL 1 ve KURAL 2'ye Uygun)
+        async function loadData() {
+            if (!userId) return;
+            try {
+                // KURAL 1: Doğru yol yapısı
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    totalBalance = data.totalBalance || 0;
+                    dragonBalance = data.dragonBalance || 0;
+                    updateUI();
+                }
+            } catch (err) {
+                console.error("Veri yüklenemedi:", err);
+            }
+        }
+
+        // Firebase'e Veri Kaydet
+        async function saveData() {
+            if (!userId) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
+                await setDoc(docRef, {
+                    totalBalance,
+                    dragonBalance,
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Veri kaydedilemedi:", err);
+            }
+        }
+
+        function updateUI() {
+            if (displayEl) displayEl.innerText = totalBalance.toFixed(4) + " TON";
+            if (dragonDisplayEl) dragonDisplayEl.innerText = dragonBalance.toLocaleString();
+        }
+
+        // Kazım Döngüsü
         setInterval(() => {
             currentSession += REWARD_PER_TICK;
-            counterEl.innerText = currentSession.toFixed(10);
+            if (counterEl) counterEl.innerText = currentSession.toFixed(10);
         }, TICK_MS);
 
-        function claimRewards() {
-            if (currentSession <= 0) return;
+        // Claim İşlemi
+        window.claimRewards = async function() {
+            if (currentSession <= 0 || !userId) return;
 
             totalBalance += currentSession;
-            displayEl.innerText = totalBalance.toFixed(4) + " TON";
+            updateUI();
             
             const toast = document.createElement('div');
             toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20';
-            toast.innerText = '+' + currentSession.toFixed(6) + ' TON COLLECTED! 🔥';
+            toast.innerText = '+' + currentSession.toFixed(6) + ' TON TOPLANDI! 🔥';
             document.body.appendChild(toast);
             
             currentSession = 0;
+            
+            // Veriyi buluta işle
+            await saveData();
             
             setTimeout(() => {
                 toast.style.opacity = '0';
