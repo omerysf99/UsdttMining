@@ -105,6 +105,21 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         }
 
+        /* Sol üstteki yatay dikdörtgen */
+        .fan-decorator-rect {
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 80px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            z-index: 20;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -187,7 +202,7 @@
                     </div>
                 </div>
                 
-                <!-- Kağıt Dolar Görseli (Tam burada) -->
+                <!-- Kağıt Dolar Görseli -->
                 <div class="flex items-center gap-2 mt-2 border-t border-white/5 pt-2">
                     <img src="dolar.jpg" class="h-10 w-24 object-contain rounded-md shadow-lg" alt="Dolar Banknot" onerror="this.parentElement.innerHTML='<p class=\'text-[10px] text-gray-500 font-bold\'>USD $</p>'">
                 </div>
@@ -200,6 +215,9 @@
             <!-- HOME TAB -->
             <div id="home-tab" class="tab-content active text-center justify-around py-4">
                 <div class="fan-container">
+                    <!-- Fanın sol üstündeki yatay dikdörtgen -->
+                    <div class="fan-decorator-rect"></div>
+                    
                     <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
                     <div class="fan-center-icon">
                         <img src="dragon.jpg" class="w-full h-full object-cover" alt="Ejderha" onerror="this.parentElement.style.display='none'">
