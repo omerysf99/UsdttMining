@@ -71,34 +71,21 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Fan Alanı - Yuvarlak Kesim Kaldırıldı, Kenarlar Kırpıldı */
+        /* Fan Alanı - Orijinal haliyle, kesme işlemi olmadan ekleme */
         .fan-container {
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px auto;
-            position: relative;
-        }
-
-        .fan-crop {
-            width: 300px;
-            height: 300px;
-            border-radius: 24px; /* Daire yerine köşeleri yuvarlatılmış kare */
-            overflow: hidden; /* Dışarı taşan (siyah) kısımları keser */
-            border: 2px solid rgba(255, 0, 21, 0.2);
-            background-color: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            filter: drop-shadow(0 0 35px rgba(255, 0, 21, 0.4));
+            width: 100%;
+            max-width: 400px;
         }
 
         .fan-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Görseli alanı dolduracak şekilde büyütür */
+            width: 90%; /* Ekran genişliğine göre orantılı */
+            height: auto;
             display: block;
-            transform: scale(1.2); /* Siyah köşeleri tamamen dışarıda bırakmak için biraz daha büyütüldü */
+            filter: drop-shadow(0 0 25px rgba(255, 0, 21, 0.3));
         }
 
         /* Sayaç Alanı */
@@ -247,9 +234,7 @@
 
         <!-- Ana Madenci Ünitesi -->
         <div class="fan-container">
-            <div class="fan-crop">
-                <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan">
-            </div>
+            <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan">
         </div>
 
         <!-- Sayaç -->
