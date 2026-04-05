@@ -74,7 +74,7 @@
         /* Fan Alanı */
         .fan-container {
             display: flex;
-            justify-content: center;
+            justify(content: center;
             align-items: center;
             margin: 20px auto;
             width: 100%;
@@ -204,7 +204,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-black">TON Balance</p>
-                    <h3 class="text-base font-extrabold" id="ton-balance-display">0.0000 TON</h3>
+                    <h3 class="text-base font-extrabold" id="ton-balance-display">0.00000000 TON</h3>
                 </div>
             </div>
             <div class="wallet-btn">
@@ -290,17 +290,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        // Senin özel Firebase Yapılandırman
+        // Yapılandırma
         const userFirebaseConfig = {
             apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
             authDomain: "asdbn-5dd38.firebaseapp.com",
             projectId: "asdbn-5dd38",
             storageBucket: "asdbn-5dd38.firebasestorage.app",
             messagingSenderId: "852532391581",
-            appId: "1:852532391581:web:c864fc3aace8de0d41ee74",
-            measurementId: "G-6BYL9TCNQJ"
+            appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
         };
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
@@ -310,33 +308,25 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        let analytics;
-        try {
-            analytics = getAnalytics(app);
-        } catch(e) {
-            console.log("Analytics başlatılamadı.");
-        }
-
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
 
-        // Oyun Ayarları
+        // Oyun Ayarları - Hassas Kazanç
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
-        const TICK_MS = 80; 
-        const REWARD_PER_TICK = REWARD_PER_SECOND / (1000 / TICK_MS);
+        const DRAGON_PER_TON = 1000000; // 1 TON başına kazanılan $DRAGON
 
         let currentSession = 0.0;
         let totalBalance = 0.0;
         let dragonBalance = 0;
         let userId = null;
         let dataLoaded = false;
+        let lastUpdateTime = Date.now();
 
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
         const dragonDisplayEl = document.getElementById('dragon-balance-display');
 
-        // Giriş Akışı
+        // Giriş ve Veri Senkronizasyonu
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -345,7 +335,6 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.error("Giriş hatası:", error);
                 setTimeout(initAuth, 2000);
             }
         };
@@ -359,7 +348,6 @@
             }
         });
 
-        // Veri Yükleme
         async function loadData() {
             if (!userId) return;
             try {
@@ -368,81 +356,75 @@
                 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    totalBalance = data.totalBalance || 0;
-                    dragonBalance = data.dragonBalance || 0;
+                    totalBalance = Number(data.totalBalance) || 0;
+                    dragonBalance = Math.floor(Number(data.dragonBalance)) || 0;
                     
+                    // Offline kazanç hesapla
                     if (data.updatedAt) {
-                        const now = Date.now();
-                        const diffSec = (now - data.updatedAt) / 1000;
-                        const offlineEarned = diffSec * REWARD_PER_SECOND;
-                        if (offlineEarned > 0.000001) {
-                            totalBalance += offlineEarned;
-                            showOfflineToast(offlineEarned);
+                        const diffSec = (Date.now() - data.updatedAt) / 1000;
+                        const earned = diffSec * REWARD_PER_SECOND;
+                        if (earned > 0) {
+                            totalBalance += earned;
+                            dragonBalance += Math.floor(earned * DRAGON_PER_TON);
+                            showOfflineToast(earned);
                         }
                     }
                 }
                 dataLoaded = true;
+                lastUpdateTime = Date.now();
                 updateUI();
             } catch (err) {
-                console.error("Veri yüklenemedi:", err);
                 dataLoaded = true;
             }
         }
 
-        // Veri Kaydetme
         async function saveData() {
             if (!userId || !dataLoaded) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 await setDoc(docRef, {
-                    totalBalance,
-                    dragonBalance,
+                    totalBalance: totalBalance,
+                    dragonBalance: dragonBalance,
                     updatedAt: Date.now()
                 }, { merge: true });
             } catch (err) {
-                console.error("Kaydetme hatası:", err);
+                console.error("Save error:", err);
             }
         }
 
         function updateUI() {
-            if (displayEl) displayEl.innerText = totalBalance.toFixed(4) + " TON";
-            if (dragonDisplayEl) dragonDisplayEl.innerText = dragonBalance.toLocaleString();
+            if (displayEl) displayEl.innerText = totalBalance.toFixed(8) + " TON";
+            if (dragonDisplayEl) dragonDisplayEl.innerText = Math.floor(dragonBalance).toLocaleString();
         }
 
-        // Kazım Döngüsü
+        // Kazım Döngüsü - Zaman bazlı hassas artış
         setInterval(() => {
             if (!dataLoaded) return;
-            currentSession += REWARD_PER_TICK;
+            const now = Date.now();
+            const delta = (now - lastUpdateTime) / 1000;
+            const tickEarned = delta * REWARD_PER_SECOND;
+            
+            currentSession += tickEarned;
+            lastUpdateTime = now;
+
             if (counterEl) counterEl.innerText = currentSession.toFixed(10);
-        }, TICK_MS);
+        }, 100);
 
-        // Otomatik Kayıt
-        setInterval(() => {
-            if (dataLoaded) saveData();
-        }, 60000);
-
-        function showOfflineToast(amount) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-3 rounded-xl z-50 font-bold shadow-xl text-sm border-2 border-black';
-            toast.innerText = 'Hoş Geldin! Sen yokken +' + amount.toFixed(6) + ' TON kazandın! 💤';
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 1s';
-                setTimeout(() => toast.remove(), 1000);
-            }, 5000);
-        }
-
+        // Claim İşlemi
         window.claimRewards = async function() {
             if (currentSession <= 0 || !userId || !dataLoaded) return;
 
+            const earnedDragon = Math.floor(currentSession * DRAGON_PER_TON);
+            
             totalBalance += currentSession;
+            dragonBalance += earnedDragon;
             currentSession = 0;
+            
             updateUI();
             
             const toast = document.createElement('div');
-            toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20';
-            toast.innerText = 'TOPLANDI! 🔥';
+            toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20 text-center';
+            toast.innerHTML = `TOPLANDI!<br><span class="text-xs text-yellow-300">+${earnedDragon.toLocaleString()} $DRAGON</span>`;
             document.body.appendChild(toast);
             
             await saveData();
@@ -452,8 +434,25 @@
                 toast.style.transform = 'translate(-50%, -20px)';
                 toast.style.transition = 'all 0.4s ease';
                 setTimeout(() => toast.remove(), 400);
-            }, 1800);
+            }, 2000);
         }
+
+        function showOfflineToast(amount) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-3 rounded-xl z-50 font-bold shadow-xl text-sm border-2 border-black';
+            toast.innerText = 'Hoş Geldin! Sen yokken +' + amount.toFixed(6) + ' TON toplandı! 💤';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 1s';
+                setTimeout(() => toast.remove(), 1000);
+            }, 5000);
+        }
+
+        // Otomatik Kayıt (Dakikada bir)
+        setInterval(() => {
+            if (dataLoaded) saveData();
+        }, 60000);
     </script>
 </body>
 </html>
