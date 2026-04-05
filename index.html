@@ -50,6 +50,20 @@
             border-radius: 1.25rem;
         }
 
+        /* Sekme İçeriği Yönetimi - Kritik Düzeltme */
+        .tab-content {
+            display: none !important; /* Her şeyi kesin olarak gizle */
+            flex-grow: 1;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        /* Sadece aktif sekme flex olur */
+        .tab-content.active {
+            display: flex !important;
+            flex-direction: column;
+        }
+
         .fan-container {
             position: relative;
             width: min(65vw, 240px);
@@ -110,20 +124,6 @@
             color: #a78bfa;
         }
 
-        /* Sekme İçeriği Yönetimi */
-        .tab-content {
-            display: none; /* Varsayılan olarak gizle */
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-top: 1rem;
-        }
-
-        /* Aktif sekme hem görünür hem flex olur */
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
         .mission-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -148,12 +148,12 @@
 <body>
 
     <div class="app-container" id="app">
-        <!-- Üst Panel -->
+        <!-- Üst Panel (Her Zaman Üstte) -->
         <div id="header" class="space-y-2 shrink-0">
             <!-- TON Bakiye -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg shadow-sky-500/10">
+                    <div class="w-10 h-10 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg">
                         <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-gem text-lg\'></i>'">
                     </div>
                     <div>
@@ -170,7 +170,7 @@
             <div class="glass-card p-3 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg shadow-blue-500/10">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg">
                             <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-lg\'></i>'">
                         </div>
                         <div>
@@ -190,111 +190,95 @@
             </div>
         </div>
 
-        <!-- ANA SAYFA (HOME) -->
-        <div id="home-tab" class="tab-content active text-center flex flex-col justify-around">
-            <div class="fan-container my-2">
-                <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
-                <div class="fan-center-icon">
-                    <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX Icon" onerror="this.parentElement.style.display='none'">
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
-                <p class="text-xl font-bold text-white/70 mb-3">TON</p>
-                <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
-                    <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
-                    <i class="fa-solid fa-bolt text-orange-400"></i>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 px-2">
-                <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-500/20">
-                    <i class="fa-solid fa-coins"></i> Claim
-                </button>
-                <button class="bg-gray-800 text-gray-600 p-4 rounded-xl flex items-center justify-center gap-2 font-bold cursor-not-allowed">
-                    <i class="fa-solid fa-rocket"></i> Boost
-                </button>
-            </div>
-        </div>
-
-        <!-- ARKADAŞLAR (FRIENDS) -->
-        <div id="friends-tab" class="tab-content px-2">
-            <div class="text-center py-4">
-                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-                    <i class="fa-solid fa-user-group text-3xl text-blue-400"></i>
-                </div>
-                <h2 class="text-xl font-bold">Arkadaşlarını Çağır</h2>
-                <p class="text-gray-400 text-xs mt-1">Davetlerin için TONIX ve bonus kazan!</p>
-            </div>
-
-            <div class="glass-card p-4 mb-4">
-                <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Davet Linkin</p>
-                <div class="flex gap-2">
-                    <input type="text" readonly value="t.me/tonix_bot?start=user1" class="bg-black/40 border border-white/10 rounded-lg flex-grow p-2 text-xs text-gray-300 outline-none">
-                    <button onclick="copyLink()" class="bg-blue-600 px-3 rounded-lg font-bold text-xs active:scale-95 transition-transform">Kopyala</button>
-                </div>
-            </div>
-
-            <h3 class="font-bold text-sm mb-2 px-1 text-gray-400">Davet Edilenler (0)</h3>
-            <div class="space-y-2">
-                <div class="text-center text-gray-600 text-xs py-10 italic glass-card bg-white/[0.02]">
-                    Henüz kimseyi davet etmedin.
-                </div>
-            </div>
-        </div>
-
-        <!-- GÖREVLER (MISSIONS) -->
-        <div id="missions-tab" class="tab-content px-2">
-            <div class="text-center py-4">
-                <h2 class="text-xl font-bold">Görevler</h2>
-                <p class="text-gray-400 text-xs mt-1">Görevleri yaparak TONIX bakiyeni artır.</p>
-            </div>
-
-            <div class="space-y-3">
-                <div class="mission-card p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400">
-                            <i class="fa-brands fa-telegram text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-xs">Kanala Katıl</p>
-                            <p class="text-[10px] text-green-400 font-bold">+100 TONIX</p>
-                        </div>
+        <!-- İÇERİK ALANI -->
+        <div class="flex-grow relative overflow-hidden flex flex-col">
+            
+            <!-- ANA SAYFA (HOME) -->
+            <div id="home-tab" class="tab-content active text-center justify-around py-4">
+                <div class="fan-container">
+                    <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
+                    <div class="fan-center-icon">
+                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX Icon" onerror="this.parentElement.style.display='none'">
                     </div>
-                    <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
                 </div>
-                <div class="mission-card p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white">
-                            <i class="fa-brands fa-x-twitter text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-xs">X'te Takip Et</p>
-                            <p class="text-[10px] text-green-400 font-bold">+50 TONIX</p>
-                        </div>
+
+                <div class="my-4">
+                    <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
+                    <p class="text-xl font-bold text-white/70 mb-3">TON</p>
+                    <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
+                        <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
+                        <i class="fa-solid fa-bolt text-orange-400"></i>
                     </div>
-                    <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 px-2">
+                    <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-500/20">
+                        <i class="fa-solid fa-coins"></i> Claim
+                    </button>
+                    <button class="bg-gray-800 text-gray-600 p-4 rounded-xl flex items-center justify-center gap-2 font-bold cursor-not-allowed">
+                        <i class="fa-solid fa-rocket"></i> Boost
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- CÜZDAN (WALLET) -->
-        <div id="wallet-tab" class="tab-content items-center justify-center text-center px-6">
-            <div class="mt-auto mb-auto">
-                <i class="fa-solid fa-wallet text-5xl text-purple-500 mb-4 opacity-50"></i>
+            <!-- ARKADAŞLAR (FRIENDS) -->
+            <div id="friends-tab" class="tab-content px-2 pt-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                        <i class="fa-solid fa-user-group text-3xl text-blue-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold">Arkadaşlarını Çağır</h2>
+                    <p class="text-gray-400 text-xs mt-1">Her davet için 50 TONIX ve %10 bonus!</p>
+                </div>
+                <div class="glass-card p-4 mb-4">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Davet Linkin</p>
+                    <div class="flex gap-2">
+                        <input type="text" readonly value="t.me/tonix_bot?start=user1" class="bg-black/40 border border-white/10 rounded-lg flex-grow p-2 text-xs text-gray-300 outline-none">
+                        <button onclick="copyLink()" class="bg-blue-600 px-3 rounded-lg font-bold text-xs">Kopyala</button>
+                    </div>
+                </div>
+                <h3 class="font-bold text-sm mb-2 px-1 text-gray-400">Davet Edilenler (0)</h3>
+                <div class="text-center text-gray-600 text-xs py-10 italic glass-card">Henüz kimseyi davet etmedin.</div>
+            </div>
+
+            <!-- GÖREVLER (MISSIONS) -->
+            <div id="missions-tab" class="tab-content px-2 pt-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold">Görevler</h2>
+                    <p class="text-gray-400 text-xs mt-1">Görevleri yaparak TONIX kazan.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="mission-card p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400"><i class="fa-brands fa-telegram text-xl"></i></div>
+                            <div><p class="font-bold text-xs">Kanala Katıl</p><p class="text-[10px] text-green-400 font-bold">+100 TONIX</p></div>
+                        </div>
+                        <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
+                    </div>
+                    <div class="mission-card p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white"><i class="fa-brands fa-x-twitter text-xl"></i></div>
+                            <div><p class="font-bold text-xs">X'te Takip Et</p><p class="text-[10px] text-green-400 font-bold">+50 TONIX</p></div>
+                        </div>
+                        <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CÜZDAN (WALLET) -->
+            <div id="wallet-tab" class="tab-content items-center justify-center text-center px-6">
+                <i class="fa-solid fa-wallet text-5xl text-purple-500 mb-4 opacity-30"></i>
                 <h2 class="text-lg font-bold">Cüzdan</h2>
                 <p class="text-gray-500 text-xs">Çok Yakında!</p>
             </div>
-        </div>
 
-        <!-- AYARLAR (MORE) -->
-        <div id="more-tab" class="tab-content items-center justify-center text-center px-6">
-             <div class="mt-auto mb-auto">
-                <i class="fa-solid fa-gear text-5xl text-gray-700 mb-4 opacity-50"></i>
+            <!-- AYARLAR (MORE) -->
+            <div id="more-tab" class="tab-content items-center justify-center text-center px-6">
+                <i class="fa-solid fa-gear text-5xl text-gray-700 mb-4 opacity-30"></i>
                 <h2 class="text-lg font-bold">Ayarlar</h2>
                 <p class="text-gray-500 text-xs">Geliştirme Aşamasında.</p>
             </div>
+
         </div>
 
         <!-- ALT NAVİGASYON -->
@@ -367,7 +351,6 @@
             tonBalanceEl.innerText = state.tonBalance.toFixed(4);
             counterEl.innerText = "0.0000000000";
             
-            // Simüle edilmiş TONIX kazanımı
             state.tonixBalance += Math.floor(Math.random() * 5) + 1;
             document.getElementById('tonix-balance').innerText = state.tonixBalance;
             usdValueEl.innerText = (state.tonBalance * 6.50).toFixed(2); 
@@ -376,21 +359,23 @@
         }
 
         function switchTab(tabId, element) {
-            // Tüm sekmeleri gizle
-            document.querySelectorAll('.tab-content').forEach(tab => {
+            // Tüm sekmeleri kapat
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
                 tab.classList.remove('active');
             });
-            // Tüm navigasyon ikonlarını pasif yap
-            document.querySelectorAll('.nav-item').forEach(nav => {
+
+            // Tüm nav butonlarını pasif yap
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(nav => {
                 nav.classList.remove('active');
             });
             
-            // Seçilen sekmeyi göster
+            // Seçilen sekmeyi aç
             const selectedTab = document.getElementById(tabId + '-tab');
             if (selectedTab) {
                 selectedTab.classList.add('active');
             }
-            // İkonu aktif yap
             element.classList.add('active');
         }
 
