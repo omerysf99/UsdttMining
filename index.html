@@ -24,7 +24,7 @@
         /* 9:16 Mobil Oranı için Kapsayıcı */
         .app-container {
             width: 100%;
-            max-width: 420px; /* Standart telefon genişliği */
+            max-width: 420px;
             height: 100dvh;
             background-color: #0f0f0f;
             position: relative;
@@ -69,6 +69,18 @@
             box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
         }
 
+        .fan-center-icon {
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            overflow: hidden;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -98,7 +110,6 @@
             color: #a78bfa;
         }
 
-        /* Tab Yönetimi */
         .tab-content {
             display: none;
             flex-grow: 1;
@@ -111,7 +122,6 @@
             flex-direction: column;
         }
 
-        /* Görev Kartları */
         .mission-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -154,19 +164,26 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye -->
-            <div class="glass-card p-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg shadow-blue-500/10">
-                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-lg\'></i>'">
+            <!-- TONIX Bakiye ve Dolar Göstergesi -->
+            <div class="glass-card p-3 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg shadow-blue-500/10">
+                            <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-lg\'></i>'">
+                        </div>
+                        <div>
+                            <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
+                            <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
-                        <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
+                    <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
                     </div>
                 </div>
-                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
+                <!-- Dolar İşareti/Görseli -->
+                <div class="flex items-center gap-1.5 mt-1 border-t border-white/5 pt-1.5">
+                    <img src="dolar.jpg" class="w-4 h-4 rounded-full object-cover border border-white/10" alt="Dolar" onerror="this.style.display='none'">
+                    <p class="text-[10px] text-gray-500 font-bold tracking-tight">≈ <span id="usd-value">0.00</span> USD</p>
                 </div>
             </div>
         </div>
@@ -175,6 +192,10 @@
         <div id="home-tab" class="tab-content active text-center flex flex-col justify-around">
             <div class="fan-container my-2">
                 <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
+                <!-- Fan Üstüne TONIX (Ejderha) İkonu -->
+                <div class="fan-center-icon">
+                    <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX Icon" onerror="this.parentElement.style.display='none'">
+                </div>
             </div>
 
             <div class="mb-4">
@@ -326,6 +347,7 @@
 
         const counterEl = document.getElementById('mining-counter');
         const tonBalanceEl = document.getElementById('ton-balance');
+        const usdValueEl = document.getElementById('usd-value');
 
         function startMining() {
             setInterval(() => {
@@ -343,6 +365,12 @@
             state.miningValue = 0;
             tonBalanceEl.innerText = state.tonBalance.toFixed(4);
             counterEl.innerText = "0.0000000000";
+            
+            // TONIX bakiyesini ve dolar değerini simüle et
+            state.tonixBalance += Math.floor(Math.random() * 10) + 1;
+            document.getElementById('tonix-balance').innerText = state.tonixBalance;
+            usdValueEl.innerText = (state.tonBalance * 5.25).toFixed(2); // Örnek çarpan
+            
             showToast("TON Toplandı!");
         }
 
