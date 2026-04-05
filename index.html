@@ -71,22 +71,30 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Fan Alanı - Yuvarlak Çerçeveler Kaldırıldı */
-        .fan-display {
+        /* Fan Alanı - Sadece kırmızı yuvarlağı odaklayan kesim */
+        .fan-container {
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px auto;
-            width: 100%;
-            max-width: 340px;
+            position: relative;
+        }
+
+        .fan-crop {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #1a0002;
+            box-shadow: 0 0 60px rgba(255, 0, 21, 0.6);
+            background-color: #000;
         }
 
         .fan-image {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover; /* Siyah kenarları kırpar, kırmızı yuvarlağı merkeze alır */
             display: block;
-            /* Dönme animasyonu yok, sadece doğrudan görsel */
-            filter: drop-shadow(0 0 30px rgba(255, 0, 21, 0.3));
         }
 
         /* Sayaç Alanı */
@@ -234,8 +242,10 @@
         </div>
 
         <!-- Ana Madenci Ünitesi -->
-        <div class="fan-display">
-            <img src="fan.jpg" class="fan-image" alt="Dragon Fan" onerror="this.src='https://via.placeholder.com/340/000000/ff0000?text=FAN.JPG'">
+        <div class="fan-container">
+            <div class="fan-crop">
+                <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan">
+            </div>
         </div>
 
         <!-- Sayaç -->
@@ -288,7 +298,6 @@
     </nav>
 
     <script>
-        // Madencilik Hesabı: Günde 1 TON
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
         const TICK_MS = 80; 
@@ -300,7 +309,6 @@
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
 
-        // Kazım Döngüsü
         setInterval(() => {
             currentSession += REWARD_PER_TICK;
             counterEl.innerText = currentSession.toFixed(10);
