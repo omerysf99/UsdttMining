@@ -145,26 +145,26 @@
             to { transform: translate(-50%, 0); opacity: 1; }
         }
 
-        /* Kaydırma çubuğunu gizle ama işlevini koru */
         ::-webkit-scrollbar {
             display: none;
         }
 
-        /* Banner Stili */
-        .promo-banner {
-            width: 100%;
-            height: 120px;
-            border-radius: 1.25rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Invite Kart Stili */
+        .invite-card {
+            background: #1c1c1e;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .invite-input-container {
+            background: #2c2c2e;
+            border-radius: 1rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -211,7 +211,7 @@
         <!-- ANA İÇERİK ALANI -->
         <div class="flex-grow flex flex-col overflow-hidden relative mt-2">
             
-            <!-- HOME TAB (Kaydırılabilir hale getirildi) -->
+            <!-- HOME TAB -->
             <div id="home-tab" class="tab-content active text-center py-4">
                 
                 <!-- Fan Bölümü -->
@@ -241,44 +241,40 @@
                         <i class="fa-solid fa-rocket"></i> Boost
                     </button>
                 </div>
-
-                <!-- ALT BANNER (Kaydırınca Görülür) -->
-                <div class="promo-banner px-6">
-                    <div class="absolute inset-0 opacity-20">
-                        <img src="https://images.unsplash.com/photo-1621504450181-5d356f63d3ee?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover" alt="Arka Plan">
-                    </div>
-                    <div class="relative z-10 text-left w-full">
-                        <p class="text-xs font-bold text-purple-300 uppercase tracking-widest mb-1">Yeni Özellik</p>
-                        <p class="text-lg font-bold leading-tight mb-1">TON Turnuvası Başladı!</p>
-                        <p class="text-[10px] text-gray-300">Arkadaşlarını davet et, ödül havuzundan payını al.</p>
-                    </div>
-                    <div class="relative z-10 ml-auto">
-                         <i class="fa-solid fa-chevron-right text-gray-400"></i>
-                    </div>
-                </div>
-                
-                <!-- Ekstra Boşluk (Alt menü kapatmasın diye) -->
-                <div class="h-8 shrink-0"></div>
-
             </div>
 
-            <!-- ARKADAŞLAR TAB -->
-            <div id="friends-tab" class="tab-content px-2 pt-6">
-                <div class="text-center py-4">
-                    <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-                        <i class="fa-solid fa-user-group text-3xl text-blue-400"></i>
-                    </div>
-                    <h2 class="text-xl font-bold">Arkadaşlarını Çağır</h2>
-                    <p class="text-gray-400 text-xs mt-1">Her davet için TONIX kazan!</p>
+            <!-- ARKADAŞLAR TAB (YENİ TASARIM) -->
+            <div id="friends-tab" class="tab-content px-4 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-2">Invite Friends!</h2>
+                    <p class="text-gray-400 text-sm">You and your friend will receive bonuses</p>
                 </div>
-                <div class="glass-card p-4 mb-4">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Referans Linkin</p>
+
+                <!-- Invite Card -->
+                <div class="invite-card">
+                    <h3 class="text-lg font-bold text-white">Your Invite Code</h3>
+                    
+                    <div class="invite-input-container">
+                        <input id="invite-code-input" type="text" readonly value="Drg123Ton45" class="bg-transparent border-none text-gray-300 font-medium outline-none flex-grow text-sm">
+                        <button onclick="copyInviteCode()" class="text-gray-500 hover:text-white">
+                            <i class="fa-regular fa-copy text-xl"></i>
+                        </button>
+                    </div>
+
                     <div class="flex gap-2">
-                        <input type="text" readonly value="t.me/tonix_bot?start=r1" class="bg-black/40 border border-white/10 rounded-lg flex-grow p-2 text-xs text-gray-300 outline-none">
-                        <button onclick="copyLink()" class="bg-blue-600 px-3 rounded-lg font-bold text-xs">Kopyala</button>
+                        <button onclick="showToast('Invite sent!')" class="btn-primary flex-grow py-3 rounded-2xl font-bold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Invite a friend
+                        </button>
+                        <button onclick="copyInviteCode()" class="btn-primary w-14 py-3 rounded-2xl font-bold flex items-center justify-center">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="text-center text-gray-600 text-xs py-10 italic glass-card">Henüz kimseyi davet etmedin.</div>
+
+                <!-- Friends List Button -->
+                <button onclick="showToast('Friends list is empty')" class="btn-primary w-full py-4 mt-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-list-ul"></i> Open Friends List
+                </button>
             </div>
 
             <!-- GÖREVLER TAB -->
@@ -357,8 +353,17 @@
             tonixBalance: 0,
             miningValue: 0.0,
             hashRate: 1.0,
-            isMining: true
+            isMining: true,
+            inviteCode: ""
         };
+
+        // Rastgele Davet Kodu Üret (DrgXㄧTonYY formatı)
+        function generateInviteCode() {
+            const drgNum = Math.floor(Math.random() * 99) + 10;
+            const tonNum = Math.floor(Math.random() * 99) + 10;
+            state.inviteCode = `Drg${drgNum}Ton${tonNum}`;
+            document.getElementById('invite-code-input').value = state.inviteCode;
+        }
 
         function startMining() {
             setInterval(() => {
@@ -392,9 +397,17 @@
             element.classList.add('active');
         }
 
-        function copyLink() {
-            const link = "t.me/tonix_bot?start=r1";
-            navigator.clipboard.writeText(link).then(() => showToast("Link Kopyalandı!"));
+        function copyInviteCode() {
+            const input = document.getElementById('invite-code-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                showToast("Code Copied!");
+            } catch (err) {
+                showToast("Failed to copy");
+            }
         }
 
         function showToast(msg) {
@@ -407,6 +420,7 @@
 
         window.onload = () => {
             startMining();
+            generateInviteCode();
             if (webapp) {
                 const adjustHeight = () => {
                     document.getElementById('app').style.height = webapp.viewportHeight + 'px';
