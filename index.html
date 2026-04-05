@@ -8,12 +8,38 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #0f0f0f;
+            background-color: #000;
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
             user-select: none;
             touch-action: manipulation;
+        }
+
+        /* 9:16 Oranı için Kapsayıcı */
+        .app-container {
+            width: 100%;
+            max-width: 450px; /* Yaklaşık 9:16 telefon genişliği */
+            height: 100vh;
+            background-color: #0f0f0f;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            box-shadow: 0 0 100px rgba(0,0,0,0.5);
+        }
+
+        @media (min-aspect-ratio: 9/16) {
+            .app-container {
+                height: 95vh;
+                border-radius: 2rem;
+                margin: auto;
+            }
         }
 
         .glass-card {
@@ -25,9 +51,9 @@
 
         .fan-container {
             position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 1.5rem auto;
+            width: 280px;
+            height: 280px;
+            margin: 2rem auto;
         }
 
         .fan-image {
@@ -56,227 +82,145 @@
         }
 
         .btn-primary:active {
-            transform: scale(0.92);
-            filter: brightness(1.2);
+            transform: scale(0.95);
         }
 
         .nav-item {
-            transition: all 0.2s;
-            color: #9ca3af;
+            color: #4b5563;
+            cursor: default;
         }
 
         .nav-item.active {
             color: #a78bfa;
-            background: rgba(139, 92, 246, 0.15);
-            border-radius: 1rem;
         }
 
-        /* Tab Management */
-        .tab-content {
-            display: none;
-            height: calc(100vh - 200px);
-            overflow-y: auto;
+        .toast {
+            animation: slideUp 0.3s ease-out;
         }
 
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Toast Animation */
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
-        .toast {
-            animation: slideUp 0.3s ease-out;
-        }
     </style>
 </head>
-<body class="flex flex-col h-screen p-4">
+<body>
 
-    <!-- Üst Panel (Bakiyeler) -->
-    <div id="header" class="space-y-3 mb-4">
-        <!-- TON Bakiye -->
-        <div class="glass-card p-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
-                    <i class="fa-solid fa-gem"></i>
+    <div class="app-container">
+        <!-- Üst Panel (Bakiyeler) -->
+        <div id="header" class="space-y-3 mb-6">
+            <!-- TON Bakiye -->
+            <div class="glass-card p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-gem text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Balance</p>
+                        <p class="font-bold text-xl leading-tight"><span id="ton-balance">0.0000</span> TON</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Balance</p>
-                    <p class="font-bold text-lg leading-tight"><span id="ton-balance">0.0000</span> TON</p>
+                <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-wallet text-gray-600"></i>
                 </div>
             </div>
-            <button class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/10">
-                <i class="fa-solid fa-wallet text-gray-400"></i>
-            </button>
-        </div>
 
-        <!-- TONIX Bakiye -->
-        <div class="glass-card p-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i class="fa-solid fa-wind text-xl"></i>
+            <!-- TONIX Bakiye -->
+            <div class="glass-card p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-wind text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Balance</p>
+                        <p class="font-bold text-xl leading-tight"><span id="tonix-balance">0</span> TONIX</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Balance</p>
-                    <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
-                </div>
-            </div>
-            <button class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/10">
-                <i class="fa-solid fa-wallet text-gray-400"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- İÇERİK ALANLARI -->
-    
-    <!-- HOME (Mining) -->
-    <div id="home-tab" class="tab-content active text-center justify-center">
-        <div class="fan-container">
-            <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-14 h-14 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 flex items-center justify-center shadow-2xl">
-                    <i class="fa-solid fa-gem text-sky-400 text-xl"></i>
+                <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-wallet text-gray-600"></i>
                 </div>
             </div>
         </div>
 
-        <div class="mt-4">
-            <h1 class="text-3xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
-            <p class="text-2xl font-bold text-white/90 mb-2">TON</p>
-            <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-sm border border-white/10">
-                <i class="fa-solid fa-circle-info text-[10px] text-gray-500"></i>
-                <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
-                <i class="fa-solid fa-bolt text-orange-400 text-xs"></i>
+        <!-- ANA SAYFA (Mining) -->
+        <div class="flex-grow flex flex-col justify-center text-center">
+            <div class="fan-container">
+                <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
+                <!-- Fan üstündeki ikon kaldırıldı -->
+            </div>
+
+            <div class="mt-6">
+                <h1 class="text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
+                <p class="text-2xl font-bold text-white/80 mb-4">TON</p>
+                <div class="inline-flex items-center gap-2 bg-white/5 px-5 py-2 rounded-full text-sm border border-white/10">
+                    <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
+                    <i class="fa-solid fa-bolt text-orange-400"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-10 px-2">
+                <button onclick="claimMining()" class="btn-primary p-5 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-xl">
+                    <i class="fa-solid fa-coins text-xl"></i> Claim
+                </button>
+                <!-- Boost devre dışı bırakıldı -->
+                <button class="bg-gray-800 text-gray-500 p-5 rounded-2xl flex items-center justify-center gap-3 font-bold cursor-not-allowed">
+                    <i class="fa-solid fa-rocket text-xl"></i> Boost
+                </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mt-8 px-2">
-            <button onclick="claimMining()" class="btn-primary p-4 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-lg shadow-purple-500/20">
-                <i class="fa-solid fa-coins text-lg"></i> Claim
-            </button>
-            <button onclick="boostSpeed()" class="btn-primary p-4 rounded-2xl flex items-center justify-center gap-3 font-bold opacity-90 shadow-lg shadow-purple-500/10">
-                <i class="fa-solid fa-rocket text-lg"></i> Boost
-            </button>
-        </div>
-    </div>
-
-    <!-- WALLET -->
-    <div id="wallet-tab" class="tab-content items-center justify-center text-center p-6">
-        <div class="w-20 h-20 bg-purple-500/20 rounded-3xl flex items-center justify-center mb-6 border border-purple-500/30">
-            <i class="fa-solid fa-wallet text-4xl text-purple-400"></i>
-        </div>
-        <h2 class="text-2xl font-bold mb-2">Cüzdan</h2>
-        <p class="text-gray-400 mb-8">Henüz bir cüzdan bağlı değil. Çok yakında TON cüzdanınızı bağlayarak çekim yapabileceksiniz.</p>
-        <button class="w-full bg-white/10 p-4 rounded-2xl font-bold border border-white/10">Cüzdan Bağla</button>
-    </div>
-
-    <!-- FRIENDS -->
-    <div id="friends-tab" class="tab-content items-center justify-center text-center p-6">
-        <div class="w-20 h-20 bg-blue-500/20 rounded-3xl flex items-center justify-center mb-6 border border-blue-500/30">
-            <i class="fa-solid fa-users text-4xl text-blue-400"></i>
-        </div>
-        <h2 class="text-2xl font-bold mb-2">Arkadaşlarını Davet Et</h2>
-        <p class="text-gray-400 mb-8">Her davet ettiğin arkadaşın için kazım hızında %10 bonus ve 50 TONIX kazan!</p>
-        <button class="w-full bg-blue-500 p-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20">Arkadaşlarını Çağır</button>
-    </div>
-
-    <!-- MISSIONS -->
-    <div id="missions-tab" class="tab-content p-2 space-y-4">
-        <h2 class="text-xl font-bold px-2 py-4">Günlük Görevler</h2>
-        <div class="glass-card p-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-blue-400">
-                    <i class="fa-brands fa-telegram text-2xl"></i>
-                </div>
-                <div>
-                    <p class="font-bold">Telegram Kanalına Katıl</p>
-                    <p class="text-xs text-green-400 font-bold">+100 TONIX</p>
-                </div>
+        <!-- ALT NAVİGASYON (Çalışmıyor/Görsel) -->
+        <div class="mt-auto glass-card flex justify-around items-center p-2 relative z-50">
+            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+                <i class="fa-solid fa-wallet text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
             </div>
-            <button class="bg-purple-600 px-4 py-2 rounded-xl text-sm font-bold">Yap</button>
-        </div>
-        <div class="glass-card p-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-white">
-                    <i class="fa-brands fa-x-twitter text-2xl"></i>
-                </div>
-                <div>
-                    <p class="font-bold">X'te Takip Et</p>
-                    <p class="text-xs text-green-400 font-bold">+50 TONIX</p>
-                </div>
+            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+                <i class="fa-solid fa-users text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tighter">Friends</span>
             </div>
-            <button class="bg-purple-600 px-4 py-2 rounded-xl text-sm font-bold">Yap</button>
-        </div>
-    </div>
-
-    <!-- MORE -->
-    <div id="more-tab" class="tab-content items-center justify-center text-center p-6">
-        <i class="fa-solid fa-sliders text-6xl mb-4 text-gray-600"></i>
-        <h2 class="text-xl font-bold">Ayarlar</h2>
-        <p class="text-gray-500">Profil ve uygulama ayarları burada yer alacak.</p>
-    </div>
-
-    <!-- ALT NAVİGASYON -->
-    <div class="mt-auto glass-card flex justify-around items-center p-2 mb-2 relative z-50">
-        <button onclick="switchTab('wallet', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-            <i class="fa-solid fa-wallet text-xl"></i>
-            <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
-        </button>
-        <button onclick="switchTab('friends', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-            <i class="fa-solid fa-users text-xl"></i>
-            <span class="text-[9px] font-bold uppercase tracking-tighter">Friends</span>
-        </button>
-        <button onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center gap-1 p-2 w-full">
-            <div class="bg-purple-600/20 w-10 h-10 rounded-xl flex items-center justify-center mb-[-4px]">
-                 <i class="fa-solid fa-fan text-xl text-purple-400"></i>
+            <div class="nav-item active flex flex-col items-center gap-1 p-2 w-full">
+                <div class="bg-purple-600/20 w-10 h-10 rounded-xl flex items-center justify-center mb-[-4px]">
+                     <i class="fa-solid fa-fan text-xl text-purple-400"></i>
+                </div>
+                <span class="text-[9px] font-bold uppercase tracking-tighter mt-1">Home</span>
             </div>
-            <span class="text-[9px] font-bold uppercase tracking-tighter mt-1">Home</span>
-        </button>
-        <button onclick="switchTab('missions', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full relative">
-            <i class="fa-solid fa-bullseye text-xl"></i>
-            <span class="text-[9px] font-bold uppercase tracking-tighter">Missions</span>
-            <div class="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></div>
-        </button>
-        <button onclick="switchTab('more', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-            <i class="fa-solid fa-bars-staggered text-xl"></i>
-            <span class="text-[9px] font-bold uppercase tracking-tighter">More</span>
-        </button>
+            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full relative">
+                <i class="fa-solid fa-bullseye text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tighter">Missions</span>
+            </div>
+            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+                <i class="fa-solid fa-bars-staggered text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tighter">More</span>
+            </div>
+        </div>
     </div>
 
     <script>
         /**
          * MADENCİLİK HESABI:
-         * 1 GH/s = Günde 0.10 TON
+         * 1 GH/s = Günde 1 TON
          * 1 Gün = 86,400 Saniye
-         * Saniyede TON artışı = 0.10 / 86400 ≈ 0.0000011574 TON
-         * 100ms Döngüde artış = 0.00000011574 TON
+         * Saniyede TON artışı = 1 / 86400
          */
-        const DAILY_RATE_PER_GH = 0.10;
+        const DAILY_RATE_PER_GH = 1.0;
         const SECONDS_IN_DAY = 86400;
-        const TICK_MS = 100; // Her 0.1 saniyede bir güncelle
+        const TICK_MS = 100;
 
         let state = {
             tonBalance: 0.0,
             tonixBalance: 0,
             miningValue: 0.0,
-            hashRate: 1.0, // Başlangıç 1 GH/s
+            hashRate: 1.0,
             isMining: true
         };
 
         const counterEl = document.getElementById('mining-counter');
         const tonBalanceEl = document.getElementById('ton-balance');
-        const tonixBalanceEl = document.getElementById('tonix-balance');
-        const hashRateEl = document.getElementById('hash-rate');
-        const fanImg = document.querySelector('.fan-image');
 
-        // Madencilik Döngüsü
         function startMining() {
             setInterval(() => {
                 if (state.isMining) {
-                    // GH/s başına saniyelik artışın 1/10'u (100ms için)
                     const increment = (DAILY_RATE_PER_GH / SECONDS_IN_DAY / (1000 / TICK_MS)) * state.hashRate;
                     state.miningValue += increment;
                     counterEl.innerText = state.miningValue.toFixed(10);
@@ -284,9 +228,8 @@
             }, TICK_MS);
         }
 
-        // Claim
         function claimMining() {
-            if (state.miningValue <= 0.0000000001) return;
+            if (state.miningValue <= 0) return;
             
             state.tonBalance += state.miningValue;
             state.miningValue = 0;
@@ -294,46 +237,19 @@
             tonBalanceEl.innerText = state.tonBalance.toFixed(4);
             counterEl.innerText = "0.0000000000";
             
-            showToast("TON Başarıyla Toplandı!");
+            showToast("TON Bakiyeye Aktarıldı!");
         }
 
-        // Boost (Hızlandırma)
-        function boostSpeed() {
-            // Test amaçlı TONIX maliyeti olmadan hız veriyoruz
-            // Normalde: if(state.tonixBalance >= 100) ...
-            state.hashRate += 0.5;
-            hashRateEl.innerText = state.hashRate.toFixed(1);
-            
-            // Animasyon hızını güncelle (Sınır: 0.5s)
-            let currentDur = parseFloat(getComputedStyle(fanImg).animationDuration);
-            fanImg.style.animationDuration = Math.max(0.4, currentDur * 0.8) + "s";
-            
-            showToast("Hız Artırıldı: " + state.hashRate.toFixed(1) + " GH/s");
-        }
-
-        // Sekme Değiştirici
-        function switchTab(tabId, element) {
-            // Tüm içerikleri gizle
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            // Tüm nav itemları pasif yap
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            
-            // Seçileni aktif yap
-            document.getElementById(tabId + '-tab').classList.add('active');
-            element.classList.add('active');
-        }
-
-        // Bildirim
         function showToast(msg) {
             const toast = document.createElement('div');
-            toast.className = "toast fixed bottom-24 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-2xl font-bold text-sm shadow-2xl z-[100]";
-            toast.innerHTML = `<i class="fa-solid fa-check-circle text-green-600 mr-2"></i> ${msg}`;
+            toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-3 rounded-2xl font-bold text-sm shadow-2xl z-[100]";
+            toast.innerText = msg;
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transition = '0.5s';
                 setTimeout(() => toast.remove(), 500);
-            }, 2500);
+            }, 2000);
         }
 
         window.onload = startMining;
