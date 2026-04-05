@@ -10,7 +10,8 @@
         :root {
             --bg-dark: #0a0a0a;
             --card-bg: #1a1a1a;
-            --accent-purple: #7c69e3;
+            --accent-red: #e63946;
+            --accent-gold: #ffb703;
             --text-gray: #888888;
         }
 
@@ -58,7 +59,7 @@
         }
 
         .wallet-btn {
-            background-color: var(--accent-purple);
+            background-color: var(--accent-red);
             width: 36px;
             height: 36px;
             border-radius: 8px;
@@ -66,38 +67,35 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
         }
 
-        /* Orta Alan: Dönen Fan */
+        /* Orta Alan: Sabit Fan */
         .fan-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 30px auto;
+            width: 320px;
+            height: 320px;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: radial-gradient(circle, rgba(230, 57, 70, 0.15) 0%, transparent 75%);
         }
 
         .fan-image {
-            width: 260px;
-            height: 260px;
+            width: 290px;
+            height: 290px;
             border-radius: 50%;
             object-fit: cover;
-            animation: spin 3s linear infinite;
-            filter: drop-shadow(0 0 20px rgba(124, 105, 227, 0.3));
-            border: 4px solid rgba(124, 105, 227, 0.2);
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            /* Dönme animasyonu kaldırıldı */
+            filter: drop-shadow(0 0 25px rgba(230, 57, 70, 0.4));
+            border: 2px solid rgba(230, 57, 70, 0.3);
         }
 
         /* Sayaç */
         .counter-container {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .counter-text {
@@ -105,7 +103,7 @@
             font-size: 32px;
             font-weight: 800;
             color: white;
-            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+            text-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
         }
 
         .mining-stat {
@@ -141,8 +139,8 @@
         }
 
         .btn:active { transform: scale(0.95); }
-        .btn-claim { background: linear-gradient(135deg, #7c69e3, #5a49c2); }
-        .btn-boost { background: rgba(124, 105, 227, 0.15); border: 1px solid var(--accent-purple); }
+        .btn-claim { background: linear-gradient(135deg, var(--accent-red), #b91c1c); }
+        .btn-boost { background: rgba(230, 57, 70, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); }
 
         /* Navigasyon */
         .nav-container {
@@ -221,19 +219,19 @@
             </div>
         </div>
 
-        <!-- Ana Madenci Ünitesi -->
+        <!-- Ana Madenci Ünitesi (Sabit Kırmızı Ejderha Fanı) -->
         <div class="fan-container">
-            <img src="fan.jpg" class="fan-image" alt="Mining Fan" onerror="this.src='https://via.placeholder.com/260/1a1a1a/7c69e3?text=FAN'">
+            <img src="fan.jpg" class="fan-image" alt="Dragon Fan" onerror="this.src='https://via.placeholder.com/290/1a1a1a/e63946?text=DRAGON+FAN'">
         </div>
 
         <!-- Sayaç ve İstatistik -->
         <div class="counter-container">
             <div class="counter-text" id="mining-counter">0.0000000000</div>
-            <div class="text-xs text-blue-400 font-bold mb-2">TON MINING</div>
+            <div class="text-xs text-red-500 font-bold mb-2">DRAGON POWER MINING</div>
             <div class="mining-stat">
                 <span class="opacity-50">Power:</span> 
                 <span class="text-white font-bold">1 GH/s</span> 
-                <span class="text-orange-500 animate-pulse">⚡</span>
+                <span class="text-red-500 animate-pulse">🔥</span>
             </div>
         </div>
 
@@ -261,7 +259,7 @@
         </div>
         <div class="nav-item active">
             <div class="nav-active-bg">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="#7c69e3"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#e63946"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 <span class="text-white">Home</span>
             </div>
         </div>
@@ -276,14 +274,12 @@
     </nav>
 
     <script>
-        // Hesaplama: 1 Gün = 86400 saniye. 
-        // 1 TON / 86400 sn ≈ 0.00001157407407407407 TON Her Saniye
+        // Madencilik Ayarları: Günde 1 TON
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
         const UPDATE_INTERVAL_MS = 100;
         const REWARD_PER_TICK = REWARD_PER_SECOND / (1000 / UPDATE_INTERVAL_MS);
 
-        // Her şey 0'dan başlıyor
         let currentMiningSession = 0.0;
         let totalTonBalance = 0.0;
 
@@ -303,8 +299,8 @@
             totalDisplayEl.innerText = totalTonBalance.toFixed(4) + " TON";
             
             const toast = document.createElement('div');
-            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-8 py-3 rounded-2xl z-50 font-bold shadow-2xl';
-            toast.innerText = '+' + currentMiningSession.toFixed(6) + ' TON Claimed! 🐉';
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-3 rounded-2xl z-50 font-bold shadow-2xl';
+            toast.innerText = '+' + currentMiningSession.toFixed(6) + ' TON Claimed! 🔥';
             document.body.appendChild(toast);
             
             currentMiningSession = 0;
