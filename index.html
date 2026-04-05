@@ -54,7 +54,7 @@
             border-radius: 1.25rem;
         }
 
-        /* Sekme İçerik Yönetimi - Çakışma Önleyici */
+        /* Sekme İçerik Yönetimi */
         .tab-content {
             display: none !important; 
             flex-direction: column;
@@ -76,12 +76,13 @@
 
         .fan-container {
             position: relative;
-            width: min(50vw, 180px); /* Fan küçültüldü */
-            height: min(50vw, 180px); /* Fan küçültüldü */
-            margin: auto;
+            width: min(60vw, 200px);
+            height: min(60vw, 200px);
+            margin: 2rem auto;
             display: flex;
             align-items: center;
             justify-content: center;
+            shrink-0;
         }
 
         .fan-image {
@@ -103,22 +104,6 @@
             overflow: hidden;
             z-index: 10;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        /* Sol üstteki büyütülmüş yatay dikdörtgen */
-        .fan-decorator-rect {
-            position: absolute;
-            top: -25px;
-            left: -40px;
-            width: 120px; /* Dikdörtgen büyütüldü */
-            height: 50px; /* Dikdörtgen büyütüldü */
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            z-index: 20;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            overflow: hidden;
         }
 
         @keyframes rotate-fan {
@@ -160,8 +145,26 @@
             to { transform: translate(-50%, 0); opacity: 1; }
         }
 
+        /* Kaydırma çubuğunu gizle ama işlevini koru */
         ::-webkit-scrollbar {
             display: none;
+        }
+
+        /* Banner Stili */
+        .promo-banner {
+            width: 100%;
+            height: 120px;
+            border-radius: 1.25rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -186,7 +189,7 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye & Kağıt Dolar -->
+            <!-- TONIX Bakiye -->
             <div class="glass-card p-3 relative overflow-hidden">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -202,32 +205,25 @@
                         <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
                     </div>
                 </div>
-                
-                <!-- Üst paneldeki dolar göstergesi korunuyor -->
-                <div class="flex items-center gap-2 mt-2 border-t border-white/5 pt-2">
-                    <img src="dolar.jpg" class="h-6 w-14 object-contain rounded-md shadow-lg" alt="Dolar Banknot" onerror="this.parentElement.innerHTML='<p class=\'text-[10px] text-gray-500 font-bold\'>USD $</p>'">
-                </div>
             </div>
         </div>
 
         <!-- ANA İÇERİK ALANI -->
         <div class="flex-grow flex flex-col overflow-hidden relative mt-2">
             
-            <!-- HOME TAB -->
-            <div id="home-tab" class="tab-content active text-center justify-around py-4">
+            <!-- HOME TAB (Kaydırılabilir hale getirildi) -->
+            <div id="home-tab" class="tab-content active text-center py-4">
+                
+                <!-- Fan Bölümü -->
                 <div class="fan-container">
-                    <!-- Fanın sol üstündeki büyütülmüş yatay dikdörtgen + dolar.jpg -->
-                    <div class="fan-decorator-rect">
-                        <img src="dolar.jpg" class="w-full h-full object-cover" alt="Dolar">
-                    </div>
-                    
                     <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
                     <div class="fan-center-icon">
                         <img src="dragon.jpg" class="w-full h-full object-cover" alt="Ejderha" onerror="this.parentElement.style.display='none'">
                     </div>
                 </div>
 
-                <div class="my-2">
+                <!-- Sayaç Bölümü -->
+                <div class="my-4">
                     <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
                     <p class="text-xl font-bold text-white/70 mb-3">TON</p>
                     <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
@@ -236,7 +232,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 px-2">
+                <!-- Butonlar Bölümü -->
+                <div class="grid grid-cols-2 gap-3 px-2 shrink-0">
                     <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-500/20">
                         <i class="fa-solid fa-coins"></i> Claim
                     </button>
@@ -244,6 +241,25 @@
                         <i class="fa-solid fa-rocket"></i> Boost
                     </button>
                 </div>
+
+                <!-- ALT BANNER (Kaydırınca Görülür) -->
+                <div class="promo-banner px-6">
+                    <div class="absolute inset-0 opacity-20">
+                        <img src="https://images.unsplash.com/photo-1621504450181-5d356f63d3ee?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover" alt="Arka Plan">
+                    </div>
+                    <div class="relative z-10 text-left w-full">
+                        <p class="text-xs font-bold text-purple-300 uppercase tracking-widest mb-1">Yeni Özellik</p>
+                        <p class="text-lg font-bold leading-tight mb-1">TON Turnuvası Başladı!</p>
+                        <p class="text-[10px] text-gray-300">Arkadaşlarını davet et, ödül havuzundan payını al.</p>
+                    </div>
+                    <div class="relative z-10 ml-auto">
+                         <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- Ekstra Boşluk (Alt menü kapatmasın diye) -->
+                <div class="h-8 shrink-0"></div>
+
             </div>
 
             <!-- ARKADAŞLAR TAB -->
