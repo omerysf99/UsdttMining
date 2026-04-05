@@ -14,25 +14,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Telegram viewport yüksekliği için dinamik ayar */
-            height: 100vh;
-            height: -webkit-fill-available;
+            height: 100dvh;
             margin: 0;
             overflow: hidden;
             user-select: none;
             touch-action: manipulation;
         }
 
-        /* 9:16 Oranı ve Telegram Uyumluluğu */
+        /* Daha geniş bir görünüm için max-width 550px yapıldı */
         .app-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 550px;
             height: 100%;
             background-color: #0f0f0f;
             position: relative;
             display: flex;
             flex-direction: column;
-            /* Alt kısımda Telegram barı için ekstra boşluk bırakıyoruz */
             padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom)); 
             box-sizing: border-box;
         }
@@ -47,8 +44,8 @@
 
         .fan-container {
             position: relative;
-            width: min(60vw, 220px);
-            height: min(60vw, 220px);
+            width: min(55vw, 220px);
+            height: min(55vw, 220px);
             margin: auto;
             display: flex;
             align-items: center;
@@ -86,14 +83,39 @@
 
         .nav-item {
             color: #4b5563;
-            transition: color 0.2s;
+            transition: all 0.2s;
         }
 
         .nav-item.active {
             color: #a78bfa;
         }
 
-        /* Toast Bildirimi */
+        /* Tab Yönetimi */
+        .tab-content {
+            display: none;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 2rem;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Görev Kartları */
+        .mission-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: background 0.2s;
+        }
+
+        .mission-card:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Toast */
         .toast {
             animation: slideUp 0.3s ease-out;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
@@ -103,14 +125,18 @@
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
+
+        /* Kaydırma çubuğunu gizle */
+        ::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container" id="app">
-        <!-- Üst Panel (Bakiyeler) -->
+        <!-- Üst Panel (Her zaman görünür) -->
         <div id="header" class="space-y-2 shrink-0">
-            <!-- TON Bakiye -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center border border-white/10">
@@ -126,7 +152,6 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10">
@@ -143,13 +168,13 @@
             </div>
         </div>
 
-        <!-- ANA SAYFA (Mining) -->
-        <div class="flex-grow flex flex-col justify-around py-2 text-center overflow-hidden">
+        <!-- ANA SAYFA (Home) -->
+        <div id="home-tab" class="tab-content active text-center pt-4">
             <div class="fan-container">
                 <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
             </div>
 
-            <div class="my-1">
+            <div class="my-4">
                 <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
                 <p class="text-xl font-bold text-white/70 mb-2">TON</p>
                 <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
@@ -168,41 +193,125 @@
             </div>
         </div>
 
-        <!-- ALT NAVİGASYON -->
-        <div class="shrink-0 glass-card flex justify-around items-center p-2 mt-4 relative z-50 shadow-2xl">
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
+        <!-- ARKADAŞLAR (Friends) -->
+        <div id="friends-tab" class="tab-content pt-6 px-2">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                    <i class="fa-solid fa-user-group text-4xl text-blue-400"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Arkadaşlarını Çağır</h2>
+                <p class="text-gray-400 text-sm mt-2">Her başarılı davet için 50 TONIX ve %10 bonus kazan!</p>
+            </div>
+
+            <div class="glass-card p-4 mb-6">
+                <p class="text-xs text-gray-500 font-bold uppercase mb-2">Senin Davet Linkin</p>
+                <div class="flex gap-2">
+                    <input type="text" readonly value="t.me/tonix_bot?start=r12345" class="bg-black/40 border border-white/10 rounded-lg flex-grow p-2 text-sm text-gray-300 outline-none">
+                    <button onclick="copyLink()" class="bg-blue-600 px-4 rounded-lg font-bold text-sm">Kopyala</button>
+                </div>
+            </div>
+
+            <h3 class="font-bold mb-3 px-1 text-gray-300">Davet Edilenler (0)</h3>
+            <div class="space-y-2">
+                <p class="text-center text-gray-600 text-sm py-8 italic">Henüz kimseyi davet etmedin.</p>
+            </div>
+        </div>
+
+        <!-- GÖREVLER (Missions) -->
+        <div id="missions-tab" class="tab-content pt-6 px-2">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold">Görevleri Tamamla</h2>
+                <p class="text-gray-400 text-sm mt-1">Ekstra TONIX kazanmak için görevleri yap.</p>
+            </div>
+
+            <div class="space-y-3">
+                <div class="mission-card p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 text-2xl">
+                            <i class="fa-brands fa-telegram"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Kanalımıza Katıl</p>
+                            <p class="text-xs text-green-400 font-bold">+100 TONIX</p>
+                        </div>
+                    </div>
+                    <button onclick="showToast('Görev kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold border border-white/5">Yap</button>
+                </div>
+
+                <div class="mission-card p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Bizi X'te Takip Et</p>
+                            <p class="text-xs text-green-400 font-bold">+50 TONIX</p>
+                        </div>
+                    </div>
+                    <button onclick="showToast('Görev kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold border border-white/5">Yap</button>
+                </div>
+
+                <div class="mission-card p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-500 text-2xl">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Videoyu İzle</p>
+                            <p class="text-xs text-green-400 font-bold">+30 TONIX</p>
+                        </div>
+                    </div>
+                    <button onclick="showToast('Video açılıyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold border border-white/5">İzle</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder Tabs (Wallet & More) -->
+        <div id="wallet-tab" class="tab-content pt-20 items-center text-center px-6">
+            <i class="fa-solid fa-wallet text-6xl text-gray-700 mb-4"></i>
+            <h2 class="text-xl font-bold">Cüzdan Çok Yakında</h2>
+            <p class="text-gray-500 text-sm">Çekim işlemleri için TON cüzdan bağlama özelliği yakında aktif edilecek.</p>
+        </div>
+
+        <div id="more-tab" class="tab-content pt-20 items-center text-center px-6">
+            <i class="fa-solid fa-gear text-6xl text-gray-700 mb-4"></i>
+            <h2 class="text-xl font-bold">Ayarlar</h2>
+            <p class="text-gray-500 text-sm">Dil ve profil ayarları burada yer alacak.</p>
+        </div>
+
+        <!-- ALT NAVİGASYON (Aktif) -->
+        <div class="shrink-0 glass-card flex justify-around items-center p-2 mt-auto relative z-50 shadow-2xl">
+            <button onclick="switchTab('wallet', this)" class="nav-item flex flex-col items-center gap-0.5 p-1 w-full outline-none">
                 <i class="fa-solid fa-wallet text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Wallet</span>
-            </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
+            </button>
+            <button onclick="switchTab('friends', this)" class="nav-item flex flex-col items-center gap-0.5 p-1 w-full outline-none">
                 <i class="fa-solid fa-users text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Friends</span>
-            </div>
-            <div class="nav-item active flex flex-col items-center gap-0.5 p-1 w-full">
+            </button>
+            <button onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center gap-0.5 p-1 w-full outline-none">
                 <div class="bg-purple-600/20 w-9 h-9 rounded-lg flex items-center justify-center mb-[-2px]">
                      <i class="fa-solid fa-fan text-lg text-purple-400"></i>
                 </div>
                 <span class="text-[8px] font-bold uppercase tracking-tighter mt-1">Home</span>
-            </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
+            </button>
+            <button onclick="switchTab('missions', this)" class="nav-item flex flex-col items-center gap-0.5 p-1 w-full outline-none">
                 <i class="fa-solid fa-bullseye text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">Missions</span>
-            </div>
-            <div class="nav-item flex flex-col items-center gap-0.5 p-1 w-full">
+            </button>
+            <button onclick="switchTab('more', this)" class="nav-item flex flex-col items-center gap-0.5 p-1 w-full outline-none">
                 <i class="fa-solid fa-bars-staggered text-lg"></i>
                 <span class="text-[8px] font-bold uppercase tracking-tighter">More</span>
-            </div>
+            </button>
         </div>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Telegram WebApp Ayarları
         const webapp = window.Telegram.WebApp;
         if (webapp) {
             webapp.expand();
             webapp.ready();
-            // Arka plan rengini Telegram temasına göre set et
             webapp.backgroundColor = '#0f0f0f';
             webapp.headerColor = '#0f0f0f';
         }
@@ -234,14 +343,32 @@
 
         function claimMining() {
             if (state.miningValue <= 0.0000000001) return;
-            
             state.tonBalance += state.miningValue;
             state.miningValue = 0;
-            
             tonBalanceEl.innerText = state.tonBalance.toFixed(4);
             counterEl.innerText = "0.0000000000";
-            
             showToast("TON Bakiyeye Aktarıldı!");
+        }
+
+        function switchTab(tabId, element) {
+            // Tüm içerikleri gizle
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Tüm nav itemlarını pasif yap
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            // Seçileni göster
+            document.getElementById(tabId + '-tab').classList.add('active');
+            element.classList.add('active');
+        }
+
+        function copyLink() {
+            const el = document.createElement('textarea');
+            el.value = "t.me/tonix_bot?start=r12345";
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("Link Kopyalandı!");
         }
 
         function showToast(msg) {
@@ -258,8 +385,6 @@
 
         window.onload = () => {
             startMining();
-            
-            // Telegram viewport değiştiğinde boyutu güncelle
             if (webapp) {
                 webapp.onEvent('viewportChanged', () => {
                     document.body.style.height = webapp.viewportHeight + 'px';
