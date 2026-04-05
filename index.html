@@ -8,11 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #0a0a0a;
-            --card-bg: #1a1a1a;
-            --accent-red: #e63946;
+            --bg-dark: #000000;
+            --card-bg: #111111;
+            --accent-red: #ff0015;
             --accent-gold: #ffb703;
-            --text-gray: #888888;
+            --text-gray: #a0a0a0;
         }
 
         body {
@@ -27,29 +27,30 @@
             user-select: none;
         }
 
-        /* Bakiye Kartları */
+        /* Üst Bakiye Kartları */
         .balance-card {
             background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 12px 16px;
+            border-radius: 20px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,0,21,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .balance-icon {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             overflow: hidden;
-            background: #222;
+            background: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            margin-right: 14px;
+            border: 1.5px solid rgba(255,255,255,0.05);
         }
 
         .balance-icon img {
@@ -59,119 +60,146 @@
         }
 
         .wallet-btn {
-            background-color: var(--accent-red);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-red), #80000b);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
+            box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Orta Alan: Sabit Fan */
-        .fan-container {
+        /* Orta Fan Ünitesi - Tam Oturması İçin Düzenlendi */
+        .fan-frame {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 20px auto;
+            width: 340px;
+            height: 340px;
+            margin: 15px auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle, rgba(230, 57, 70, 0.15) 0%, transparent 75%);
+            /* Görselin dışındaki siyahlıklarla birleşmesi için */
+            background: radial-gradient(circle, rgba(255, 0, 21, 0.2) 0%, transparent 75%);
+            border-radius: 50%;
+        }
+
+        .fan-image-container {
+            width: 310px;
+            height: 310px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #1a0002; /* Görselin içindeki koyu halkayla uyumlu */
+            box-shadow: 0 0 40px rgba(255, 0, 21, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
+            background-color: #000;
         }
 
         .fan-image {
-            width: 290px;
-            height: 290px;
-            border-radius: 50%;
-            object-fit: cover;
-            /* Dönme animasyonu kaldırıldı */
-            filter: drop-shadow(0 0 25px rgba(230, 57, 70, 0.4));
-            border: 2px solid rgba(230, 57, 70, 0.3);
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Görüntünün yuvayı tam doldurmasını sağlar */
+            display: block;
         }
 
-        /* Sayaç */
-        .counter-container {
+        /* Sayaç Alanı */
+        .counter-section {
             text-align: center;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
-        .counter-text {
+        .counter-value {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 800;
-            color: white;
-            text-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
+            color: #ffffff;
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(255, 0, 21, 0.4);
         }
 
-        .mining-stat {
-            color: var(--text-gray);
-            font-size: 14px;
+        .power-label {
+            color: var(--accent-red);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-top: 5px;
+            gap: 8px;
         }
 
-        /* Aksiyon Butonları */
-        .action-buttons {
+        /* Butonlar */
+        .action-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 16px;
             padding: 20px;
             margin-top: auto;
-            margin-bottom: 90px;
+            margin-bottom: 95px;
         }
 
-        .btn {
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: 700;
+        .btn-main {
+            padding: 18px;
+            border-radius: 16px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 16px;
-            transition: transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
         }
 
-        .btn:active { transform: scale(0.95); }
-        .btn-claim { background: linear-gradient(135deg, var(--accent-red), #b91c1c); }
-        .btn-boost { background: rgba(230, 57, 70, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .btn-claim {
+            background: linear-gradient(to right, #ff0015, #99000d);
+            box-shadow: 0 4px 15px rgba(255, 0, 21, 0.3);
+        }
+
+        .btn-boost {
+            background: #111;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-main:active { transform: scale(0.96); }
 
         /* Navigasyon */
-        .nav-container {
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 85px;
-            background-color: #0f0f0f;
+            background-color: #080808;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 10px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .nav-item {
+        .nav-link {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: var(--text-gray);
+            gap: 5px;
+            color: #666;
             font-size: 11px;
-            flex: 1;
+            font-weight: 600;
         }
 
-        .nav-item.active { color: white; }
-        .nav-active-bg {
-            background-color: #1a1a1a;
-            padding: 8px 16px;
-            border-radius: 12px;
+        .nav-link.active {
+            color: white;
+        }
+
+        .active-indicator {
+            background: #151515;
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 0, 21, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -180,8 +208,7 @@
 </head>
 <body>
 
-    <!-- Mining Ekranı -->
-    <div id="screen-mining" class="p-5 flex flex-col h-full">
+    <div class="p-5 flex flex-col h-full max-w-md mx-auto w-full">
         
         <!-- Bakiye: TON -->
         <div class="balance-card">
@@ -190,12 +217,12 @@
                     <img src="ton.jpg" alt="TON" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                 </div>
                 <div>
-                    <div class="text-[10px] text-gray-500 uppercase font-bold">TON Balance</div>
-                    <div class="text-sm font-extrabold tracking-tight" id="ton-balance-display">0.0000 TON</div>
+                    <p class="text-[10px] text-gray-500 uppercase font-black">TON Balance</p>
+                    <h3 class="text-base font-extrabold" id="ton-balance-display">0.0000 TON</h3>
                 </div>
             </div>
             <div class="wallet-btn">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
                     <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8z"/>
                 </svg>
             </div>
@@ -205,42 +232,44 @@
         <div class="balance-card">
             <div class="flex items-center">
                 <div class="balance-icon">
-                    <img src="dragon.jpg" alt="DRAGON" onerror="this.style.display='none'; this.parentNode.innerText='🐉'">
+                    <img src="dragon.jpg" alt="DRAGON" onerror="this.style.display='none'; this.parentNode.innerHTML='<span class=\'text-2xl\'>🐉</span>'">
                 </div>
                 <div>
-                    <div class="text-[10px] text-gray-500 uppercase font-bold">$DRAGON Balance</div>
-                    <div class="text-sm font-extrabold tracking-tight">0</div>
+                    <p class="text-[10px] text-gray-500 uppercase font-black">$DRAGON Balance</p>
+                    <h3 class="text-base font-extrabold">0</h3>
                 </div>
             </div>
-            <div class="wallet-btn" style="background: #333;">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+            <div class="wallet-btn" style="background: #222; box-shadow: none;">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                 </svg>
             </div>
         </div>
 
-        <!-- Ana Madenci Ünitesi (Sabit Kırmızı Ejderha Fanı) -->
-        <div class="fan-container">
-            <img src="fan.jpg" class="fan-image" alt="Dragon Fan" onerror="this.src='https://via.placeholder.com/290/1a1a1a/e63946?text=DRAGON+FAN'">
-        </div>
-
-        <!-- Sayaç ve İstatistik -->
-        <div class="counter-container">
-            <div class="counter-text" id="mining-counter">0.0000000000</div>
-            <div class="text-xs text-red-500 font-bold mb-2">DRAGON POWER MINING</div>
-            <div class="mining-stat">
-                <span class="opacity-50">Power:</span> 
-                <span class="text-white font-bold">1 GH/s</span> 
-                <span class="text-red-500 animate-pulse">🔥</span>
+        <!-- Ana Madenci Ünitesi -->
+        <div class="fan-frame">
+            <div class="fan-image-container">
+                <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan" onerror="this.src='https://via.placeholder.com/310/000000/ff0000?text=DRAGON+FAN'">
             </div>
         </div>
 
-        <!-- Alt Butonlar -->
-        <div class="action-buttons">
-            <button class="btn btn-claim" onclick="claimRewards()">
+        <!-- Sayaç -->
+        <div class="counter-section">
+            <div class="counter-value" id="mining-counter">0.0000000000</div>
+            <div class="power-label">
+                <span>DRAGON POWER</span>
+                <span class="text-white">|</span>
+                <span>1 GH/S</span>
+                <span class="animate-pulse">🔥</span>
+            </div>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="action-grid">
+            <button class="btn-main btn-claim" onclick="claimRewards()">
                 <span>📥</span> Claim
             </button>
-            <button class="btn btn-boost">
+            <button class="btn-main btn-boost">
                 <span>🚀</span> Boost
             </button>
         </div>
@@ -248,68 +277,69 @@
     </div>
 
     <!-- Navigasyon -->
-    <nav class="nav-container">
-        <div class="nav-item">
+    <nav class="bottom-nav">
+        <div class="nav-link">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
             <span>Wallet</span>
         </div>
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
+        <div class="nav-link">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
             <span>Friends</span>
         </div>
-        <div class="nav-item active">
-            <div class="nav-active-bg">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="#e63946"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span class="text-white">Home</span>
+        <div class="nav-link active">
+            <div class="active-indicator">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="#ff0015"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="text-white mt-1">Home</span>
             </div>
         </div>
-        <div class="nav-item">
+        <div class="nav-link">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-            <span>Missions</span>
+            <span>Tasks</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-link">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
             <span>More</span>
         </div>
     </nav>
 
     <script>
-        // Madencilik Ayarları: Günde 1 TON
+        // Madencilik Hesabı: Günde 1 TON
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
-        const UPDATE_INTERVAL_MS = 100;
-        const REWARD_PER_TICK = REWARD_PER_SECOND / (1000 / UPDATE_INTERVAL_MS);
+        const TICK_MS = 80; // Akıcılık için 80ms
+        const REWARD_PER_TICK = REWARD_PER_SECOND / (1000 / TICK_MS);
 
-        let currentMiningSession = 0.0;
-        let totalTonBalance = 0.0;
+        let currentSession = 0.0;
+        let totalBalance = 0.0;
 
         const counterEl = document.getElementById('mining-counter');
-        const totalDisplayEl = document.getElementById('ton-balance-display');
+        const displayEl = document.getElementById('ton-balance-display');
 
-        // Madencilik Döngüsü
+        // Kazım Döngüsü
         setInterval(() => {
-            currentMiningSession += REWARD_PER_TICK;
-            counterEl.innerText = currentMiningSession.toFixed(10);
-        }, UPDATE_INTERVAL_MS);
+            currentSession += REWARD_PER_TICK;
+            counterEl.innerText = currentSession.toFixed(10);
+        }, TICK_MS);
 
         function claimRewards() {
-            if (currentMiningSession <= 0) return;
+            if (currentSession <= 0) return;
 
-            totalTonBalance += currentMiningSession;
-            totalDisplayEl.innerText = totalTonBalance.toFixed(4) + " TON";
+            totalBalance += currentSession;
+            displayEl.innerText = totalBalance.toFixed(4) + " TON";
             
             const toast = document.createElement('div');
-            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-3 rounded-2xl z-50 font-bold shadow-2xl';
-            toast.innerText = '+' + currentMiningSession.toFixed(6) + ' TON Claimed! 🔥';
+            toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20';
+            toast.innerText = '+' + currentSession.toFixed(6) + ' TON COLLECTED! 🔥';
             document.body.appendChild(toast);
             
-            currentMiningSession = 0;
+            currentSession = 0;
             
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.5s';
-                setTimeout(() => toast.remove(), 500);
-            }, 2000);
+                toast.style.transform = 'translate(-50%, -20px)';
+                toast.style.transition = 'all 0.4s ease';
+                setTimeout(() => toast.remove(), 400);
+            }, 1800);
         }
     </script>
 </body>
