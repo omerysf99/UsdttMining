@@ -190,23 +190,9 @@
             flex-direction: column;
             align-items: center;
         }
-
-        /* Firebase Yükleme Göstergesi */
-        #loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
-
-    <div id="loading-overlay">VERİLER YÜKLENİYOR...</div>
 
     <div class="p-5 flex flex-col h-full max-w-md mx-auto w-full">
         
@@ -306,7 +292,7 @@
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        // Senin özel Firebase Yapılandırman (Sistemle uyuşmazlık durumunda fallback olarak kullanılır)
+        // Senin özel Firebase Yapılandırman
         const userFirebaseConfig = {
             apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
             authDomain: "asdbn-5dd38.firebaseapp.com",
@@ -317,7 +303,6 @@
             measurementId: "G-6BYL9TCNQJ"
         };
 
-        // Eğer __firebase_config tanımlı değilse veya geçersizse kullanıcı ayarlarını kullan
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : userFirebaseConfig;
@@ -326,7 +311,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Analytics sadece tarayıcıda çalışır
         let analytics;
         try {
             analytics = getAnalytics(app);
@@ -351,9 +335,8 @@
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
         const dragonDisplayEl = document.getElementById('dragon-balance-display');
-        const loadingOverlay = document.getElementById('loading-overlay');
 
-        // Giriş Akışı (KURAL 3: Önce Auth)
+        // Giriş Akışı
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -363,7 +346,6 @@
                 }
             } catch (error) {
                 console.error("Giriş hatası:", error);
-                // Auth hatası durumunda kullanıcı config'i ile tekrar denemeyi seçebiliriz
                 setTimeout(initAuth, 2000);
             }
         };
@@ -371,18 +353,16 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
-                console.log("Kullanıcı aktif:", userId);
                 await loadData();
             } else {
                 await initAuth();
             }
         });
 
-        // Veri Yükleme (KURAL 1)
+        // Veri Yükleme
         async function loadData() {
             if (!userId) return;
             try {
-                // KURAL 1: artifacts/{appId}/users/{userId}/gameData/status
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 const docSnap = await getDoc(docRef);
                 
@@ -391,7 +371,6 @@
                     totalBalance = data.totalBalance || 0;
                     dragonBalance = data.dragonBalance || 0;
                     
-                    // Çevrimdışı kazanç hesabı
                     if (data.updatedAt) {
                         const now = Date.now();
                         const diffSec = (now - data.updatedAt) / 1000;
@@ -403,12 +382,10 @@
                     }
                 }
                 dataLoaded = true;
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
                 updateUI();
             } catch (err) {
                 console.error("Veri yüklenemedi:", err);
                 dataLoaded = true;
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
             }
         }
 
@@ -422,7 +399,6 @@
                     dragonBalance,
                     updatedAt: Date.now()
                 }, { merge: true });
-                console.log("Veriler kaydedildi.");
             } catch (err) {
                 console.error("Kaydetme hatası:", err);
             }
@@ -440,7 +416,7 @@
             if (counterEl) counterEl.innerText = currentSession.toFixed(10);
         }, TICK_MS);
 
-        // Otomatik Kayıt (Dakikada bir)
+        // Otomatik Kayıt
         setInterval(() => {
             if (dataLoaded) saveData();
         }, 60000);
