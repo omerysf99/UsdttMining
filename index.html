@@ -74,7 +74,7 @@
         /* Fan Alanı */
         .fan-container {
             display: flex;
-            justify(content: center;
+            justify-content: center;
             align-items: center;
             margin: 20px auto;
             width: 100%;
@@ -291,7 +291,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Yapılandırma
+        // Firebase Configuration
         const userFirebaseConfig = {
             apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
             authDomain: "asdbn-5dd38.firebaseapp.com",
@@ -302,7 +302,7 @@
         };
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
+            ? (typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config)
             : userFirebaseConfig;
 
         const app = initializeApp(firebaseConfig);
@@ -310,23 +310,22 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
 
-        // Oyun Ayarları - Hassas Kazanç
+        // Oyun Ayarları
         const DAILY_REWARD = 1.0;
-        const REWARD_PER_SECOND = DAILY_REWARD / 86400;
-        const DRAGON_PER_TON = 1000000; // 1 TON başına kazanılan $DRAGON
+        const REWARD_PER_SECOND = DAILY_REWARD / 86400; // ~0.00001157 TON/s
+        const DRAGON_PER_TON = 1000000;
 
-        let currentSession = 0.0;
         let totalBalance = 0.0;
         let dragonBalance = 0;
+        let lastClaimTime = Date.now();
         let userId = null;
         let dataLoaded = false;
-        let lastUpdateTime = Date.now();
 
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
         const dragonDisplayEl = document.getElementById('dragon-balance-display');
 
-        // Giriş ve Veri Senkronizasyonu
+        // Auth akışı
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -335,6 +334,7 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
+                console.error("Auth error:", error);
                 setTimeout(initAuth, 2000);
             }
         };
@@ -348,6 +348,7 @@
             }
         });
 
+        // Veri Yükleme
         async function loadData() {
             if (!userId) return;
             try {
@@ -358,33 +359,29 @@
                     const data = docSnap.data();
                     totalBalance = Number(data.totalBalance) || 0;
                     dragonBalance = Math.floor(Number(data.dragonBalance)) || 0;
-                    
-                    // Offline kazanç hesapla
-                    if (data.updatedAt) {
-                        const diffSec = (Date.now() - data.updatedAt) / 1000;
-                        const earned = diffSec * REWARD_PER_SECOND;
-                        if (earned > 0) {
-                            totalBalance += earned;
-                            dragonBalance += Math.floor(earned * DRAGON_PER_TON);
-                            showOfflineToast(earned);
-                        }
-                    }
+                    // Eğer veritabanında lastClaimTime yoksa şu anı al
+                    lastClaimTime = Number(data.lastClaimTime) || Date.now();
+                } else {
+                    // Yeni kullanıcı ise başlangıç değerlerini kaydet
+                    await saveData();
                 }
                 dataLoaded = true;
-                lastUpdateTime = Date.now();
                 updateUI();
             } catch (err) {
-                dataLoaded = true;
+                console.error("Load error:", err);
+                dataLoaded = true; // Hata olsa bile oynamaya izin ver
             }
         }
 
+        // Veri Kaydetme
         async function saveData() {
-            if (!userId || !dataLoaded) return;
+            if (!userId) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 await setDoc(docRef, {
                     totalBalance: totalBalance,
                     dragonBalance: dragonBalance,
+                    lastClaimTime: lastClaimTime,
                     updatedAt: Date.now()
                 }, { merge: true });
             } catch (err) {
@@ -397,34 +394,41 @@
             if (dragonDisplayEl) dragonDisplayEl.innerText = Math.floor(dragonBalance).toLocaleString();
         }
 
-        // Kazım Döngüsü - Zaman bazlı hassas artış
+        // Mining Döngüsü - Gerçek zamanlı görselleştirme
         setInterval(() => {
             if (!dataLoaded) return;
-            const now = Date.now();
-            const delta = (now - lastUpdateTime) / 1000;
-            const tickEarned = delta * REWARD_PER_SECOND;
             
-            currentSession += tickEarned;
-            lastUpdateTime = now;
+            const now = Date.now();
+            const elapsedSeconds = (now - lastClaimTime) / 1000;
+            const currentMined = elapsedSeconds * REWARD_PER_SECOND;
 
-            if (counterEl) counterEl.innerText = currentSession.toFixed(10);
+            if (counterEl) {
+                // Görsel artışı hissettirmek için 10 hane kullanıyoruz
+                counterEl.innerText = currentMined.toFixed(10);
+            }
         }, 100);
 
         // Claim İşlemi
         window.claimRewards = async function() {
-            if (currentSession <= 0 || !userId || !dataLoaded) return;
+            if (!userId || !dataLoaded) return;
 
-            const earnedDragon = Math.floor(currentSession * DRAGON_PER_TON);
+            const now = Date.now();
+            const elapsedSeconds = (now - lastClaimTime) / 1000;
+            const minedAmount = elapsedSeconds * REWARD_PER_SECOND;
+
+            if (minedAmount < 0.00000001) return; // Çok küçükse toplama
+
+            const earnedDragon = Math.floor(minedAmount * DRAGON_PER_TON);
             
-            totalBalance += currentSession;
+            totalBalance += minedAmount;
             dragonBalance += earnedDragon;
-            currentSession = 0;
+            lastClaimTime = now; // Süreci sıfırla
             
             updateUI();
             
             const toast = document.createElement('div');
             toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20 text-center';
-            toast.innerHTML = `TOPLANDI!<br><span class="text-xs text-yellow-300">+${earnedDragon.toLocaleString()} $DRAGON</span>`;
+            toast.innerHTML = `BAKİYE GÜNCELLENDİ!<br><span class="text-xs text-yellow-300">+${earnedDragon.toLocaleString()} $DRAGON</span>`;
             document.body.appendChild(toast);
             
             await saveData();
@@ -437,19 +441,7 @@
             }, 2000);
         }
 
-        function showOfflineToast(amount) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-3 rounded-xl z-50 font-bold shadow-xl text-sm border-2 border-black';
-            toast.innerText = 'Hoş Geldin! Sen yokken +' + amount.toFixed(6) + ' TON toplandı! 💤';
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 1s';
-                setTimeout(() => toast.remove(), 1000);
-            }, 5000);
-        }
-
-        // Otomatik Kayıt (Dakikada bir)
+        // Her 60 saniyede bir otomatik yedekle
         setInterval(() => {
             if (dataLoaded) saveData();
         }, 60000);
