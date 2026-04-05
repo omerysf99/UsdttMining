@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejderha Dünyası - TON Mining</title>
+    <title>Ejderha Dünyası - TON Madenciliği</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #000000;
-            --card-bg: #111111;
-            --accent-red: #ff0015;
-            --accent-gold: #ffb703;
-            --text-gray: #a0a0a0;
+            --bg-dark: #050505;
+            --card-bg: #121212;
+            --accent-red: #ff1f3d;
+            --accent-glow: rgba(255, 31, 61, 0.4);
+            --text-gray: #9ca3af;
         }
 
         body {
@@ -25,307 +25,278 @@
             flex-direction: column;
             height: 100vh;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Üst Bakiye Kartları */
-        .balance-card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            border: 1px solid rgba(255,0,21,0.1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        /* Cam Efekti ve Gölgeler */
+        .glass-card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
         }
 
-        .balance-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 14px;
-            border: 1.5px solid rgba(255,255,255,0.05);
+        .red-glow {
+            box-shadow: 0 0 25px var(--accent-glow);
         }
 
-        .balance-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .wallet-btn {
-            background: linear-gradient(135deg, var(--accent-red), #80000b);
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
-        }
-
-        /* Fan Alanı */
+        /* Madenci Fan Animasyonu */
         .fan-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative;
+            width: 280px;
+            height: 280px;
             margin: 20px auto;
-            width: 100%;
-            max-width: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .fan-image {
-            width: 90%;
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 0 25px rgba(255, 0, 21, 0.3));
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 30px var(--accent-glow));
+            transition: transform 0.1s linear;
         }
 
-        /* Sayaç Alanı */
-        .counter-section {
-            text-align: center;
-            margin-top: 10px;
+        .fan-spinning {
+            animation: spin 3s linear infinite;
         }
 
-        .counter-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 36px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -1px;
-            text-shadow: 0 0 20px rgba(255, 0, 21, 0.4);
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .power-label {
-            color: var(--accent-red);
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        /* Butonlar */
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            padding: 20px;
-            margin-top: auto;
-            margin-bottom: 95px;
-        }
-
-        .btn-main {
-            padding: 18px;
-            border-radius: 16px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-        }
-
-        .btn-claim {
-            background: linear-gradient(to right, #ff0015, #99000d);
-            box-shadow: 0 4px 15px rgba(255, 0, 21, 0.3);
-        }
-
-        .btn-boost {
-            background: #111;
-            border: 2px solid var(--accent-red);
-            color: var(--accent-red);
-        }
-
-        .btn-main:active { transform: scale(0.96); }
-
-        /* Navigasyon */
+        /* Navigasyon ve Butonlar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             height: 85px;
-            background-color: #080808;
+            background: rgba(8, 8, 8, 0.95);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-bottom: env(safe-area-inset-bottom);
+            z-index: 50;
         }
 
-        .nav-link {
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            color: #666;
-            font-size: 11px;
-            font-weight: 600;
+            gap: 4px;
+            color: #555;
+            font-size: 10px;
+            font-weight: 700;
+            transition: color 0.3s;
         }
 
-        .nav-link.active {
+        .nav-item.active {
             color: white;
         }
 
-        .active-indicator {
-            background: #151515;
-            padding: 10px 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 0, 21, 0.2);
+        .nav-item.active svg {
+            color: var(--accent-red);
+            filter: drop-shadow(0 0 8px var(--accent-red));
+        }
+
+        .btn-action {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+
+        /* Sayaç Tasarımı */
+        .counter-text {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Bildirim (Toast) */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 999;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
 <body>
 
-    <div class="p-5 flex flex-col h-full max-w-md mx-auto w-full">
-        
-        <!-- Bakiye: TON -->
-        <div class="balance-card">
-            <div class="flex items-center">
-                <div class="balance-icon">
-                    <img src="ton.jpg" alt="TON" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                </div>
-                <div>
-                    <p class="text-[10px] text-gray-500 uppercase font-black">TON Balance</p>
-                    <h3 class="text-base font-extrabold" id="ton-balance-display">0.00000000 TON</h3>
-                </div>
-            </div>
-            <div class="wallet-btn">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
-                    <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8z"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Bakiye: $DRAGON -->
-        <div class="balance-card">
-            <div class="flex items-center">
-                <div class="balance-icon">
-                    <img src="dragon.jpg" alt="DRAGON" onerror="this.src='https://via.placeholder.com/44/ff0015/ffffff?text=D'">
-                </div>
-                <div>
-                    <p class="text-[10px] text-gray-500 uppercase font-black">$DRAGON Balance</p>
-                    <h3 class="text-base font-extrabold" id="dragon-balance-display">0</h3>
-                </div>
-            </div>
-            <div class="wallet-btn" style="background: #222; box-shadow: none;">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Ana Madenci Ünitesi -->
-        <div class="fan-container">
-            <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan">
-        </div>
-
-        <!-- Sayaç -->
-        <div class="counter-section">
-            <div class="counter-value" id="mining-counter">0.0000000000</div>
-            <div class="power-label">
-                <span>DRAGON POWER</span>
-                <span class="text-white">|</span>
-                <span>1 GH/S</span>
-                <span class="animate-pulse">🔥</span>
-            </div>
-        </div>
-
-        <!-- Butonlar -->
-        <div class="action-grid">
-            <button class="btn-main btn-claim" onclick="window.claimRewards()">
-                <span>📥</span> Claim
-            </button>
-            <button class="btn-main btn-boost">
-                <span>🚀</span> Boost
-            </button>
-        </div>
-
+    <!-- Yükleme Ekranı -->
+    <div id="loader" class="loader-overlay">
+        <div class="w-16 h-16 border-4 border-t-red-600 border-gray-800 rounded-full animate-spin mb-4"></div>
+        <p class="font-bold text-sm tracking-widest animate-pulse">EJDERHA AĞINA BAĞLANILIYOR...</p>
     </div>
 
-    <!-- Navigasyon -->
-    <nav class="bottom-nav">
-        <div class="nav-link">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
-            <span>Wallet</span>
-        </div>
-        <div class="nav-link">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
-            <span>Friends</span>
-        </div>
-        <div class="nav-link active">
-            <div class="active-indicator">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="#ff0015"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span class="text-white mt-1">Home</span>
+    <!-- Bildirim Konteynırı -->
+    <div id="toast-container"></div>
+
+    <main class="p-4 flex flex-col h-full max-w-md mx-auto w-full pb-24">
+        
+        <!-- Üst Bakiye Paneli -->
+        <div class="space-y-3 mt-4">
+            <!-- TON Kartı -->
+            <div class="glass-card p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center border border-blue-500/20 overflow-hidden">
+                        <img src="ton.jpg" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase">TON Cüzdanı</p>
+                        <h2 class="text-lg font-black" id="ton-display">0.00000000</h2>
+                    </div>
+                </div>
+                <button class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center red-glow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </button>
+            </div>
+
+            <!-- DRAGON Kartı -->
+            <div class="glass-card p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-red-600/10 flex items-center justify-center border border-red-500/20 overflow-hidden">
+                        <img src="dragon.jpg" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/44/ff0015/ffffff?text=D'">
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase">$DRAGON Bakiyesi</p>
+                        <h2 class="text-lg font-black text-red-500" id="dragon-display">0</h2>
+                    </div>
+                </div>
+                <button class="w-10 h-10 rounded-xl bg-neutral-800 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
             </div>
         </div>
-        <div class="nav-link">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-            <span>Tasks</span>
+
+        <!-- Madencilik Motoru -->
+        <div class="flex-1 flex flex-col items-center justify-center">
+            <div class="fan-container" id="fan-box">
+                <img src="fan.jpg" id="mining-fan" class="fan-image fan-spinning" alt="Madenci Fanı">
+            </div>
+
+            <div class="text-center">
+                <div class="counter-text text-4xl md:text-5xl font-black mb-2" id="mining-counter">0.0000000000</div>
+                <div class="flex items-center justify-center gap-3 text-[11px] font-bold tracking-widest text-red-600">
+                    <span class="opacity-50">GH/S MOTORU</span>
+                    <span class="w-1 h-1 rounded-full bg-red-600"></span>
+                    <span class="text-white" id="hash-rate">1.0 GH/S</span>
+                    <span class="animate-ping">⚡</span>
+                </div>
+            </div>
         </div>
-        <div class="nav-link">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-            <span>More</span>
+
+        <!-- Ana Aksiyonlar -->
+        <div class="grid grid-cols-2 gap-4 mt-auto">
+            <button onclick="handleClaim()" class="btn-action bg-gradient-to-r from-red-600 to-red-800 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 red-glow shadow-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m21 15-9-9-9 9"/></svg>
+                Topla
+            </button>
+            <button class="btn-action bg-neutral-900 border border-red-900/50 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-red-500 flex items-center justify-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4.5a2.09 2.09 0 0 1 2.91 0A2.1 2.1 0 0 1 9 10.5V12Z"/><path d="M15 5s-3.03.55-4.5 2a2.09 2.09 0 0 0 0 2.91A2.1 2.1 0 0 0 13.5 9H15Z"/></svg>
+                Hızlandır
+            </button>
+        </div>
+    </main>
+
+    <!-- Alt Navigasyon -->
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            <span>Cüzdan</span>
+        </div>
+        <div class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Arkadaşlar</span>
+        </div>
+        <div class="nav-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Ana Sayfa</span>
+        </div>
+        <div class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><rect width="20" height="14" x="2" y="5" rx="2"/></svg>
+            <span>Görevler</span>
+        </div>
+        <div class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            <span>Daha Fazla</span>
         </div>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration
-        const userFirebaseConfig = {
-            apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
-            authDomain: "asdbn-5dd38.firebaseapp.com",
-            projectId: "asdbn-5dd38",
-            storageBucket: "asdbn-5dd38.firebasestorage.app",
-            messagingSenderId: "852532391581",
-            appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
-        };
-
+        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? (typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config)
-            : userFirebaseConfig;
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
+                authDomain: "asdbn-5dd38.firebaseapp.com",
+                projectId: "asdbn-5dd38",
+                storageBucket: "asdbn-5dd38.firebasestorage.app",
+                messagingSenderId: "852532391581",
+                appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
+            };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-world-v1';
 
-        // Oyun Ayarları
-        const DAILY_REWARD = 1.0;
-        const REWARD_PER_SECOND = DAILY_REWARD / 86400; // Günde 1 TON
-        const DRAGON_PER_TON = 1000000;
+        // Ayarlar
+        const TON_DAILY_BASE = 0.10; // GÜNCEL: 1 GH/S = Günde 0.10 TON
+        const TON_PER_SEC = TON_DAILY_BASE / 86400;
+        const DRAGON_MULTIPLIER = 1000000; // 1 TON başına 1M $DRAGON
 
-        let totalBalance = 0.0;
-        let dragonBalance = 0;
-        let lastClaimTime = Date.now();
-        let userId = null;
-        let dataLoaded = false;
+        // Durum
+        let state = {
+            tonBalance: 0,
+            dragonBalance: 0,
+            lastClaimTime: Date.now(),
+            hashRate: 1.0,
+            loaded: false
+        };
 
-        const counterEl = document.getElementById('mining-counter');
-        const displayEl = document.getElementById('ton-balance-display');
-        const dragonDisplayEl = document.getElementById('dragon-balance-display');
+        let user = null;
 
-        // Rule 3: Auth Before Queries
+        // UI Elementleri
+        const elements = {
+            ton: document.getElementById('ton-display'),
+            dragon: document.getElementById('dragon-display'),
+            counter: document.getElementById('mining-counter'),
+            loader: document.getElementById('loader'),
+            fan: document.getElementById('mining-fan')
+        };
+
+        // Firebase Kimlik Doğrulama
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -333,128 +304,134 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (error) {
-                console.error("Auth error:", error);
+            } catch (err) {
+                console.error("Giriş hatası:", err);
                 setTimeout(initAuth, 2000);
             }
         };
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (u) => {
+            user = u;
             if (user) {
-                userId = user.uid;
-                await loadData();
+                setupRealtimeSync();
             } else {
-                await initAuth();
+                initAuth();
             }
         });
 
-        // Veri Yükleme (Rule 1)
-        async function loadData() {
-            if (!userId) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    totalBalance = Number(data.totalBalance) || 0;
-                    dragonBalance = Math.floor(Number(data.dragonBalance)) || 0;
-                    lastClaimTime = Number(data.lastClaimTime) || Date.now();
+        // Veri Senkronizasyonu
+        function setupRealtimeSync() {
+            if (!user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData', 'status');
+            
+            onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    state.tonBalance = data.tonBalance || 0;
+                    state.dragonBalance = data.dragonBalance || 0;
+                    state.lastClaimTime = data.lastClaimTime || Date.now();
+                    state.hashRate = data.hashRate || 1.0;
                 } else {
-                    // Yeni kullanıcı
-                    lastClaimTime = Date.now();
-                    await saveData();
+                    saveState(true);
                 }
-                dataLoaded = true;
+                
+                if (!state.loaded) {
+                    state.loaded = true;
+                    elements.loader.style.opacity = '0';
+                    setTimeout(() => elements.loader.style.display = 'none', 500);
+                }
                 updateUI();
-            } catch (err) {
-                console.error("Load error:", err);
-                dataLoaded = true;
-            }
+            }, (err) => {
+                console.error("Firestore hatası:", err);
+            });
         }
 
-        // Veri Kaydetme
-        async function saveData() {
-            if (!userId) return;
+        async function saveState(isInitial = false) {
+            if (!user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData', 'status');
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 await setDoc(docRef, {
-                    totalBalance: totalBalance,
-                    dragonBalance: dragonBalance,
-                    lastClaimTime: lastClaimTime,
+                    tonBalance: state.tonBalance,
+                    dragonBalance: state.dragonBalance,
+                    lastClaimTime: state.lastClaimTime,
+                    hashRate: state.hashRate,
                     updatedAt: Date.now()
                 }, { merge: true });
             } catch (err) {
-                console.error("Save error:", err);
+                console.error("Kayıt hatası:", err);
             }
         }
 
         function updateUI() {
-            // Üstteki bakiye kartı
-            if (displayEl) displayEl.innerText = totalBalance.toFixed(8) + " TON";
-            if (dragonDisplayEl) dragonDisplayEl.innerText = Math.floor(dragonBalance).toLocaleString();
+            elements.ton.innerText = state.tonBalance.toFixed(8);
+            elements.dragon.innerText = Math.floor(state.dragonBalance).toLocaleString();
         }
 
-        // Mining Döngüsü - Saniyelik Artış
+        // Madencilik Döngüsü
         setInterval(() => {
-            if (!dataLoaded) return;
+            if (!state.loaded) return;
+
+            const now = Date.now();
+            const elapsed = (now - state.lastClaimTime) / 1000;
+            const currentlyMined = elapsed * TON_PER_SEC * state.hashRate;
+
+            elements.counter.innerText = currentlyMined.toFixed(10);
             
-            const now = Date.now();
-            const elapsedSeconds = (now - lastClaimTime) / 1000;
-            const currentMined = elapsedSeconds * REWARD_PER_SECOND;
+            // Fan hızını hashrate'e göre ayarla
+            const spinDuration = Math.max(0.3, 2.5 / state.hashRate);
+            elements.fan.style.animationDuration = `${spinDuration}s`;
+        }, 80);
 
-            // Ortadaki madencilik sayacı
-            if (counterEl) {
-                counterEl.innerText = currentMined.toFixed(10);
-            }
-
-            // Opsiyonel: Üstteki TON bakiyesinin de "canlı" arttığını görmek istersen:
-            // displayEl.innerText = (totalBalance + currentMined).toFixed(8) + " TON";
-        }, 100);
-
-        // Claim İşlemi
-        window.claimRewards = async function() {
-            if (!userId || !dataLoaded) return;
+        // Claim (Topla) Mantığı
+        window.handleClaim = async () => {
+            if (!state.loaded || !user) return;
 
             const now = Date.now();
-            const elapsedSeconds = (now - lastClaimTime) / 1000;
-            const minedAmount = elapsedSeconds * REWARD_PER_SECOND;
+            const elapsed = (now - state.lastClaimTime) / 1000;
+            const minedAmount = elapsed * TON_PER_SEC * state.hashRate;
 
             if (minedAmount < 0.00000001) {
-                console.log("Miktar çok küçük, bekleniyor...");
+                showToast("Toplanacak yeterli miktar yok!", "warning");
                 return;
             }
 
-            const earnedDragon = Math.floor(minedAmount * DRAGON_PER_TON);
-            
-            // Bakiyeleri güncelle
-            totalBalance += minedAmount;
-            dragonBalance += earnedDragon;
-            lastClaimTime = now; // Başlangıç zamanını şimdiye çek
-            
+            const earnedDragon = Math.floor(minedAmount * DRAGON_MULTIPLIER);
+
+            state.tonBalance += minedAmount;
+            state.dragonBalance += earnedDragon;
+            state.lastClaimTime = now;
+
             updateUI();
+            showToast(`+${earnedDragon.toLocaleString()} $DRAGON TOPLANDI!`, "success");
             
-            // Bildirim
+            await saveState();
+        };
+
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl z-50 font-black shadow-[0_0_30px_rgba(255,0,21,0.5)] border border-white/20 text-center animate-bounce';
-            toast.innerHTML = `BAKİYE GÜNCELLENDİ!<br><span class="text-xs text-yellow-300">+${earnedDragon.toLocaleString()} $DRAGON KAZANILDI!</span>`;
-            document.body.appendChild(toast);
+            toast.className = `mb-2 px-6 py-3 rounded-full font-black text-xs tracking-widest shadow-2xl transition-all duration-500 transform translate-y-10 opacity-0 ${
+                type === 'success' ? 'bg-red-600 text-white border border-white/20' : 'bg-neutral-800 text-yellow-500 border border-yellow-500/20'
+            }`;
+            toast.innerText = message;
             
-            // Firebase'e kaydet
-            await saveData();
+            container.appendChild(toast);
             
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, -20px)';
-                toast.style.transition = 'all 0.4s ease';
-                setTimeout(() => toast.remove(), 400);
-            }, 2500);
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('-translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
         }
 
-        // Otomatik Yedekleme (Her 60 saniyede bir)
+        // Otomatik kayıt (2 dakikada bir)
         setInterval(() => {
-            if (dataLoaded) saveData();
-        }, 60000);
+            if (state.loaded) saveState();
+        }, 120000);
+
     </script>
 </body>
 </html>
