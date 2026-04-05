@@ -28,7 +28,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Cam Efekti ve Gölgeler */
         .glass-card {
             background: rgba(18, 18, 18, 0.8);
             backdrop-filter: blur(10px);
@@ -40,7 +39,6 @@
             box-shadow: 0 0 25px var(--accent-glow);
         }
 
-        /* Madenci Fan Animasyonu */
         .fan-container {
             position: relative;
             width: 280px;
@@ -68,7 +66,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Navigasyon ve Butonlar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -115,7 +112,6 @@
             transform: scale(0.95);
         }
 
-        /* Sayaç Tasarımı */
         .counter-text {
             font-family: 'JetBrains Mono', monospace;
             background: linear-gradient(to bottom, #fff, #888);
@@ -124,7 +120,6 @@
             text-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
-        /* Bildirim (Toast) */
         #toast-container {
             position: fixed;
             top: 20px;
@@ -155,12 +150,10 @@
         <p class="font-bold text-sm tracking-widest animate-pulse">EJDERHA AĞINA BAĞLANILIYOR...</p>
     </div>
 
-    <!-- Bildirim Konteynırı -->
     <div id="toast-container"></div>
 
     <main class="p-4 flex flex-col h-full max-w-md mx-auto w-full pb-24">
         
-        <!-- Üst Bakiye Paneli -->
         <div class="space-y-3 mt-4">
             <!-- TON Kartı -->
             <div class="glass-card p-4 flex items-center justify-between">
@@ -195,7 +188,6 @@
             </div>
         </div>
 
-        <!-- Madencilik Motoru -->
         <div class="flex-1 flex flex-col items-center justify-center">
             <div class="fan-container" id="fan-box">
                 <img src="fan.jpg" id="mining-fan" class="fan-image fan-spinning" alt="Madenci Fanı">
@@ -212,7 +204,6 @@
             </div>
         </div>
 
-        <!-- Ana Aksiyonlar -->
         <div class="grid grid-cols-2 gap-4 mt-auto">
             <button onclick="handleClaim()" class="btn-action bg-gradient-to-r from-red-600 to-red-800 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 red-glow shadow-lg">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m21 15-9-9-9 9"/></svg>
@@ -225,7 +216,6 @@
         </div>
     </main>
 
-    <!-- Alt Navigasyon -->
     <nav class="bottom-nav">
         <div class="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
@@ -254,29 +244,25 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Yapılandırması
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
-                authDomain: "asdbn-5dd38.firebaseapp.com",
-                projectId: "asdbn-5dd38",
-                storageBucket: "asdbn-5dd38.firebasestorage.app",
-                messagingSenderId: "852532391581",
-                appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
-            };
+        // Yapılandırma
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
+            authDomain: "asdbn-5dd38.firebaseapp.com",
+            projectId: "asdbn-5dd38",
+            storageBucket: "asdbn-5dd38.firebasestorage.app",
+            messagingSenderId: "852532391581",
+            appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-world-v1';
 
-        // Ayarlar
-        const TON_DAILY_BASE = 0.10; // GÜNCEL: 1 GH/S = Günde 0.10 TON
+        const TON_DAILY_BASE = 0.10; 
         const TON_PER_SEC = TON_DAILY_BASE / 86400;
-        const DRAGON_MULTIPLIER = 1000000; // 1 TON başına 1M $DRAGON
+        const DRAGON_MULTIPLIER = 1000000;
 
-        // Durum
         let state = {
             tonBalance: 0,
             dragonBalance: 0,
@@ -287,7 +273,6 @@
 
         let user = null;
 
-        // UI Elementleri
         const elements = {
             ton: document.getElementById('ton-display'),
             dragon: document.getElementById('dragon-display'),
@@ -296,7 +281,21 @@
             fan: document.getElementById('mining-fan')
         };
 
-        // Firebase Kimlik Doğrulama
+        // Zaman aşımı koruması: 5 saniyede yüklenmezse zorla aç
+        const loadingTimeout = setTimeout(() => {
+            if (!state.loaded) {
+                console.warn("Yükleme zaman aşımına uğradı, zorla başlatılıyor...");
+                hideLoader();
+            }
+        }, 5000);
+
+        function hideLoader() {
+            state.loaded = true;
+            elements.loader.style.opacity = '0';
+            setTimeout(() => elements.loader.style.display = 'none', 500);
+            clearTimeout(loadingTimeout);
+        }
+
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -306,7 +305,8 @@
                 }
             } catch (err) {
                 console.error("Giriş hatası:", err);
-                setTimeout(initAuth, 2000);
+                // Giriş yapılamazsa bile en azından ekranı göster (çevrimdışı mod gibi)
+                hideLoader();
             }
         };
 
@@ -319,11 +319,11 @@
             }
         });
 
-        // Veri Senkronizasyonu
         function setupRealtimeSync() {
             if (!user) return;
             const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData', 'status');
             
+            // onSnapshot içindeki hataları yakala
             onSnapshot(docRef, (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -335,14 +335,12 @@
                     saveState(true);
                 }
                 
-                if (!state.loaded) {
-                    state.loaded = true;
-                    elements.loader.style.opacity = '0';
-                    setTimeout(() => elements.loader.style.display = 'none', 500);
-                }
+                if (!state.loaded) hideLoader();
                 updateUI();
             }, (err) => {
                 console.error("Firestore hatası:", err);
+                // Hata alırsak ekranı açalım ki kullanıcı görebilsin
+                hideLoader();
             });
         }
 
@@ -363,29 +361,24 @@
         }
 
         function updateUI() {
-            elements.ton.innerText = state.tonBalance.toFixed(8);
-            elements.dragon.innerText = Math.floor(state.dragonBalance).toLocaleString();
+            if(elements.ton) elements.ton.innerText = state.tonBalance.toFixed(8);
+            if(elements.dragon) elements.dragon.innerText = Math.floor(state.dragonBalance).toLocaleString();
         }
 
-        // Madencilik Döngüsü
         setInterval(() => {
             if (!state.loaded) return;
-
             const now = Date.now();
             const elapsed = (now - state.lastClaimTime) / 1000;
             const currentlyMined = elapsed * TON_PER_SEC * state.hashRate;
-
-            elements.counter.innerText = currentlyMined.toFixed(10);
-            
-            // Fan hızını hashrate'e göre ayarla
-            const spinDuration = Math.max(0.3, 2.5 / state.hashRate);
-            elements.fan.style.animationDuration = `${spinDuration}s`;
+            if(elements.counter) elements.counter.innerText = currentlyMined.toFixed(10);
+            if(elements.fan) {
+                const spinDuration = Math.max(0.3, 2.5 / state.hashRate);
+                elements.fan.style.animationDuration = `${spinDuration}s`;
+            }
         }, 80);
 
-        // Claim (Topla) Mantığı
         window.handleClaim = async () => {
             if (!state.loaded || !user) return;
-
             const now = Date.now();
             const elapsed = (now - state.lastClaimTime) / 1000;
             const minedAmount = elapsed * TON_PER_SEC * state.hashRate;
@@ -396,14 +389,12 @@
             }
 
             const earnedDragon = Math.floor(minedAmount * DRAGON_MULTIPLIER);
-
             state.tonBalance += minedAmount;
             state.dragonBalance += earnedDragon;
             state.lastClaimTime = now;
 
             updateUI();
             showToast(`+${earnedDragon.toLocaleString()} $DRAGON TOPLANDI!`, "success");
-            
             await saveState();
         };
 
@@ -414,24 +405,15 @@
                 type === 'success' ? 'bg-red-600 text-white border border-white/20' : 'bg-neutral-800 text-yellow-500 border border-yellow-500/20'
             }`;
             toast.innerText = message;
-            
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            }, 10);
-
+            setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('-translate-y-10', 'opacity-0');
                 setTimeout(() => toast.remove(), 500);
             }, 3000);
         }
 
-        // Otomatik kayıt (2 dakikada bir)
-        setInterval(() => {
-            if (state.loaded) saveState();
-        }, 120000);
-
+        setInterval(() => { if (state.loaded) saveState(); }, 120000);
     </script>
 </body>
 </html>
