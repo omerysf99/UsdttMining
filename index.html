@@ -25,7 +25,7 @@
             touch-action: manipulation;
         }
 
-        /* 9:16 Oranı ve Telegram Safe Area */
+        /* 9:16 Mobil Oranı */
         .app-container {
             width: 100%;
             max-width: 420px;
@@ -54,9 +54,9 @@
             border-radius: 1.25rem;
         }
 
-        /* Sekme İçerik Yönetimi - İç içe girmeyi önleyen kesin çözüm */
+        /* Sekme İçerik Yönetimi - Çakışma Önleyici */
         .tab-content {
-            display: none !important; /* Varsayılan olarak her şeyi gizle */
+            display: none !important; 
             flex-direction: column;
             flex-grow: 1;
             width: 100%;
@@ -66,7 +66,7 @@
         }
 
         .tab-content.active {
-            display: flex !important; /* Sadece aktif olanı göster */
+            display: flex !important; 
         }
 
         @keyframes fadeIn {
@@ -152,7 +152,7 @@
 <body>
 
     <div class="app-container" id="app">
-        <!-- ÜST PANEL (HER ZAMAN ÜSTTE) -->
+        <!-- ÜST PANEL -->
         <div id="header" class="space-y-2 shrink-0 z-50">
             <!-- TON Bakiye -->
             <div class="glass-card p-3 flex items-center justify-between">
@@ -170,7 +170,7 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye & Dolar Göstergesi -->
+            <!-- TONIX Bakiye & Kağıt Dolar -->
             <div class="glass-card p-3 relative overflow-hidden">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -187,23 +187,22 @@
                     </div>
                 </div>
                 
-                <!-- Dolar İşareti (Tam olarak istediğiniz yer) -->
-                <div class="flex items-center gap-1.5 mt-2 border-t border-white/5 pt-1.5">
-                    <img src="dolar.jpg" class="w-6 h-4 object-cover border border-white/20 rounded-sm" alt="USD" onerror="this.style.display='none'">
-                    <p class="text-[10px] text-gray-500 font-bold tracking-tight">≈ <span id="usd-value">0.00</span> USD</p>
+                <!-- Kağıt Dolar Görseli (Tam burada) -->
+                <div class="flex items-center gap-2 mt-2 border-t border-white/5 pt-2">
+                    <img src="dolar.jpg" class="h-10 w-24 object-contain rounded-md shadow-lg" alt="Dolar Banknot" onerror="this.parentElement.innerHTML='<p class=\'text-[10px] text-gray-500 font-bold\'>USD $</p>'">
                 </div>
             </div>
         </div>
 
-        <!-- İÇERİK ALANI -->
+        <!-- ANA İÇERİK ALANI -->
         <div class="flex-grow flex flex-col overflow-hidden relative mt-2">
             
-            <!-- ANA SAYFA (HOME) -->
+            <!-- HOME TAB -->
             <div id="home-tab" class="tab-content active text-center justify-around py-4">
                 <div class="fan-container">
                     <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
                     <div class="fan-center-icon">
-                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX Center Icon" onerror="this.parentElement.style.display='none'">
+                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="Ejderha" onerror="this.parentElement.style.display='none'">
                     </div>
                 </div>
 
@@ -226,14 +225,14 @@
                 </div>
             </div>
 
-            <!-- ARKADAŞLAR (FRIENDS) -->
+            <!-- ARKADAŞLAR TAB -->
             <div id="friends-tab" class="tab-content px-2 pt-6">
                 <div class="text-center py-4">
                     <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
                         <i class="fa-solid fa-user-group text-3xl text-blue-400"></i>
                     </div>
                     <h2 class="text-xl font-bold">Arkadaşlarını Çağır</h2>
-                    <p class="text-gray-400 text-xs mt-1">Her başarılı davet için 50 TONIX kazan!</p>
+                    <p class="text-gray-400 text-xs mt-1">Her davet için TONIX kazan!</p>
                 </div>
                 <div class="glass-card p-4 mb-4">
                     <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Referans Linkin</p>
@@ -242,44 +241,34 @@
                         <button onclick="copyLink()" class="bg-blue-600 px-3 rounded-lg font-bold text-xs">Kopyala</button>
                     </div>
                 </div>
-                <h3 class="font-bold text-sm mb-2 px-1 text-gray-400">Davet Edilenler (0)</h3>
-                <div class="text-center text-gray-600 text-xs py-10 italic glass-card bg-white/[0.02]">
-                    Henüz kimseyi davet etmedin.
-                </div>
+                <div class="text-center text-gray-600 text-xs py-10 italic glass-card">Henüz kimseyi davet etmedin.</div>
             </div>
 
-            <!-- GÖREVLER (MISSIONS) -->
+            <!-- GÖREVLER TAB -->
             <div id="missions-tab" class="tab-content px-2 pt-6">
                 <div class="text-center py-4">
                     <h2 class="text-xl font-bold">Görevler</h2>
                     <p class="text-gray-400 text-xs mt-1">Ekstra TONIX kazanmak için tamamla.</p>
                 </div>
                 <div class="space-y-3">
-                    <div class="glass-card p-3 flex items-center justify-between border-white/5">
+                    <div class="glass-card p-3 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400"><i class="fa-brands fa-telegram text-xl"></i></div>
                             <div><p class="font-bold text-xs">Kanala Katıl</p><p class="text-[10px] text-green-400 font-bold">+100 TONIX</p></div>
                         </div>
                         <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
                     </div>
-                    <div class="glass-card p-3 flex items-center justify-between border-white/5">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white"><i class="fa-brands fa-x-twitter text-xl"></i></div>
-                            <div><p class="font-bold text-xs">X'te Takip Et</p><p class="text-[10px] text-green-400 font-bold">+50 TONIX</p></div>
-                        </div>
-                        <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
-                    </div>
                 </div>
             </div>
 
-            <!-- CÜZDAN (WALLET) -->
+            <!-- WALLET TAB -->
             <div id="wallet-tab" class="tab-content items-center justify-center text-center px-6">
                 <i class="fa-solid fa-wallet text-5xl text-purple-500 mb-4 opacity-30"></i>
                 <h2 class="text-lg font-bold">Cüzdan</h2>
                 <p class="text-gray-500 text-xs">Çok Yakında!</p>
             </div>
 
-            <!-- AYARLAR (MORE) -->
+            <!-- MORE TAB -->
             <div id="more-tab" class="tab-content items-center justify-center text-center px-6">
                 <i class="fa-solid fa-gear text-5xl text-gray-700 mb-4 opacity-30"></i>
                 <h2 class="text-lg font-bold">Ayarlar</h2>
@@ -320,8 +309,6 @@
         if (webapp) {
             webapp.expand();
             webapp.ready();
-            webapp.backgroundColor = '#0f0f0f';
-            webapp.headerColor = '#0f0f0f';
         }
 
         const DAILY_RATE_PER_GH = 1.0;
@@ -336,17 +323,12 @@
             isMining: true
         };
 
-        const counterEl = document.getElementById('mining-counter');
-        const tonBalanceEl = document.getElementById('ton-balance');
-        const tonixBalanceEl = document.getElementById('tonix-balance');
-        const usdValueEl = document.getElementById('usd-value');
-
         function startMining() {
             setInterval(() => {
                 if (state.isMining) {
                     const increment = (DAILY_RATE_PER_GH / SECONDS_IN_DAY / (1000 / TICK_MS)) * state.hashRate;
                     state.miningValue += increment;
-                    counterEl.innerText = state.miningValue.toFixed(10);
+                    document.getElementById('mining-counter').innerText = state.miningValue.toFixed(10);
                 }
             }, TICK_MS);
         }
@@ -355,55 +337,27 @@
             if (state.miningValue <= 0.0000000001) return;
             state.tonBalance += state.miningValue;
             state.miningValue = 0;
+            document.getElementById('ton-balance').innerText = state.tonBalance.toFixed(4);
+            document.getElementById('mining-counter').innerText = "0.0000000000";
             
-            tonBalanceEl.innerText = state.tonBalance.toFixed(4);
-            counterEl.innerText = "0.0000000000";
+            state.tonixBalance += Math.floor(Math.random() * 3) + 1;
+            document.getElementById('tonix-balance').innerText = state.tonixBalance;
             
-            const bonus = Math.floor(Math.random() * 3) + 1;
-            state.tonixBalance += bonus;
-            tonixBalanceEl.innerText = state.tonixBalance;
-            
-            usdValueEl.innerText = (state.tonBalance * 6.5).toFixed(2);
-            
-            showToast("TON Toplandı!");
+            showToast("TON Başarıyla Toplandı!");
         }
 
         function switchTab(tabId, element) {
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(nav => {
-                nav.classList.remove('active');
-            });
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             
             const targetTab = document.getElementById(tabId + '-tab');
-            if (targetTab) {
-                targetTab.classList.add('active');
-                targetTab.scrollTop = 0;
-            }
+            if (targetTab) targetTab.classList.add('active');
             element.classList.add('active');
-
-            if (webapp.HapticFeedback) {
-                webapp.HapticFeedback.impactOccurred('light');
-            }
         }
 
         function copyLink() {
             const link = "t.me/tonix_bot?start=r1";
-            navigator.clipboard.writeText(link).then(() => {
-                showToast("Link Kopyalandı!");
-            }).catch(() => {
-                const el = document.createElement('textarea');
-                el.value = link;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                showToast("Link Kopyalandı!");
-            });
+            navigator.clipboard.writeText(link).then(() => showToast("Link Kopyalandı!"));
         }
 
         function showToast(msg) {
@@ -411,11 +365,7 @@
             toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-xs z-[100]";
             toast.innerText = msg;
             document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = '0.5s';
-                setTimeout(() => toast.remove(), 500);
-            }, 2000);
+            setTimeout(() => toast.remove(), 2500);
         }
 
         window.onload = () => {
