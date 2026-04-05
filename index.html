@@ -71,7 +71,7 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Fan Alanı - Sadece kırmızı yuvarlağı odaklayan kesim */
+        /* Fan Alanı - Siyah çerçeve tamamen kaldırıldı */
         .fan-container {
             display: flex;
             justify-content: center;
@@ -83,17 +83,19 @@
         .fan-crop {
             width: 300px;
             height: 300px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #1a0002;
-            box-shadow: 0 0 60px rgba(255, 0, 21, 0.6);
-            background-color: #000;
+            /* Siyah halka ve arka plan kaldırıldı */
+            border: none;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 21, 0.3));
         }
 
         .fan-image {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Siyah kenarları kırpar, kırmızı yuvarlağı merkeze alır */
+            object-fit: contain; /* Görselin tamamını gösterir */
             display: block;
         }
 
@@ -227,7 +229,7 @@
         <div class="balance-card">
             <div class="flex items-center">
                 <div class="balance-icon">
-                    <img src="dragon.jpg" alt="DRAGON" onerror="this.src='https://via.placeholder.com/44/ff0000/ffffff?text=D'">
+                    <img src="dragon.jpg" alt="DRAGON" onerror="this.src='https://via.placeholder.com/44/ff0015/ffffff?text=D'">
                 </div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-black">$DRAGON Balance</p>
