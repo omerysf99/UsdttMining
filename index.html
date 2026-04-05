@@ -291,16 +291,10 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        /**
-         * KRİTİK DÜZELTME:
-         * El ile girilen config nesnesi, __initial_auth_token ile uyuşmadığında 
-         * 'auth/configuration-not-found' hatası verir. Canvas ortamında 
-         * daima sistemin sağladığı __firebase_config kullanılmalıdır.
-         */
+        // Sistem yapılandırmasını önceliklendir
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                // Yerel test için fallback (Opsiyonel)
                 apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
                 authDomain: "asdbn-5dd38.firebaseapp.com",
                 projectId: "asdbn-5dd38",
@@ -314,7 +308,7 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
 
-        // Oyun Durumu
+        // Kazanç Ayarları
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
         const TICK_MS = 80; 
@@ -324,15 +318,15 @@
         let totalBalance = 0.0;
         let dragonBalance = 0;
         let userId = null;
+        let lastOfflineSave = 0;
 
         const counterEl = document.getElementById('mining-counter');
         const displayEl = document.getElementById('ton-balance-display');
         const dragonDisplayEl = document.getElementById('dragon-balance-display');
 
-        // Otomatik Giriş (Garantili Akış)
+        // Giriş Akışı
         const initAuth = async () => {
             try {
-                // Sistem bir token sağladıysa onu kullan, yoksa anonim giriş yap
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -340,7 +334,6 @@
                 }
             } catch (error) {
                 console.error("Giriş hatası:", error);
-                // Hata durumunda tekrar dene
                 setTimeout(initAuth, 2000);
             }
         };
@@ -354,17 +347,28 @@
             }
         });
 
-        // Firebase'den Veri Yükle (KURAL 1 ve KURAL 2'ye Uygun)
+        // Veri Yükleme ve Çevrimdışı Kazanç Hesaplama
         async function loadData() {
             if (!userId) return;
             try {
-                // KURAL 1: Doğru yol yapısı
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     totalBalance = data.totalBalance || 0;
                     dragonBalance = data.dragonBalance || 0;
+                    
+                    // Çevrimdışı kazanç hesapla
+                    if (data.updatedAt) {
+                        const now = Date.now();
+                        const diffInSeconds = (now - data.updatedAt) / 1000;
+                        const offlineEarnings = diffInSeconds * REWARD_PER_SECOND;
+                        
+                        if (offlineEarnings > 0.000001) {
+                            totalBalance += offlineEarnings;
+                            showOfflineToast(offlineEarnings);
+                        }
+                    }
                     updateUI();
                 }
             } catch (err) {
@@ -372,7 +376,7 @@
             }
         }
 
-        // Firebase'e Veri Kaydet
+        // Veri Kaydetme (updatedAt zaman damgasını günceller)
         async function saveData() {
             if (!userId) return;
             try {
@@ -396,7 +400,26 @@
         setInterval(() => {
             currentSession += REWARD_PER_TICK;
             if (counterEl) counterEl.innerText = currentSession.toFixed(10);
+            
+            // Her 30 saniyede bir arkaplanda otomatik kaydet (zaman damgası için)
+            if (Date.now() - lastOfflineSave > 30000) {
+                saveData();
+                lastOfflineSave = Date.now();
+            }
         }, TICK_MS);
+
+        // Çevrimdışı Kazanç Bildirimi
+        function showOfflineToast(amount) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-3 rounded-xl z-50 font-bold shadow-xl text-sm border-2 border-black';
+            toast.innerText = 'Hoş Geldin! Sen yokken +' + amount.toFixed(6) + ' TON kazandın! 💤';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 1s';
+                setTimeout(() => toast.remove(), 1000);
+            }, 5000);
+        }
 
         // Claim İşlemi
         window.claimRewards = async function() {
@@ -412,7 +435,6 @@
             
             currentSession = 0;
             
-            // Veriyi buluta işle
             await saveData();
             
             setTimeout(() => {
