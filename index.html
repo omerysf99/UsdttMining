@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TONIX Miner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +14,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100dvh;
             margin: 0;
             overflow: hidden;
             user-select: none;
@@ -24,21 +24,21 @@
         /* 9:16 Oranı için Kapsayıcı */
         .app-container {
             width: 100%;
-            max-width: 450px; /* Yaklaşık 9:16 telefon genişliği */
-            height: 100vh;
+            max-width: 450px;
+            height: 100dvh;
             background-color: #0f0f0f;
             position: relative;
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            box-shadow: 0 0 100px rgba(0,0,0,0.5);
+            box-sizing: border-box;
         }
 
-        @media (min-aspect-ratio: 9/16) {
+        @media (min-height: 700px) {
             .app-container {
                 height: 95vh;
-                border-radius: 2rem;
-                margin: auto;
+                border-radius: 2.5rem;
+                box-shadow: 0 0 100px rgba(0,0,0,0.8);
             }
         }
 
@@ -51,9 +51,9 @@
 
         .fan-container {
             position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 2rem auto;
+            width: min(70vw, 260px);
+            height: min(70vw, 260px);
+            margin: auto;
         }
 
         .fan-image {
@@ -94,13 +94,12 @@
             color: #a78bfa;
         }
 
-        .toast {
-            animation: slideUp 0.3s ease-out;
-        }
-
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .toast {
+            animation: slideUp 0.3s ease-out;
         }
     </style>
 </head>
@@ -108,15 +107,15 @@
 
     <div class="app-container">
         <!-- Üst Panel (Bakiyeler) -->
-        <div id="header" class="space-y-3 mb-6">
+        <div id="header" class="space-y-3 shrink-0">
             <!-- TON Bakiye -->
             <div class="glass-card p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                        <i class="fa-solid fa-gem text-xl"></i>
+                    <div class="w-12 h-12 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center shadow-lg">
+                        <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-gem text-xl\'></i>'">
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Balance</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
                         <p class="font-bold text-xl leading-tight"><span id="ton-balance">0.0000</span> TON</p>
                     </div>
                 </div>
@@ -128,11 +127,11 @@
             <!-- TONIX Bakiye -->
             <div class="glass-card p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-wind text-2xl"></i>
+                    <div class="w-12 h-12 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center shadow-lg">
+                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-xl\'></i>'">
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Balance</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
                         <p class="font-bold text-xl leading-tight"><span id="tonix-balance">0</span> TONIX</p>
                     </div>
                 </div>
@@ -143,13 +142,12 @@
         </div>
 
         <!-- ANA SAYFA (Mining) -->
-        <div class="flex-grow flex flex-col justify-center text-center">
+        <div class="flex-grow flex flex-col justify-between py-6 text-center">
             <div class="fan-container">
                 <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
-                <!-- Fan üstündeki ikon kaldırıldı -->
             </div>
 
-            <div class="mt-6">
+            <div class="my-4">
                 <h1 class="text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
                 <p class="text-2xl font-bold text-white/80 mb-4">TON</p>
                 <div class="inline-flex items-center gap-2 bg-white/5 px-5 py-2 rounded-full text-sm border border-white/10">
@@ -158,19 +156,18 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mt-10 px-2">
+            <div class="grid grid-cols-2 gap-4 px-2">
                 <button onclick="claimMining()" class="btn-primary p-5 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-xl">
                     <i class="fa-solid fa-coins text-xl"></i> Claim
                 </button>
-                <!-- Boost devre dışı bırakıldı -->
                 <button class="bg-gray-800 text-gray-500 p-5 rounded-2xl flex items-center justify-center gap-3 font-bold cursor-not-allowed">
                     <i class="fa-solid fa-rocket text-xl"></i> Boost
                 </button>
             </div>
         </div>
 
-        <!-- ALT NAVİGASYON (Çalışmıyor/Görsel) -->
-        <div class="mt-auto glass-card flex justify-around items-center p-2 relative z-50">
+        <!-- ALT NAVİGASYON -->
+        <div class="shrink-0 glass-card flex justify-around items-center p-2 mb-2 relative z-50">
             <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
                 <i class="fa-solid fa-wallet text-xl"></i>
                 <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
@@ -197,12 +194,6 @@
     </div>
 
     <script>
-        /**
-         * MADENCİLİK HESABI:
-         * 1 GH/s = Günde 1 TON
-         * 1 Gün = 86,400 Saniye
-         * Saniyede TON artışı = 1 / 86400
-         */
         const DAILY_RATE_PER_GH = 1.0;
         const SECONDS_IN_DAY = 86400;
         const TICK_MS = 100;
