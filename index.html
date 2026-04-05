@@ -76,8 +76,8 @@
 
         .fan-container {
             position: relative;
-            width: min(60vw, 220px);
-            height: min(60vw, 220px);
+            width: min(50vw, 180px); /* Fan küçültüldü */
+            height: min(50vw, 180px); /* Fan küçültüldü */
             margin: auto;
             display: flex;
             align-items: center;
@@ -105,19 +105,20 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         }
 
-        /* Sol üstteki yatay dikdörtgen */
+        /* Sol üstteki büyütülmüş yatay dikdörtgen */
         .fan-decorator-rect {
             position: absolute;
-            top: -10px;
-            left: -30px;
-            width: 80px;
-            height: 24px;
+            top: -25px;
+            left: -40px;
+            width: 120px; /* Dikdörtgen büyütüldü */
+            height: 50px; /* Dikdörtgen büyütüldü */
             background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
+            border-radius: 8px;
             z-index: 20;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
 
         @keyframes rotate-fan {
@@ -202,9 +203,9 @@
                     </div>
                 </div>
                 
-                <!-- Kağıt Dolar Görseli -->
+                <!-- Üst paneldeki dolar göstergesi korunuyor -->
                 <div class="flex items-center gap-2 mt-2 border-t border-white/5 pt-2">
-                    <img src="dolar.jpg" class="h-10 w-24 object-contain rounded-md shadow-lg" alt="Dolar Banknot" onerror="this.parentElement.innerHTML='<p class=\'text-[10px] text-gray-500 font-bold\'>USD $</p>'">
+                    <img src="dolar.jpg" class="h-6 w-14 object-contain rounded-md shadow-lg" alt="Dolar Banknot" onerror="this.parentElement.innerHTML='<p class=\'text-[10px] text-gray-500 font-bold\'>USD $</p>'">
                 </div>
             </div>
         </div>
@@ -215,8 +216,10 @@
             <!-- HOME TAB -->
             <div id="home-tab" class="tab-content active text-center justify-around py-4">
                 <div class="fan-container">
-                    <!-- Fanın sol üstündeki yatay dikdörtgen -->
-                    <div class="fan-decorator-rect"></div>
+                    <!-- Fanın sol üstündeki büyütülmüş yatay dikdörtgen + dolar.jpg -->
+                    <div class="fan-decorator-rect">
+                        <img src="dolar.jpg" class="w-full h-full object-cover" alt="Dolar">
+                    </div>
                     
                     <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
                     <div class="fan-center-icon">
