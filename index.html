@@ -2,11 +2,16 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TONIX Miner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --tg-viewport-height: 100vh;
+            --tg-viewport-stable-height: 100vh;
+        }
+
         body {
             background-color: #000;
             color: white;
@@ -21,39 +26,44 @@
             touch-action: manipulation;
         }
 
-        /* 9:16 Oranı için Kapsayıcı */
+        /* 9:16 Oranı ve Telegram Uyumluluğu */
         .app-container {
             width: 100%;
             max-width: 450px;
-            height: 100dvh;
+            height: 100%;
             background-color: #0f0f0f;
             position: relative;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
+            /* Telegram ve iOS alt bar çakışmasını önlemek için safe-area ekliyoruz */
+            padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); 
             box-sizing: border-box;
         }
 
-        @media (min-height: 700px) {
+        @media (min-height: 750px) and (min-width: 450px) {
             .app-container {
-                height: 95vh;
+                height: 92vh;
                 border-radius: 2.5rem;
-                box-shadow: 0 0 100px rgba(0,0,0,0.8);
+                box-shadow: 0 0 80px rgba(0,0,0,0.9);
             }
         }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
+            border-radius: 1.25rem;
         }
 
         .fan-container {
             position: relative;
-            width: min(70vw, 260px);
-            height: min(70vw, 260px);
+            width: min(65vw, 240px);
+            height: min(65vw, 240px);
             margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .fan-image {
@@ -62,7 +72,7 @@
             border-radius: 50%;
             object-fit: cover;
             animation: rotate-fan 4s linear infinite;
-            box-shadow: 0 0 60px rgba(56, 189, 248, 0.15);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
         }
 
         @keyframes rotate-fan {
@@ -82,24 +92,26 @@
         }
 
         .btn-primary:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
 
         .nav-item {
             color: #4b5563;
-            cursor: default;
         }
 
         .nav-item.active {
             color: #a78bfa;
         }
 
+        /* Toast Bildirimi */
+        .toast {
+            animation: slideUp 0.3s ease-out;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
-        }
-        .toast {
-            animation: slideUp 0.3s ease-out;
         }
     </style>
 </head>
@@ -107,88 +119,88 @@
 
     <div class="app-container">
         <!-- Üst Panel (Bakiyeler) -->
-        <div id="header" class="space-y-3 shrink-0">
+        <div id="header" class="space-y-2 shrink-0">
             <!-- TON Bakiye -->
-            <div class="glass-card p-4 flex items-center justify-between">
+            <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center shadow-lg">
-                        <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-gem text-xl\'></i>'">
+                    <div class="w-10 h-10 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center border border-white/10">
+                        <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-gem text-lg\'></i>'">
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
-                        <p class="font-bold text-xl leading-tight"><span id="ton-balance">0.0000</span> TON</p>
+                        <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
+                        <p class="font-bold text-lg leading-tight"><span id="ton-balance">0.0000</span> TON</p>
                     </div>
                 </div>
-                <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-wallet text-gray-600"></i>
+                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
                 </div>
             </div>
 
             <!-- TONIX Bakiye -->
-            <div class="glass-card p-4 flex items-center justify-between">
+            <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center shadow-lg">
-                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-xl\'></i>'">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10">
+                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-lg\'></i>'">
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
-                        <p class="font-bold text-xl leading-tight"><span id="tonix-balance">0</span> TONIX</p>
+                        <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
+                        <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
                     </div>
                 </div>
-                <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-wallet text-gray-600"></i>
+                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
                 </div>
             </div>
         </div>
 
         <!-- ANA SAYFA (Mining) -->
-        <div class="flex-grow flex flex-col justify-between py-6 text-center">
+        <div class="flex-grow flex flex-col justify-around py-4 text-center">
             <div class="fan-container">
                 <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
             </div>
 
-            <div class="my-4">
-                <h1 class="text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
-                <p class="text-2xl font-bold text-white/80 mb-4">TON</p>
-                <div class="inline-flex items-center gap-2 bg-white/5 px-5 py-2 rounded-full text-sm border border-white/10">
+            <div class="my-2">
+                <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
+                <p class="text-xl font-bold text-white/70 mb-3">TON</p>
+                <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
                     <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
                     <i class="fa-solid fa-bolt text-orange-400"></i>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 px-2">
-                <button onclick="claimMining()" class="btn-primary p-5 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-xl">
-                    <i class="fa-solid fa-coins text-xl"></i> Claim
+            <div class="grid grid-cols-2 gap-3 px-2 mb-2">
+                <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg">
+                    <i class="fa-solid fa-coins"></i> Claim
                 </button>
-                <button class="bg-gray-800 text-gray-500 p-5 rounded-2xl flex items-center justify-center gap-3 font-bold cursor-not-allowed">
-                    <i class="fa-solid fa-rocket text-xl"></i> Boost
+                <button class="bg-gray-800 text-gray-600 p-4 rounded-xl flex items-center justify-center gap-2 font-bold cursor-not-allowed">
+                    <i class="fa-solid fa-rocket"></i> Boost
                 </button>
             </div>
         </div>
 
         <!-- ALT NAVİGASYON -->
-        <div class="shrink-0 glass-card flex justify-around items-center p-2 mb-2 relative z-50">
-            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-                <i class="fa-solid fa-wallet text-xl"></i>
-                <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
+        <div class="shrink-0 glass-card flex justify-around items-center p-1.5 relative z-50">
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+                <i class="fa-solid fa-wallet text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-tighter">Wallet</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-                <i class="fa-solid fa-users text-xl"></i>
-                <span class="text-[9px] font-bold uppercase tracking-tighter">Friends</span>
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+                <i class="fa-solid fa-users text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-tighter">Friends</span>
             </div>
-            <div class="nav-item active flex flex-col items-center gap-1 p-2 w-full">
-                <div class="bg-purple-600/20 w-10 h-10 rounded-xl flex items-center justify-center mb-[-4px]">
-                     <i class="fa-solid fa-fan text-xl text-purple-400"></i>
+            <div class="nav-item active flex flex-col items-center gap-0.5 p-1.5 w-full">
+                <div class="bg-purple-600/20 w-9 h-9 rounded-lg flex items-center justify-center mb-[-2px]">
+                     <i class="fa-solid fa-fan text-lg text-purple-400"></i>
                 </div>
-                <span class="text-[9px] font-bold uppercase tracking-tighter mt-1">Home</span>
+                <span class="text-[8px] font-bold uppercase tracking-tighter mt-1">Home</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full relative">
-                <i class="fa-solid fa-bullseye text-xl"></i>
-                <span class="text-[9px] font-bold uppercase tracking-tighter">Missions</span>
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+                <i class="fa-solid fa-bullseye text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-tighter">Missions</span>
             </div>
-            <div class="nav-item flex flex-col items-center gap-1 p-2 w-full">
-                <i class="fa-solid fa-bars-staggered text-xl"></i>
-                <span class="text-[9px] font-bold uppercase tracking-tighter">More</span>
+            <div class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full">
+                <i class="fa-solid fa-bars-staggered text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-tighter">More</span>
             </div>
         </div>
     </div>
@@ -220,7 +232,7 @@
         }
 
         function claimMining() {
-            if (state.miningValue <= 0) return;
+            if (state.miningValue <= 0.0000000001) return;
             
             state.tonBalance += state.miningValue;
             state.miningValue = 0;
@@ -233,7 +245,7 @@
 
         function showToast(msg) {
             const toast = document.createElement('div');
-            toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-3 rounded-2xl font-bold text-sm shadow-2xl z-[100]";
+            toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-xs shadow-2xl z-[100]";
             toast.innerText = msg;
             document.body.appendChild(toast);
             setTimeout(() => {
@@ -244,6 +256,12 @@
         }
 
         window.onload = startMining;
+
+        // Telegram WebView için bazen gerekli olabilen yükseklik düzeltmesi
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.ready();
+        }
     </script>
 </body>
 </html>
