@@ -71,35 +71,22 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Orta Fan Ünitesi - Siyah Çerçeve Kaldırıldı */
-        .fan-frame {
-            position: relative;
-            width: 340px;
-            height: 340px;
-            margin: 15px auto;
+        /* Fan Alanı - Yuvarlak Çerçeveler Kaldırıldı */
+        .fan-display {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle, rgba(255, 0, 21, 0.25) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .fan-image-container {
-            width: 310px;
-            height: 310px;
-            border-radius: 50%;
-            overflow: hidden;
-            /* Siyah çerçeve ve arka plan kaldırıldı */
-            border: none; 
-            box-shadow: 0 0 50px rgba(255, 0, 21, 0.6);
-            background-color: transparent;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 340px;
         }
 
         .fan-image {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
+            /* Dönme animasyonu yok, sadece doğrudan görsel */
+            filter: drop-shadow(0 0 30px rgba(255, 0, 21, 0.3));
         }
 
         /* Sayaç Alanı */
@@ -232,7 +219,7 @@
         <div class="balance-card">
             <div class="flex items-center">
                 <div class="balance-icon">
-                    <img src="dragon.jpg" alt="DRAGON" onerror="this.style.display='none'; this.parentNode.innerHTML='<span class=\'text-2xl\'>🐉</span>'">
+                    <img src="dragon.jpg" alt="DRAGON" onerror="this.src='https://via.placeholder.com/44/ff0000/ffffff?text=D'">
                 </div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-black">$DRAGON Balance</p>
@@ -247,10 +234,8 @@
         </div>
 
         <!-- Ana Madenci Ünitesi -->
-        <div class="fan-frame">
-            <div class="fan-image-container">
-                <img src="fan.jpg" class="fan-image" alt="Red Dragon Fan" onerror="this.src='https://via.placeholder.com/310/000000/ff0000?text=DRAGON+FAN'">
-            </div>
+        <div class="fan-display">
+            <img src="fan.jpg" class="fan-image" alt="Dragon Fan" onerror="this.src='https://via.placeholder.com/340/000000/ff0000?text=FAN.JPG'">
         </div>
 
         <!-- Sayaç -->
