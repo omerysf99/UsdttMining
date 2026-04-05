@@ -3,417 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejderha Dünyası - TON Madenciliği</title>
+    <title>TONIX Miner</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #050505;
-            --card-bg: #121212;
-            --accent-red: #ff1f3d;
-            --accent-glow: rgba(255, 31, 61, 0.4);
-            --text-gray: #9ca3af;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
+            background-color: #0f0f0f;
             color: white;
-            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .glass-card {
-            background: rgba(18, 18, 18, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-        }
-
-        .red-glow {
-            box-shadow: 0 0 25px var(--accent-glow);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
         }
 
         .fan-container {
             position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 260px;
+            height: 260px;
+            margin: 1.5rem auto;
         }
 
         .fan-image {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 30px var(--accent-glow));
-            transition: transform 0.1s linear;
+            border-radius: 50%;
+            object-fit: cover;
+            animation: rotate-fan 4s linear infinite;
+            box-shadow: 0 0 60px rgba(56, 189, 248, 0.15);
         }
 
-        .fan-spinning {
-            animation: spin 3s linear infinite;
-        }
-
-        @keyframes spin {
+        @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 85px;
-            background: rgba(8, 8, 8, 0.95);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: env(safe-area-inset-bottom);
-            z-index: 50;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #555;
-            font-size: 10px;
+        .mining-text {
+            font-family: 'Courier New', Courier, monospace;
             font-weight: 700;
-            transition: color 0.3s;
+            letter-spacing: -1px;
         }
 
-        .nav-item.active {
-            color: white;
-        }
-
-        .nav-item.active svg {
-            color: var(--accent-red);
-            filter: drop-shadow(0 0 8px var(--accent-red));
-        }
-
-        .btn-action {
-            position: relative;
-            overflow: hidden;
+        .btn-primary {
+            background: #8b5cf6;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn-action:active {
-            transform: scale(0.95);
+        .btn-primary:active {
+            transform: scale(0.92);
+            filter: brightness(1.2);
         }
 
-        .counter-text {
-            font-family: 'JetBrains Mono', monospace;
-            background: linear-gradient(to bottom, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        .nav-item {
+            transition: all 0.2s;
+            color: #9ca3af;
         }
 
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            pointer-events: none;
+        .nav-item.active {
+            color: #a78bfa;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: 1rem;
         }
 
-        .loader-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-dark);
-            z-index: 999;
+        /* Tab Management */
+        .tab-content {
+            display: none;
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
+        }
+
+        /* Toast Animation */
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .toast {
+            animation: slideUp 0.3s ease-out;
         }
     </style>
 </head>
-<body>
+<body class="flex flex-col h-screen p-4">
 
-    <!-- Yükleme Ekranı -->
-    <div id="loader" class="loader-overlay">
-        <div class="w-16 h-16 border-4 border-t-red-600 border-gray-800 rounded-full animate-spin mb-4"></div>
-        <p class="font-bold text-sm tracking-widest animate-pulse">EJDERHA AĞINA BAĞLANILIYOR...</p>
+    <!-- Üst Panel (Bakiyeler) -->
+    <div id="header" class="space-y-3 mb-4">
+        <!-- TON Bakiye -->
+        <div class="glass-card p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-gem"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Balance</p>
+                    <p class="font-bold text-lg leading-tight"><span id="ton-balance">0.0000</span> TON</p>
+                </div>
+            </div>
+            <button class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/10">
+                <i class="fa-solid fa-wallet text-gray-400"></i>
+            </button>
+        </div>
+
+        <!-- TONIX Bakiye -->
+        <div class="glass-card p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-wind text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Balance</p>
+                    <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
+                </div>
+            </div>
+            <button class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/10">
+                <i class="fa-solid fa-wallet text-gray-400"></i>
+            </button>
+        </div>
     </div>
 
-    <div id="toast-container"></div>
-
-    <main class="p-4 flex flex-col h-full max-w-md mx-auto w-full pb-24">
-        
-        <div class="space-y-3 mt-4">
-            <!-- TON Kartı -->
-            <div class="glass-card p-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center border border-blue-500/20 overflow-hidden">
-                        <img src="ton.jpg" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase">TON Cüzdanı</p>
-                        <h2 class="text-lg font-black" id="ton-display">0.00000000</h2>
-                    </div>
-                </div>
-                <button class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center red-glow">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                </button>
-            </div>
-
-            <!-- DRAGON Kartı -->
-            <div class="glass-card p-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-red-600/10 flex items-center justify-center border border-red-500/20 overflow-hidden">
-                        <img src="dragon.jpg" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/44/ff0015/ffffff?text=D'">
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase">$DRAGON Bakiyesi</p>
-                        <h2 class="text-lg font-black text-red-500" id="dragon-display">0</h2>
-                    </div>
-                </div>
-                <button class="w-10 h-10 rounded-xl bg-neutral-800 flex items-center justify-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="fan-container" id="fan-box">
-                <img src="fan.jpg" id="mining-fan" class="fan-image fan-spinning" alt="Madenci Fanı">
-            </div>
-
-            <div class="text-center">
-                <div class="counter-text text-4xl md:text-5xl font-black mb-2" id="mining-counter">0.0000000000</div>
-                <div class="flex items-center justify-center gap-3 text-[11px] font-bold tracking-widest text-red-600">
-                    <span class="opacity-50">GH/S MOTORU</span>
-                    <span class="w-1 h-1 rounded-full bg-red-600"></span>
-                    <span class="text-white" id="hash-rate">1.0 GH/S</span>
-                    <span class="animate-ping">⚡</span>
+    <!-- İÇERİK ALANLARI -->
+    
+    <!-- HOME (Mining) -->
+    <div id="home-tab" class="tab-content active text-center justify-center">
+        <div class="fan-container">
+            <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-14 h-14 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 flex items-center justify-center shadow-2xl">
+                    <i class="fa-solid fa-gem text-sky-400 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mt-auto">
-            <button onclick="handleClaim()" class="btn-action bg-gradient-to-r from-red-600 to-red-800 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 red-glow shadow-lg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m21 15-9-9-9 9"/></svg>
-                Topla
+        <div class="mt-4">
+            <h1 class="text-3xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
+            <p class="text-2xl font-bold text-white/90 mb-2">TON</p>
+            <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-sm border border-white/10">
+                <i class="fa-solid fa-circle-info text-[10px] text-gray-500"></i>
+                <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
+                <i class="fa-solid fa-bolt text-orange-400 text-xs"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-8 px-2">
+            <button onclick="claimMining()" class="btn-primary p-4 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-lg shadow-purple-500/20">
+                <i class="fa-solid fa-coins text-lg"></i> Claim
             </button>
-            <button class="btn-action bg-neutral-900 border border-red-900/50 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-red-500 flex items-center justify-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4.5a2.09 2.09 0 0 1 2.91 0A2.1 2.1 0 0 1 9 10.5V12Z"/><path d="M15 5s-3.03.55-4.5 2a2.09 2.09 0 0 0 0 2.91A2.1 2.1 0 0 0 13.5 9H15Z"/></svg>
-                Hızlandır
+            <button onclick="boostSpeed()" class="btn-primary p-4 rounded-2xl flex items-center justify-center gap-3 font-bold opacity-90 shadow-lg shadow-purple-500/10">
+                <i class="fa-solid fa-rocket text-lg"></i> Boost
             </button>
         </div>
-    </main>
+    </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-            <span>Cüzdan</span>
+    <!-- WALLET -->
+    <div id="wallet-tab" class="tab-content items-center justify-center text-center p-6">
+        <div class="w-20 h-20 bg-purple-500/20 rounded-3xl flex items-center justify-center mb-6 border border-purple-500/30">
+            <i class="fa-solid fa-wallet text-4xl text-purple-400"></i>
         </div>
-        <div class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Arkadaşlar</span>
-        </div>
-        <div class="nav-item active">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Ana Sayfa</span>
-        </div>
-        <div class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><rect width="20" height="14" x="2" y="5" rx="2"/></svg>
-            <span>Görevler</span>
-        </div>
-        <div class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-            <span>Daha Fazla</span>
-        </div>
-    </nav>
+        <h2 class="text-2xl font-bold mb-2">Cüzdan</h2>
+        <p class="text-gray-400 mb-8">Henüz bir cüzdan bağlı değil. Çok yakında TON cüzdanınızı bağlayarak çekim yapabileceksiniz.</p>
+        <button class="w-full bg-white/10 p-4 rounded-2xl font-bold border border-white/10">Cüzdan Bağla</button>
+    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- FRIENDS -->
+    <div id="friends-tab" class="tab-content items-center justify-center text-center p-6">
+        <div class="w-20 h-20 bg-blue-500/20 rounded-3xl flex items-center justify-center mb-6 border border-blue-500/30">
+            <i class="fa-solid fa-users text-4xl text-blue-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">Arkadaşlarını Davet Et</h2>
+        <p class="text-gray-400 mb-8">Her davet ettiğin arkadaşın için kazım hızında %10 bonus ve 50 TONIX kazan!</p>
+        <button class="w-full bg-blue-500 p-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20">Arkadaşlarını Çağır</button>
+    </div>
 
-        // Yapılandırma
-        const firebaseConfig = {
-            apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
-            authDomain: "asdbn-5dd38.firebaseapp.com",
-            projectId: "asdbn-5dd38",
-            storageBucket: "asdbn-5dd38.firebasestorage.app",
-            messagingSenderId: "852532391581",
-            appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
-        };
+    <!-- MISSIONS -->
+    <div id="missions-tab" class="tab-content p-2 space-y-4">
+        <h2 class="text-xl font-bold px-2 py-4">Günlük Görevler</h2>
+        <div class="glass-card p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-blue-400">
+                    <i class="fa-brands fa-telegram text-2xl"></i>
+                </div>
+                <div>
+                    <p class="font-bold">Telegram Kanalına Katıl</p>
+                    <p class="text-xs text-green-400 font-bold">+100 TONIX</p>
+                </div>
+            </div>
+            <button class="bg-purple-600 px-4 py-2 rounded-xl text-sm font-bold">Yap</button>
+        </div>
+        <div class="glass-card p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-white">
+                    <i class="fa-brands fa-x-twitter text-2xl"></i>
+                </div>
+                <div>
+                    <p class="font-bold">X'te Takip Et</p>
+                    <p class="text-xs text-green-400 font-bold">+50 TONIX</p>
+                </div>
+            </div>
+            <button class="bg-purple-600 px-4 py-2 rounded-xl text-sm font-bold">Yap</button>
+        </div>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-world-v1';
+    <!-- MORE -->
+    <div id="more-tab" class="tab-content items-center justify-center text-center p-6">
+        <i class="fa-solid fa-sliders text-6xl mb-4 text-gray-600"></i>
+        <h2 class="text-xl font-bold">Ayarlar</h2>
+        <p class="text-gray-500">Profil ve uygulama ayarları burada yer alacak.</p>
+    </div>
 
-        const TON_DAILY_BASE = 0.10; 
-        const TON_PER_SEC = TON_DAILY_BASE / 86400;
-        const DRAGON_MULTIPLIER = 1000000;
+    <!-- ALT NAVİGASYON -->
+    <div class="mt-auto glass-card flex justify-around items-center p-2 mb-2 relative z-50">
+        <button onclick="switchTab('wallet', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+            <i class="fa-solid fa-wallet text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
+        </button>
+        <button onclick="switchTab('friends', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+            <i class="fa-solid fa-users text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Friends</span>
+        </button>
+        <button onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center gap-1 p-2 w-full">
+            <div class="bg-purple-600/20 w-10 h-10 rounded-xl flex items-center justify-center mb-[-4px]">
+                 <i class="fa-solid fa-fan text-xl text-purple-400"></i>
+            </div>
+            <span class="text-[9px] font-bold uppercase tracking-tighter mt-1">Home</span>
+        </button>
+        <button onclick="switchTab('missions', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full relative">
+            <i class="fa-solid fa-bullseye text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Missions</span>
+            <div class="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></div>
+        </button>
+        <button onclick="switchTab('more', this)" class="nav-item flex flex-col items-center gap-1 p-2 w-full">
+            <i class="fa-solid fa-bars-staggered text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">More</span>
+        </button>
+    </div>
+
+    <script>
+        /**
+         * MADENCİLİK HESABI:
+         * 1 GH/s = Günde 0.10 TON
+         * 1 Gün = 86,400 Saniye
+         * Saniyede TON artışı = 0.10 / 86400 ≈ 0.0000011574 TON
+         * 100ms Döngüde artış = 0.00000011574 TON
+         */
+        const DAILY_RATE_PER_GH = 0.10;
+        const SECONDS_IN_DAY = 86400;
+        const TICK_MS = 100; // Her 0.1 saniyede bir güncelle
 
         let state = {
-            tonBalance: 0,
-            dragonBalance: 0,
-            lastClaimTime: Date.now(),
-            hashRate: 1.0,
-            loaded: false
+            tonBalance: 0.0,
+            tonixBalance: 0,
+            miningValue: 0.0,
+            hashRate: 1.0, // Başlangıç 1 GH/s
+            isMining: true
         };
 
-        let user = null;
+        const counterEl = document.getElementById('mining-counter');
+        const tonBalanceEl = document.getElementById('ton-balance');
+        const tonixBalanceEl = document.getElementById('tonix-balance');
+        const hashRateEl = document.getElementById('hash-rate');
+        const fanImg = document.querySelector('.fan-image');
 
-        const elements = {
-            ton: document.getElementById('ton-display'),
-            dragon: document.getElementById('dragon-display'),
-            counter: document.getElementById('mining-counter'),
-            loader: document.getElementById('loader'),
-            fan: document.getElementById('mining-fan')
-        };
-
-        // Zaman aşımı koruması: 5 saniyede yüklenmezse zorla aç
-        const loadingTimeout = setTimeout(() => {
-            if (!state.loaded) {
-                console.warn("Yükleme zaman aşımına uğradı, zorla başlatılıyor...");
-                hideLoader();
-            }
-        }, 5000);
-
-        function hideLoader() {
-            state.loaded = true;
-            elements.loader.style.opacity = '0';
-            setTimeout(() => elements.loader.style.display = 'none', 500);
-            clearTimeout(loadingTimeout);
+        // Madencilik Döngüsü
+        function startMining() {
+            setInterval(() => {
+                if (state.isMining) {
+                    // GH/s başına saniyelik artışın 1/10'u (100ms için)
+                    const increment = (DAILY_RATE_PER_GH / SECONDS_IN_DAY / (1000 / TICK_MS)) * state.hashRate;
+                    state.miningValue += increment;
+                    counterEl.innerText = state.miningValue.toFixed(10);
+                }
+            }, TICK_MS);
         }
 
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Giriş hatası:", err);
-                // Giriş yapılamazsa bile en azından ekranı göster (çevrimdışı mod gibi)
-                hideLoader();
-            }
-        };
-
-        onAuthStateChanged(auth, (u) => {
-            user = u;
-            if (user) {
-                setupRealtimeSync();
-            } else {
-                initAuth();
-            }
-        });
-
-        function setupRealtimeSync() {
-            if (!user) return;
-            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData', 'status');
+        // Claim
+        function claimMining() {
+            if (state.miningValue <= 0.0000000001) return;
             
-            // onSnapshot içindeki hataları yakala
-            onSnapshot(docRef, (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    state.tonBalance = data.tonBalance || 0;
-                    state.dragonBalance = data.dragonBalance || 0;
-                    state.lastClaimTime = data.lastClaimTime || Date.now();
-                    state.hashRate = data.hashRate || 1.0;
-                } else {
-                    saveState(true);
-                }
-                
-                if (!state.loaded) hideLoader();
-                updateUI();
-            }, (err) => {
-                console.error("Firestore hatası:", err);
-                // Hata alırsak ekranı açalım ki kullanıcı görebilsin
-                hideLoader();
-            });
+            state.tonBalance += state.miningValue;
+            state.miningValue = 0;
+            
+            tonBalanceEl.innerText = state.tonBalance.toFixed(4);
+            counterEl.innerText = "0.0000000000";
+            
+            showToast("TON Başarıyla Toplandı!");
         }
 
-        async function saveState(isInitial = false) {
-            if (!user) return;
-            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData', 'status');
-            try {
-                await setDoc(docRef, {
-                    tonBalance: state.tonBalance,
-                    dragonBalance: state.dragonBalance,
-                    lastClaimTime: state.lastClaimTime,
-                    hashRate: state.hashRate,
-                    updatedAt: Date.now()
-                }, { merge: true });
-            } catch (err) {
-                console.error("Kayıt hatası:", err);
-            }
+        // Boost (Hızlandırma)
+        function boostSpeed() {
+            // Test amaçlı TONIX maliyeti olmadan hız veriyoruz
+            // Normalde: if(state.tonixBalance >= 100) ...
+            state.hashRate += 0.5;
+            hashRateEl.innerText = state.hashRate.toFixed(1);
+            
+            // Animasyon hızını güncelle (Sınır: 0.5s)
+            let currentDur = parseFloat(getComputedStyle(fanImg).animationDuration);
+            fanImg.style.animationDuration = Math.max(0.4, currentDur * 0.8) + "s";
+            
+            showToast("Hız Artırıldı: " + state.hashRate.toFixed(1) + " GH/s");
         }
 
-        function updateUI() {
-            if(elements.ton) elements.ton.innerText = state.tonBalance.toFixed(8);
-            if(elements.dragon) elements.dragon.innerText = Math.floor(state.dragonBalance).toLocaleString();
+        // Sekme Değiştirici
+        function switchTab(tabId, element) {
+            // Tüm içerikleri gizle
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Tüm nav itemları pasif yap
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            // Seçileni aktif yap
+            document.getElementById(tabId + '-tab').classList.add('active');
+            element.classList.add('active');
         }
 
-        setInterval(() => {
-            if (!state.loaded) return;
-            const now = Date.now();
-            const elapsed = (now - state.lastClaimTime) / 1000;
-            const currentlyMined = elapsed * TON_PER_SEC * state.hashRate;
-            if(elements.counter) elements.counter.innerText = currentlyMined.toFixed(10);
-            if(elements.fan) {
-                const spinDuration = Math.max(0.3, 2.5 / state.hashRate);
-                elements.fan.style.animationDuration = `${spinDuration}s`;
-            }
-        }, 80);
-
-        window.handleClaim = async () => {
-            if (!state.loaded || !user) return;
-            const now = Date.now();
-            const elapsed = (now - state.lastClaimTime) / 1000;
-            const minedAmount = elapsed * TON_PER_SEC * state.hashRate;
-
-            if (minedAmount < 0.00000001) {
-                showToast("Toplanacak yeterli miktar yok!", "warning");
-                return;
-            }
-
-            const earnedDragon = Math.floor(minedAmount * DRAGON_MULTIPLIER);
-            state.tonBalance += minedAmount;
-            state.dragonBalance += earnedDragon;
-            state.lastClaimTime = now;
-
-            updateUI();
-            showToast(`+${earnedDragon.toLocaleString()} $DRAGON TOPLANDI!`, "success");
-            await saveState();
-        };
-
-        function showToast(message, type) {
-            const container = document.getElementById('toast-container');
+        // Bildirim
+        function showToast(msg) {
             const toast = document.createElement('div');
-            toast.className = `mb-2 px-6 py-3 rounded-full font-black text-xs tracking-widest shadow-2xl transition-all duration-500 transform translate-y-10 opacity-0 ${
-                type === 'success' ? 'bg-red-600 text-white border border-white/20' : 'bg-neutral-800 text-yellow-500 border border-yellow-500/20'
-            }`;
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
+            toast.className = "toast fixed bottom-24 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-2xl font-bold text-sm shadow-2xl z-[100]";
+            toast.innerHTML = `<i class="fa-solid fa-check-circle text-green-600 mr-2"></i> ${msg}`;
+            document.body.appendChild(toast);
             setTimeout(() => {
-                toast.classList.add('-translate-y-10', 'opacity-0');
+                toast.style.opacity = '0';
+                toast.style.transition = '0.5s';
                 setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            }, 2500);
         }
 
-        setInterval(() => { if (state.loaded) saveState(); }, 120000);
+        window.onload = startMining;
     </script>
 </body>
 </html>
