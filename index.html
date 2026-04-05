@@ -94,18 +94,6 @@
             box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
         }
 
-        .fan-center-icon {
-            position: absolute;
-            width: 25%;
-            height: 25%;
-            border-radius: 50%;
-            background: #1a1a1a;
-            border: 2px solid rgba(255, 215, 0, 0.5);
-            overflow: hidden;
-            z-index: 10;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -217,9 +205,6 @@
                 <!-- Fan Bölümü -->
                 <div class="fan-container">
                     <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
-                    <div class="fan-center-icon">
-                        <img src="dragon.jpg" class="w-full h-full object-cover" alt="Ejderha" onerror="this.parentElement.style.display='none'">
-                    </div>
                 </div>
 
                 <!-- Sayaç Bölümü -->
