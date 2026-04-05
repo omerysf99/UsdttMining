@@ -304,25 +304,39 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        // Firebase Configuration (Environment config has priority)
+        // Senin özel Firebase Yapılandırman (Sistemle uyuşmazlık durumunda fallback olarak kullanılır)
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
+            authDomain: "asdbn-5dd38.firebaseapp.com",
+            projectId: "asdbn-5dd38",
+            storageBucket: "asdbn-5dd38.firebasestorage.app",
+            messagingSenderId: "852532391581",
+            appId: "1:852532391581:web:c864fc3aace8de0d41ee74",
+            measurementId: "G-6BYL9TCNQJ"
+        };
+
+        // Eğer __firebase_config tanımlı değilse veya geçersizse kullanıcı ayarlarını kullan
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "AIzaSyBhxm1GLb_gqnMzulWFDtTGPkGFp-nPREw",
-                authDomain: "asdbn-5dd38.firebaseapp.com",
-                projectId: "asdbn-5dd38",
-                storageBucket: "asdbn-5dd38.firebasestorage.app",
-                messagingSenderId: "852532391581",
-                appId: "1:852532391581:web:c864fc3aace8de0d41ee74"
-            };
+            : userFirebaseConfig;
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        
+        // Analytics sadece tarayıcıda çalışır
+        let analytics;
+        try {
+            analytics = getAnalytics(app);
+        } catch(e) {
+            console.log("Analytics başlatılamadı.");
+        }
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'asdbn-5dd38';
 
-        // Game Settings
+        // Oyun Ayarları
         const DAILY_REWARD = 1.0;
         const REWARD_PER_SECOND = DAILY_REWARD / 86400;
         const TICK_MS = 80; 
@@ -339,7 +353,7 @@
         const dragonDisplayEl = document.getElementById('dragon-balance-display');
         const loadingOverlay = document.getElementById('loading-overlay');
 
-        // Auth Sequence (RULE 3)
+        // Giriş Akışı (KURAL 3: Önce Auth)
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -348,7 +362,8 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.error("Auth error:", error);
+                console.error("Giriş hatası:", error);
+                // Auth hatası durumunda kullanıcı config'i ile tekrar denemeyi seçebiliriz
                 setTimeout(initAuth, 2000);
             }
         };
@@ -356,17 +371,18 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
-                console.log("Logged in as:", userId);
+                console.log("Kullanıcı aktif:", userId);
                 await loadData();
             } else {
-                initAuth();
+                await initAuth();
             }
         });
 
-        // Load Data (RULE 1)
+        // Veri Yükleme (KURAL 1)
         async function loadData() {
             if (!userId) return;
             try {
+                // KURAL 1: artifacts/{appId}/users/{userId}/gameData/status
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'status');
                 const docSnap = await getDoc(docRef);
                 
@@ -375,7 +391,7 @@
                     totalBalance = data.totalBalance || 0;
                     dragonBalance = data.dragonBalance || 0;
                     
-                    // Offline earning calculation
+                    // Çevrimdışı kazanç hesabı
                     if (data.updatedAt) {
                         const now = Date.now();
                         const diffSec = (now - data.updatedAt) / 1000;
@@ -390,14 +406,13 @@
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
                 updateUI();
             } catch (err) {
-                console.error("Data load failed:", err);
-                // Even if it fails, allow play
+                console.error("Veri yüklenemedi:", err);
                 dataLoaded = true;
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
             }
         }
 
-        // Save Data
+        // Veri Kaydetme
         async function saveData() {
             if (!userId || !dataLoaded) return;
             try {
@@ -407,9 +422,9 @@
                     dragonBalance,
                     updatedAt: Date.now()
                 }, { merge: true });
-                console.log("Data saved successfully");
+                console.log("Veriler kaydedildi.");
             } catch (err) {
-                console.error("Data save failed:", err);
+                console.error("Kaydetme hatası:", err);
             }
         }
 
@@ -418,14 +433,14 @@
             if (dragonDisplayEl) dragonDisplayEl.innerText = dragonBalance.toLocaleString();
         }
 
-        // Mining Loop
+        // Kazım Döngüsü
         setInterval(() => {
             if (!dataLoaded) return;
             currentSession += REWARD_PER_TICK;
             if (counterEl) counterEl.innerText = currentSession.toFixed(10);
         }, TICK_MS);
 
-        // Auto-save every 60 seconds
+        // Otomatik Kayıt (Dakikada bir)
         setInterval(() => {
             if (dataLoaded) saveData();
         }, 60000);
