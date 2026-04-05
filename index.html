@@ -71,7 +71,7 @@
             box-shadow: 0 0 15px rgba(255, 0, 21, 0.4);
         }
 
-        /* Fan Alanı - Siyah çerçeve tamamen kaldırıldı */
+        /* Fan Alanı - Yuvarlak Kesim Uygulandı */
         .fan-container {
             display: flex;
             justify-content: center;
@@ -83,20 +83,22 @@
         .fan-crop {
             width: 300px;
             height: 300px;
-            /* Siyah halka ve arka plan kaldırıldı */
+            border-radius: 50%; /* Tam yuvarlak kesim */
+            overflow: hidden; /* Köşeleri gizle */
             border: none;
             background-color: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
-            filter: drop-shadow(0 0 30px rgba(255, 0, 21, 0.3));
+            filter: drop-shadow(0 0 35px rgba(255, 0, 21, 0.4));
         }
 
         .fan-image {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Görselin tamamını gösterir */
+            object-fit: cover; /* Görselin daireyi tam doldurmasını sağlar */
             display: block;
+            transform: scale(1.1); /* Dış siyah halkayı tamamen atmak için hafif büyüteç */
         }
 
         /* Sayaç Alanı */
