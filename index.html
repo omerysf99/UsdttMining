@@ -58,6 +58,7 @@
             font-size: 0.75rem;
             margin-top: 1rem;
             color: #6b7280;
+            word-break: break-word;
         }
         .telegram-info {
             background: #f0f7ff;
@@ -95,18 +96,18 @@
     <div class="counter-card">
         <div class="telegram-info">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
-            <span id="tg-id-display">TG ID: Yükleniyor...</span>
+            <span id="tg-id-display">TG ID: Bekleniyor...</span>
         </div>
         
         <h2 class="text-gray-500 text-xs font-bold tracking-widest mb-2 uppercase">Toplam Puan</h2>
         <div id="counter-display" class="loading-pulse">0</div>
         
         <button id="increment-btn" class="btn-increment" disabled>
-            Yükleniyor...
+            Bağlanıyor...
         </button>
         
         <button id="reset-trigger" class="mt-4 text-gray-400 hover:text-red-500 text-xs underline transition-colors">Verileri Sıfırla</button>
-        <div id="status-indicator">Başlatılıyor...</div>
+        <div id="status-indicator">Sistem başlatılıyor...</div>
     </div>
 
     <div id="reset-modal">
@@ -125,16 +126,20 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
-            authDomain: "studio-9241589115-a403e.firebaseapp.com",
-            projectId: "studio-9241589115-a403e",
-            storageBucket: "studio-9241589115-a403e.firebasestorage.app",
-            messagingSenderId: "1010284036381",
-            appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
-        };
+        // ÖNEMLİ: Sistem tarafından sağlanan __firebase_config değişkenini kullanıyoruz.
+        // Eğer bu değişken yoksa kullanıcının sağladığı config'e geri dönüyoruz.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
+                authDomain: "studio-9241589115-a403e.firebaseapp.com",
+                projectId: "studio-9241589115-a403e",
+                storageBucket: "studio-9241589115-a403e.firebasestorage.app",
+                messagingSenderId: "1010284036381",
+                appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
+            };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-counter-bot';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-counter-bot-01';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -152,22 +157,21 @@
         const status = document.getElementById('status-indicator');
         const resetModal = document.getElementById('reset-modal');
 
-        // Firebase'e Kaydetme Fonksiyonu
         async function updateCloud(newCount) {
             if (!currentUser) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'counter');
                 await setDoc(docRef, { value: newCount, updatedAt: serverTimestamp() }, { merge: true });
             } catch (e) {
-                status.textContent = "Kaydetme hatası!";
+                console.error("Yazma hatası:", e);
             }
         }
 
-        // Veri Senkronizasyonu
         function startSyncing(user) {
             currentUser = user;
+            status.textContent = "Bağlantı kuruldu, veriler alınıyor...";
             
-            // 1. Sayaç Verisini Dinle
+            // Sayaç Verisi
             const counterRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'counter');
             unsubCounter = onSnapshot(counterRef, (snap) => {
                 if (snap.exists()) {
@@ -179,30 +183,40 @@
                     status.textContent = "Veriler güncel.";
                 } else {
                     updateCloud(0);
+                    display.textContent = "0";
+                    display.classList.remove('loading-pulse');
+                    btn.disabled = false;
                 }
+            }, (err) => {
+                console.error("Sayaç hatası:", err);
+                status.textContent = "Veri okunamadı (Firestore Kuralları).";
             });
 
-            // 2. Telegram Profil Bilgisini Dinle (RULE 1 uyumlu yol)
+            // Telegram Profil Bilgisi
             const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info');
             unsubProfile = onSnapshot(profileRef, (snap) => {
                 if (snap.exists() && snap.data().telegramId) {
                     tgDisplay.textContent = `ID: ${snap.data().telegramId}`;
                 } else {
-                    tgDisplay.textContent = "TG ID: Bağlı Değil";
+                    tgDisplay.textContent = "TG ID: Tanımlanmadı";
                 }
+            }, (err) => {
+                console.error("Profil hatası:", err);
+                tgDisplay.textContent = "ID Alınamadı";
             });
         }
 
-        // Auth Başlatma
-        const initAuth = async () => {
+        const performLogin = async () => {
             try {
+                // Kural 3: Önce __initial_auth_token ile giriş yapmayı dene
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (e) {
-                status.textContent = "Giriş yapılamadı.";
+                console.error("Auth hatası:", e);
+                status.textContent = `Giriş Hatası: ${e.code}. Firebase Auth yapılandırmasını kontrol edin.`;
             }
         };
 
@@ -212,15 +226,15 @@
             } else {
                 if (unsubCounter) unsubCounter();
                 if (unsubProfile) unsubProfile();
-                status.textContent = "Oturum açılmalı.";
+                currentUser = null;
+                status.textContent = "Oturum kapalı.";
             }
         });
 
-        // Buton Olayları
         btn.addEventListener('click', () => {
-            count++;
-            display.textContent = count; // Hızlı geri bildirim
-            updateCloud(count);
+            const next = count + 1;
+            display.textContent = next; 
+            updateCloud(next);
             display.style.transform = 'scale(1.1)';
             setTimeout(() => display.style.transform = 'scale(1)', 100);
         });
@@ -232,7 +246,7 @@
             resetModal.style.display = 'none';
         });
 
-        initAuth();
+        performLogin();
     </script>
 </body>
 </html>
