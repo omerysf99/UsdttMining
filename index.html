@@ -173,6 +173,7 @@
             color: #888;
             text-decoration: none;
             width: 20%;
+            cursor: pointer;
         }
 
         .nav-item.active {
@@ -195,88 +196,63 @@
             opacity: 0.7;
             z-index: 200;
         }
+
+        /* Friends Page Specific Styles */
+        .invite-box {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .code-display {
+            background: #000;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+            border: 1px solid #333;
+        }
+        .referral-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 12px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div id="saveStatus">Bağlanıyor...</div>
-        <div class="content">
-            <!-- Üst Bakiye Kartları -->
-            <div class="balance-card">
-                <div class="flex items-center">
-                    <img src="ton.jpg" alt="TON" class="coin-icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    <div>
-                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
-                        <div class="font-bold text-sm" id="mainWalletBalance">0.0000000000 TON</div>
-                    </div>
-                </div>
-                <div class="wallet-btn">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg>
-                </div>
-            </div>
-
-            <div class="balance-card">
-                <div class="flex items-center">
-                    <img src="dragon.jpg" alt="TONIX" class="coin-icon" onerror="this.src='https://via.placeholder.com/32/333/fff?text=T'">
-                    <div>
-                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
-                        <div class="font-bold text-sm">0 TONIX</div>
-                    </div>
-                </div>
-                <div class="wallet-btn">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg>
-                </div>
-            </div>
-
-            <!-- Fan Alanı -->
-            <div class="mining-section">
-                <div class="fan-container">
-                    <img src="fan.jpg" alt="Fan" class="fan-img" id="miningFan" onerror="this.src='https://img.freepik.com/premium-photo/3d-render-electric-fan-ventilator-blue-color-isolated-black-background_1020697-2384.jpg'">
-                </div>
-
-                <div class="main-balance" id="tonBalance">0.0000000000</div>
-                <div class="text-xl font-extrabold text-white mb-2">TON</div>
-                
-                <div class="stats-badge">
-                    <span style="font-size: 14px; opacity: 0.6;">ℹ️</span>
-                    <span class="font-bold text-white">11 GH/s</span>
-                    <span style="color: #ff9d00;">⚡</span>
-                </div>
-            </div>
-
-            <!-- İşlem Butonları -->
-            <div class="action-buttons">
-                <div class="btn btn-claim" id="claimBtn">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
-                    Claim
-                </div>
-                <div class="btn btn-boost" id="boostBtn">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14H11V21L20 10H13Z"/></svg>
-                    Boost
-                </div>
-            </div>
+        
+        <!-- Main Content Area -->
+        <div id="page-content" class="content">
+            <!-- Content will be rendered here via JS -->
         </div>
 
         <!-- Alt Navigasyon -->
         <nav class="bottom-nav">
-            <div class="nav-item">
+            <div class="nav-item" onclick="changePage('wallet')">
                 <span class="nav-icon">👛</span>
                 <span>Wallet</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" id="nav-friends" onclick="changePage('friends')">
                 <span class="nav-icon">👥</span>
                 <span>Friends</span>
             </div>
-            <div class="nav-item active">
+            <div class="nav-item active" id="nav-home" onclick="changePage('home')">
                 <span class="nav-icon">🏠</span>
                 <span>Home</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="changePage('missions')">
                 <span class="nav-icon">🎯</span>
                 <span>Missions</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="changePage('more')">
                 <span class="nav-icon">⚙️</span>
                 <span>More</span>
             </div>
@@ -300,14 +276,11 @@
         };
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
-        
-        // Ortam değişkenlerinden apiKey boş gelirse varsayılanı kullan (auth/configuration-not-found hatasını önlemek için)
         if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
             firebaseConfig.apiKey = defaultFirebaseConfig.apiKey;
         }
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-v1';
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -315,14 +288,18 @@
         // Değişkenler
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON (11 GH/s)
+        let currentPage = 'home';
+        const incrementPerSecond = 0.11 / 86400; 
 
-        const balanceElement = document.getElementById('tonBalance');
-        const walletElement = document.getElementById('mainWalletBalance');
-        const saveStatus = document.getElementById('saveStatus');
-        const miningFan = document.getElementById('miningFan');
+        // Rastgele Davet Kodu Üret (Drg111x12345 formatında)
+        const generateRandomCode = () => {
+            const part1 = Math.floor(100 + Math.random() * 900); // 3 rakam
+            const part2 = Math.floor(10000 + Math.random() * 90000); // 5 rakam
+            return `Drg${part1}x${part2}`;
+        };
+        const userInviteCode = generateRandomCode();
 
-        // Madencilik Döngüsü (Hemen Başlar)
+        // Madencilik Döngüsü
         let lastTick = Date.now();
         setInterval(() => {
             const now = Date.now();
@@ -330,10 +307,113 @@
             lastTick = now;
             
             currentBalance += deltaSeconds * incrementPerSecond;
-            balanceElement.textContent = currentBalance.toFixed(10);
+            
+            // Eğer Home sayfasındaysak bakiye elementini güncelle
+            const balanceEl = document.getElementById('tonBalance');
+            if (balanceEl) balanceEl.textContent = currentBalance.toFixed(10);
         }, 100);
 
-        // Kimlik Doğrulama Başlatma
+        // Sayfa Değiştirme Fonksiyonu
+        window.changePage = (page) => {
+            currentPage = page;
+            render();
+            
+            // Navigasyon sınıflarını güncelle
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (page === 'home') document.getElementById('nav-home').classList.add('active');
+            if (page === 'friends') document.getElementById('nav-friends').classList.add('active');
+            if (page === 'wallet') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if (page === 'missions') document.querySelectorAll('.nav-item')[3].classList.add('active');
+            if (page === 'more') document.querySelectorAll('.nav-item')[4].classList.add('active');
+        };
+
+        const render = () => {
+            const container = document.getElementById('page-content');
+            if (currentPage === 'home') {
+                container.innerHTML = `
+                    <div class="balance-card">
+                        <div class="flex items-center">
+                            <img src="ton.jpg" alt="TON" class="coin-icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                            <div>
+                                <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
+                                <div class="font-bold text-sm" id="mainWalletBalance">${walletBalance.toFixed(10)} TON</div>
+                            </div>
+                        </div>
+                        <div class="wallet-btn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg></div>
+                    </div>
+                    <div class="balance-card">
+                        <div class="flex items-center">
+                            <img src="dragon.jpg" alt="TONIX" class="coin-icon" onerror="this.src='https://via.placeholder.com/32/333/fff?text=T'">
+                            <div>
+                                <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
+                                <div class="font-bold text-sm">0 TONIX</div>
+                            </div>
+                        </div>
+                        <div class="wallet-btn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg></div>
+                    </div>
+                    <div class="mining-section">
+                        <div class="fan-container">
+                            <img src="fan.jpg" alt="Fan" class="fan-img" id="miningFan" onerror="this.src='https://img.freepik.com/premium-photo/3d-render-electric-fan-ventilator-blue-color-isolated-black-background_1020697-2384.jpg'">
+                        </div>
+                        <div class="main-balance" id="tonBalance">${currentBalance.toFixed(10)}</div>
+                        <div class="text-xl font-extrabold text-white mb-2">TON</div>
+                        <div class="stats-badge">
+                            <span style="font-size: 14px; opacity: 0.6;">ℹ️</span>
+                            <span class="font-bold text-white">11 GH/s</span>
+                            <span style="color: #ff9d00;">⚡</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <div class="btn btn-claim" onclick="window.handleClaim(event)">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg> Claim
+                        </div>
+                        <div class="btn btn-boost" onclick="window.handleBoost()">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14H11V21L20 10H13Z"/></svg> Boost
+                        </div>
+                    </div>
+                `;
+            } else if (currentPage === 'friends') {
+                container.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4">Invite Friends</h2>
+                    <div class="invite-box">
+                        <p class="text-sm text-gray-400 mb-3 font-semibold">Your Invite Link</p>
+                        <div class="code-display mb-6">
+                            <span>${userInviteCode}</span>
+                            <button onclick="window.copyToClipboard('${userInviteCode}')">
+                                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button class="btn btn-claim flex-1" onclick="window.handleInvite()">
+                                <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M13 8c0-2.21-1.79-4-4-4S5 5.79 5 8s1.79 4 4 4 4-1.79 4-4zm2 2v2h2v-2h2V8h-2V6h-2v2h-2v2h2zM1 18v2h16v-2c0-2.66-5.33-4-8-4s-8 1.34-8 4z"/></svg>
+                                Invite a friend
+                            </button>
+                            <button class="bg-gray-800 p-4 rounded-2xl" onclick="window.copyToClipboard('${userInviteCode}')">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-claim w-full mt-4 !bg-blue-600" onclick="window.alert('Arkadaşlar listesi şu an boş.')">
+                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                         Open Friends List
+                    </button>
+
+                    <div class="referral-card mt-8">
+                         <p class="text-sm text-gray-500 mb-1">Referrals</p>
+                         <h3 class="text-3xl font-extrabold">0</h3>
+                         <p class="text-xs text-gray-600 mt-2">Kaç referansım var?</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500">
+                    <p class="text-xl font-bold">${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)} sekmesi yakında!</p>
+                </div>`;
+            }
+        };
+
+        // Firebase Logic
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
@@ -342,113 +422,80 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.error("Auth hatası:", err);
-                // Custom token hatası durumunda anonim girişi dene
-                try {
-                    await signInAnonymously(auth);
-                } catch (anonErr) {
-                    console.error("Anonim giriş hatası:", anonErr);
-                    saveStatus.textContent = "Bağlantı Hatası";
-                }
+                try { await signInAnonymously(auth); } catch (e) { saveStatus.textContent = "Bağlantı Hatası"; }
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
-            
-            saveStatus.textContent = "Eşitleniyor...";
-            
-            // Kural 1: 6 segmentli doküman yolu (artifacts/{appId}/public/data/users/{userId})
             const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-            
             try {
                 const userDoc = await getDoc(userDocRef);
                 const now = Date.now();
-
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     walletBalance = parseFloat(data.walletBalance) || 0;
-                    
                     const savedMiningBalance = parseFloat(data.currentBalance) || 0;
                     const savedUpdateTime = data.lastUpdateTime || now;
-                    
-                    // Offline (çevrimdışı) kazancı hesapla
                     const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
-                    
                     currentBalance = savedMiningBalance + offlineGain;
                 } else {
-                    // Yeni kullanıcı kaydı oluştur
-                    await setDoc(userDocRef, {
-                        walletBalance: 0,
-                        currentBalance: 0,
-                        lastUpdateTime: now
-                    });
+                    await setDoc(userDocRef, { walletBalance: 0, currentBalance: 0, lastUpdateTime: now });
                 }
-
                 saveStatus.textContent = "Bulut Aktif";
-                walletElement.textContent = walletBalance.toFixed(10) + " TON";
-                
-                // Her 30 saniyede bir otomatik buluta yedekleme
-                setInterval(async () => {
-                    await saveToCloud(userDocRef);
-                }, 30000);
-
-            } catch (err) {
-                console.error("Firestore hatası:", err);
-                saveStatus.textContent = "Yerel Mod";
-            }
+                render();
+                setInterval(async () => { await saveToCloud(userDocRef); }, 30000);
+            } catch (err) { saveStatus.textContent = "Yerel Mod"; render(); }
         });
 
         async function saveToCloud(docRef) {
             if (!docRef || !auth.currentUser) return;
             try {
-                await updateDoc(docRef, {
-                    walletBalance: walletBalance,
-                    currentBalance: currentBalance,
-                    lastUpdateTime: Date.now()
-                });
+                await updateDoc(docRef, { walletBalance: walletBalance, currentBalance: currentBalance, lastUpdateTime: Date.now() });
                 saveStatus.textContent = "Kaydedildi";
                 setTimeout(() => { saveStatus.textContent = "Bulut Aktif"; }, 2000);
-            } catch (e) {
-                console.error("Kaydetme hatası:", e);
-                saveStatus.textContent = "Eşitleme Hatası";
-            }
+            } catch (e) { saveStatus.textContent = "Eşitleme Hatası"; }
         }
 
-        // Claim (Talep Et) İşlemi
-        document.getElementById('claimBtn').addEventListener('click', async () => {
+        // Global Handlers
+        window.handleClaim = async (e) => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
                 currentBalance = 0;
-                
-                walletElement.textContent = walletBalance.toFixed(10) + " TON";
-                balanceElement.textContent = "0.0000000000";
-                
+                render();
                 if (auth.currentUser) {
                     const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', auth.currentUser.uid);
                     await saveToCloud(userDocRef);
                 }
-
-                // Buton geri bildirimi
-                const btn = document.getElementById('claimBtn');
-                btn.style.transform = "scale(0.95)";
-                setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
             }
-        });
+        };
 
-        // Boost (Hızlandır) İşlemi
-        document.getElementById('boostBtn').addEventListener('click', () => {
-            miningFan.style.animationDuration = '0.4s';
-            const btn = document.getElementById('boostBtn');
-            btn.style.transform = "scale(0.95)";
-            setTimeout(() => {
-                miningFan.style.animationDuration = '3s';
-                btn.style.transform = "scale(1)";
-            }, 2500);
-        });
+        window.handleBoost = () => {
+            const fan = document.getElementById('miningFan');
+            if (fan) fan.style.animationDuration = '0.4s';
+            setTimeout(() => { if (fan) fan.style.animationDuration = '3s'; }, 2500);
+        };
+
+        window.copyToClipboard = (text) => {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Davet kodunuz kopyalandı!");
+        };
+
+        window.handleInvite = () => {
+            const shareUrl = "http://t.me/DragTon_bot/Xc1";
+            const shareText = `Dragon Ton Slash Oyununa Katıl Davet Kodum Bu ${userInviteCode}`;
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+            window.open(telegramUrl, '_blank');
+        };
 
         initAuth();
+        render(); // Initial render
     </script>
 </body>
 </html>
