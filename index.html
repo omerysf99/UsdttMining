@@ -435,12 +435,12 @@
                     </div>
                 </div>
 
-                <!-- Reklam Görevi (YENİ) -->
+                <!-- Reklam Görevi (GÜNCELLENDİ) -->
                 <div class="mission-card" id="mission-ad-card">
                     <div class="mission-icon">📺</div>
                     <div class="mission-info-text">
                         <p class="text-white text-xs font-black uppercase">Reklam İzle</p>
-                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.001 TON | +1 $DRAGON</p>
+                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.0003 TON | +3 $DRAGON</p>
                         <p class="text-[8px] text-gray-500 uppercase mt-0.5 italic">Her 5 dakikada bir</p>
                     </div>
                     <div>
@@ -740,7 +740,7 @@
             }, 1000);
         };
 
-        // AD MISSION (RECURRING EVERY 5 MINS)
+        // AD MISSION (RECURRING EVERY 5 MINS) - Updated Rewards
         document.getElementById('mission-ad-btn').onclick = function() {
             const btn = this;
             const now = Date.now();
@@ -749,10 +749,10 @@
             // Trigger SDK Ad
             if (typeof show_10839932 === 'function') {
                 show_10839932().then(() => {
-                    // Reward user
+                    // Reward user: 0.0003 ton ve 3 $dragon
                     mission_ad_last_time = Date.now();
-                    totalWalletBalance += 0.001;
-                    dragonBalance += 1;
+                    totalWalletBalance += 0.0003;
+                    dragonBalance += 3;
                     save();
                     updateMissionUI();
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
@@ -762,8 +762,8 @@
             } else {
                 // Fallback for simulation/preview
                 mission_ad_last_time = Date.now();
-                totalWalletBalance += 0.001;
-                dragonBalance += 1;
+                totalWalletBalance += 0.0003;
+                dragonBalance += 3;
                 save();
                 updateMissionUI();
             }
