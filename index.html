@@ -289,7 +289,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Yapılandırmasını ortam değişkenlerinden alıyoruz
+        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "", 
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
@@ -305,16 +305,17 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Değişkenler
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        const incrementPerSecond = 0.11 / 86400; 
+        const incrementPerSecond = 0.11 / 86400; // 11 GH/s = Günde 0.11 TON
 
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const saveStatus = document.getElementById('saveStatus');
         const miningFan = document.getElementById('miningFan');
 
-        // Sayaç döngüsü
+        // Madencilik Döngüsü (Hassas Zamanlama)
         let lastTick = Date.now();
         setInterval(() => {
             const now = Date.now();
@@ -325,25 +326,22 @@
             balanceElement.textContent = currentBalance.toFixed(10);
         }, 50);
 
-        // Kimlik doğrulama başlatma
+        // Kimlik Doğrulama
         const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth hatası:", err);
-                saveStatus.textContent = "Auth Hatası";
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
             
-            saveStatus.textContent = "Eşitleniyor...";
-            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'mining', 'data');
+            saveStatus.textContent = "Veriler Eşitleniyor...";
+            
+            // Veri yolu: artifacts/{appId}/users/{userId}/data/mining (6 parça)
+            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'mining');
             
             try {
                 const userDoc = await getDoc(userDocRef);
@@ -355,11 +353,14 @@
                     
                     const savedMiningBalance = parseFloat(data.currentBalance) || 0;
                     const savedUpdateTime = data.lastUpdateTime || now;
+                    
+                    // Offline kazancı hesapla
                     const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
                     
                     currentBalance = savedMiningBalance + offlineGain;
                 } else {
+                    // Yeni kullanıcı kaydı
                     await setDoc(userDocRef, {
                         walletBalance: 0,
                         currentBalance: 0,
@@ -370,13 +371,13 @@
                 saveStatus.textContent = "Bulut Aktif";
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 
-                // Periyodik kayıt
+                // Her 30 saniyede bir otomatik kayıt
                 setInterval(async () => {
                     await saveToCloud(userDocRef);
                 }, 30000);
 
             } catch (err) {
-                console.error("Firestore hatası:", err);
+                console.error("Firestore yükleme hatası:", err);
                 saveStatus.textContent = "Yerel Mod";
             }
         });
@@ -396,7 +397,7 @@
             }
         }
 
-        // İşlem Tetikleyicileri
+        // Claim Butonu
         document.getElementById('claimBtn').addEventListener('click', async () => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
@@ -406,7 +407,7 @@
                 balanceElement.textContent = "0.0000000000";
                 
                 if (auth.currentUser) {
-                    const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'mining', 'data');
+                    const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'data', 'mining');
                     await saveToCloud(userDocRef);
                 }
 
@@ -416,6 +417,7 @@
             }
         });
 
+        // Boost Butonu
         document.getElementById('boostBtn').addEventListener('click', () => {
             miningFan.style.animationDuration = '0.4s';
             const btn = document.getElementById('boostBtn');
