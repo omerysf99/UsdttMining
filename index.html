@@ -182,7 +182,7 @@
     <div id="telegram-only-overlay">
         <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse">
         <h2 class="text-xl font-black mb-2 uppercase" style="color:white">Giriş Engellendi</h2>
-        <p class="text-gray-500 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
+        <p class="text-gray-400 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
     </div>
 
     <div class="app-container" id="main-app-container">
@@ -222,9 +222,14 @@
                     <div class="fan-container"><img src="fan.jpg" class="fan-image"></div>
                     <div class="text-center">
                         <h2 class="text-3xl font-black text-white tracking-tighter mb-1"><span id="mining-display">0.0000000000</span> <span class="text-blue-500 text-lg">TON</span></h2>
-                        <div class="inline-flex items-center gap-2 bg-[#111] px-5 py-2 rounded-full border border-white/5">
-                            <span id="ghs-speed-display" class="text-xs font-bold text-gray-400">11.00</span>
-                            <span class="text-[10px] font-black text-orange-500 uppercase tracking-widest">GH/S ⚡</span>
+                        <div class="flex flex-col items-center gap-1.5">
+                            <div class="inline-flex items-center gap-2 bg-[#111] px-5 py-2 rounded-full border border-white/5">
+                                <span id="ghs-speed-display" class="text-xs font-bold text-gray-400">11.00</span>
+                                <span class="text-[10px] font-black text-orange-500 uppercase tracking-widest">GH/S ⚡</span>
+                            </div>
+                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                                Günlük: <span id="daily-yield-display" class="text-green-400">0.11</span> TON
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -409,7 +414,7 @@
             <p class="text-gray-500 text-[10px] mb-8 font-bold uppercase tracking-widest">Hediye paketini hemen al!</p>
             <div class="w-full space-y-3 mb-10">
                 <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">TON</span><span class="text-green-400 font-black text-base">+0.05</span></div>
-                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">$DRAGON</span><span class="text-orange-400 font-black text-base">+50</span></div>
+                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase">$DRAGON</span><span class="text-orange-400 font-black text-base">+50</span></div>
             </div>
             <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-blue-900/30">Al ve Başla</button>
         </div>
@@ -420,9 +425,8 @@
         <div class="modal-content p-6 flex flex-col items-center">
             <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-500/20 text-xl">⚡</div>
             <h3 class="text-lg font-black mb-1 uppercase">Hızlandırıcı</h3>
-            <p class="text-gray-500 text-[9px] text-center mb-6 px-2 font-bold uppercase leading-relaxed text-white">Kalıcı <span class="text-white">+0.01 GH/S</span> kazan</p>
-            <div id="ad-simulation" class="hidden w-full mb-6"><div class="w-full h-2 bg-white/5 rounded-full overflow-hidden"><div id="ad-progress" class="h-full bg-indigo-500 w-0 transition-all duration-[3000ms] ease-linear"></div></div></div>
-            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-[10px] uppercase">Reklam İzle</button>
+            <p class="text-gray-500 text-[9px] text-center mb-6 px-2 font-bold uppercase leading-relaxed text-white">REKLAM İZLE VE <span class="text-white">+0.01 GH/S</span> KAZAN</p>
+            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg shadow-indigo-900/30">HIZLANDIRICIYI BAŞLAT</button>
             <button onclick="document.getElementById('boost-modal').style.display='none'" class="mt-4 text-gray-600 text-[9px] font-black uppercase">Kapat</button>
         </div>
     </div>
@@ -564,11 +568,13 @@
                     const tonBalEl = document.getElementById('total-ton-balance');
                     const dragBalEl = document.getElementById('dragon-balance');
                     const statMinedEl = document.getElementById('stats-total-mined');
+                    const statDailyEl = document.getElementById('stats-daily');
                     const refEarnEl = document.getElementById('referral-earnings-display');
 
                     if(tonBalEl) tonBalEl.textContent = totalWalletBalance.toFixed(4);
                     if(dragBalEl) dragBalEl.textContent = dragonBalance;
                     if(statMinedEl) statMinedEl.textContent = totalMinedStats.toFixed(4) + " TON";
+                    if(statDailyEl) statDailyEl.textContent = (ghsSpeed * 0.01).toFixed(2) + " TON";
                     if(refEarnEl) refEarnEl.textContent = referralEarnings.toFixed(2) + " TON";
                     
                     const wdTon = document.getElementById('wd-ton-bal');
@@ -621,10 +627,15 @@
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
             const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
+            const dailyYield = ghsSpeed * 0.01;
+            
             const miningEl = document.getElementById('mining-display');
             const speedEl = document.getElementById('ghs-speed-display');
+            const dailyYieldEl = document.getElementById('daily-yield-display');
+            
             if(miningEl) miningEl.textContent = currentMining.toFixed(10);
             if(speedEl) speedEl.textContent = ghsSpeed.toFixed(2);
+            if(dailyYieldEl) dailyYieldEl.textContent = dailyYield.toFixed(2);
         }, 100);
 
         // Safe Assignments
@@ -636,7 +647,7 @@
                 const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
                 if(gained > 0) {
                     totalWalletBalance += gained; totalMinedStats += gained; lastClaimTime = now;
-                    save(); showToast(`+${gained.toFixed(6)} TON AKTARILDI`);
+                    save(); showToast(`+${gained.toFixed(6)} TON`);
                     if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 }
             };
@@ -667,14 +678,33 @@
                 const amountInput = document.getElementById('wd-amount');
                 const addrInput = document.getElementById('wd-address');
                 if(!amountInput || !addrInput) return;
+                
                 const amount = parseFloat(amountInput.value);
                 const address = addrInput.value.trim();
-                if (!address) { showToast("Adres girin", "⚠️"); return; }
-                if (currentWdAsset === 'TON') totalWalletBalance -= amount;
-                else dragonBalance -= amount;
-                await save();
-                closeWithdraw();
-                showToast("Talep oluşturuldu", "🚀");
+                
+                wdSendBtn.disabled = true;
+                wdSendBtn.style.opacity = "0.5";
+                wdSendBtn.textContent = "WAIT...";
+
+                try {
+                    if (address.length < 8) { throw new Error("GEÇERSİZ ADRES"); }
+                    const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
+                    if (amount > balance) { throw new Error("YETERSİZ BAKİYE"); }
+                    if (currentWdAsset === 'TON') totalWalletBalance -= amount;
+                    else dragonBalance -= amount;
+
+                    await save();
+                    closeWithdraw();
+                    showToast("ÇEKİM ONAYLANDI!", "✅");
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                } catch (error) {
+                    showToast(error.message, "❌");
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+                } finally {
+                    wdSendBtn.disabled = false;
+                    wdSendBtn.textContent = "SEND";
+                    updateWdReceive();
+                }
             };
 
             const copyFn = () => {
@@ -719,7 +749,7 @@
                         });
                         const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
                         await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
-                        referredBy = target.ownerTgId; await save(); showToast("Başarılı!");
+                        referredBy = target.ownerTgId; await save(); showToast("Referans Başarılı!");
                     }
                 } else { showToast("Geçersiz Kod!", "❌"); }
             };
@@ -761,7 +791,7 @@
                         dragonBalance += 3;
                         save();
                         updateMissionUI();
-                        showToast("+3 $DRAGON & +0.0003 TON");
+                        showToast("+3 $D & +0.0003 TON");
                     });
                 }
             };
@@ -774,21 +804,28 @@
 
             const watchAdBtn = document.getElementById('watch-ad-btn');
             if(watchAdBtn) watchAdBtn.onclick = () => {
-                watchAdBtn.disabled = true;
-                const sim = document.getElementById('ad-simulation');
-                const prog = document.getElementById('ad-progress');
-                if(sim) sim.classList.remove('hidden');
-                if(prog) prog.style.width = '100%';
-                setTimeout(async () => {
-                    ghsSpeed += 0.01; await save();
-                    if(sim) sim.classList.add('hidden');
-                    if(prog) prog.style.width = '0';
-                    watchAdBtn.disabled = false;
-                    const bModal = document.getElementById('boost-modal');
-                    if(bModal) bModal.style.display = 'none';
-                    showToast("Güç Artırıldı!", "⚡");
-                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                }, 3000);
+                if (typeof show_10839932 === 'function') {
+                    watchAdBtn.disabled = true;
+                    watchAdBtn.textContent = "LOADING...";
+                    
+                    show_10839932().then(async () => {
+                        ghsSpeed += 0.01;
+                        await save();
+                        watchAdBtn.disabled = false;
+                        watchAdBtn.textContent = "HIZLANDIRICIYI BAŞLAT";
+                        const bModal = document.getElementById('boost-modal');
+                        if(bModal) bModal.style.display = 'none';
+                        showToast("Güç Artırıldı!", "⚡");
+                        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    }).catch(err => {
+                        console.error("Ad failed:", err);
+                        watchAdBtn.disabled = false;
+                        watchAdBtn.textContent = "HIZLANDIRICIYI BAŞLAT";
+                        showToast("Reklam Yüklenemedi", "❌");
+                    });
+                } else {
+                    showToast("SDK Hazır Değil", "⚠️");
+                }
             };
 
             const resetBtn = document.getElementById('reset-data-btn');
