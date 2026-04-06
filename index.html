@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TONIX Miner Pro</title>
+    <title>DRAGON Miner Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -60,7 +60,6 @@
             background: #7169e6;
             box-shadow: 0 4px 15px rgba(113, 105, 230, 0.3);
         }
-        /* Modal Stili */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -78,6 +77,13 @@
             width: 100%;
             max-width: 320px;
             border: 1px solid rgba(255,255,255,0.1);
+        }
+        .reward-animate {
+            animation: rewardPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes rewardPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -101,15 +107,15 @@
             </div>
         </div>
 
-        <!-- TONIX Card -->
+        <!-- DRAGON Card -->
         <div class="balance-card flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center overflow-hidden border border-blue-500/20">
-                    <img src="tonix.jpg" alt="TONIX" class="w-10 h-10 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2584/2584606.png'">
+                <div class="w-10 h-10 rounded-full bg-orange-900/30 flex items-center justify-center overflow-hidden border border-orange-500/20">
+                    <img src="dragon.jpg" alt="$DRAGON" class="w-10 h-10 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-semibold">Balance</p>
-                    <p class="text-white font-extrabold text-lg tracking-tight"><span id="tonix-balance">500</span> TONIX</p>
+                    <p class="text-white font-extrabold text-lg tracking-tight"><span id="dragon-balance">0</span> $DRAGON</p>
                 </div>
             </div>
             <div class="w-10 h-10 bg-[#333333] rounded-lg flex items-center justify-center">
@@ -150,12 +156,37 @@
             </div>
         </section>
 
-        <!-- Diğer Sekmeler -->
-        <section id="tab-wallet" class="tab-content h-full flex items-center justify-center">Cüzdan Paneli</section>
+        <section id="tab-wallet" class="tab-content h-full flex items-center justify-center text-xs text-gray-500 font-bold tracking-widest uppercase">Cüzdan Paneli</section>
         <section id="tab-friends" class="tab-content h-full flex items-center justify-center text-gray-500 font-bold uppercase text-xs tracking-widest">Arkadaş Paneli</section>
-        <section id="tab-missions" class="tab-content h-full flex items-center justify-center">Görevler Paneli</section>
-        <section id="tab-more" class="tab-content h-full flex items-center justify-center">Ayarlar</section>
+        <section id="tab-missions" class="tab-content h-full flex items-center justify-center text-gray-500 font-bold uppercase text-xs tracking-widest">Görevler Paneli</section>
+        <section id="tab-more" class="tab-content h-full flex items-center justify-center text-gray-500 font-bold uppercase text-xs tracking-widest">Ayarlar</section>
     </main>
+
+    <!-- Welcome Reward Modal -->
+    <div id="welcome-modal" class="modal-overlay">
+        <div class="modal-content p-8 flex flex-col items-center reward-animate">
+            <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mb-4">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            </div>
+            <h3 class="text-2xl font-black mb-2 text-center">HOŞ GELDİN!</h3>
+            <p class="text-gray-400 text-sm text-center mb-6 leading-relaxed">Madencilik macerana başlaman için sana bir başlangıç hediyesi hazırladık!</p>
+            
+            <div class="w-full space-y-3 mb-8">
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
+                    <span class="text-xs font-bold text-gray-400 uppercase">TON Ödülü</span>
+                    <span class="text-green-400 font-black">+0.05 TON</span>
+                </div>
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
+                    <span class="text-xs font-bold text-gray-400 uppercase">$DRAGON Ödülü</span>
+                    <span class="text-orange-400 font-black">+50 $DRAGON</span>
+                </div>
+            </div>
+
+            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+                HEDİYELERİ AL
+            </button>
+        </div>
+    </div>
 
     <!-- Boost Modal -->
     <div id="boost-modal" class="modal-overlay">
@@ -166,9 +197,8 @@
             <h3 class="text-xl font-bold mb-1">Hızını Artır!</h3>
             <p class="text-gray-500 text-xs text-center mb-6">Bir reklam izleyerek kalıcı olarak 0.01 GH/s kazanabilirsin.</p>
             
-            <!-- Ad Simulation -->
             <div id="ad-simulation" class="hidden w-full mb-6">
-                <div class="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase">Reklam İzleniyor...</div>
+                <div class="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-widest">Reklam İzleniyor...</div>
                 <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                     <div id="ad-progress" class="h-full bg-indigo-500 w-0 transition-all duration-[3000ms] ease-linear"></div>
                 </div>
@@ -222,22 +252,23 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'tonix-miner-pro-v2';
+        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v1';
 
         // State
         let ghsSpeed = 11.0;
         let totalWalletBalance = 0;
         let lastClaimTime = Date.now();
         let currentMiningBalance = 0;
-        let tonixBalance = 500;
+        let dragonBalance = 0; // Yeni kullanıcı için 0'dan başlar, ödülle artar
         let currentUser = null;
 
         const miningDisplay = document.getElementById('mining-display');
         const walletDisplay = document.getElementById('total-ton-balance');
-        const tonixDisplay = document.getElementById('tonix-balance');
+        const dragonDisplay = document.getElementById('dragon-balance');
         const ghsDisplay = document.getElementById('ghs-speed-display');
 
-        // Modal Elements
+        // Modals
+        const welcomeModal = document.getElementById('welcome-modal');
         const boostModal = document.getElementById('boost-modal');
         const watchAdBtn = document.getElementById('watch-ad-btn');
         const adSimulation = document.getElementById('ad-simulation');
@@ -258,12 +289,12 @@
         function tick() {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
-            // Reward calculation: 1 Gh/s = 0.01 TON daily
             const perSecondReward = (ghsSpeed * 0.01) / 86400;
             currentMiningBalance = Math.max(0, elapsed * perSecondReward);
             
             miningDisplay.textContent = currentMiningBalance.toFixed(10);
             walletDisplay.textContent = totalWalletBalance.toFixed(8);
+            dragonDisplay.textContent = dragonBalance;
             ghsDisplay.textContent = ghsSpeed.toFixed(2);
         }
 
@@ -272,18 +303,19 @@
         function startSync(user) {
             currentUser = user;
             const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'miner', 'data');
+            
             onSnapshot(docRef, (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
                     totalWalletBalance = data.walletBalance || 0;
                     lastClaimTime = data.lastClaimTime || Date.now();
-                    tonixBalance = data.tonixBalance || 500;
+                    dragonBalance = data.dragonBalance || 0;
                     ghsSpeed = data.ghsSpeed || 11.0;
-                    tonixDisplay.textContent = tonixBalance;
                 } else {
-                    saveToCloud();
+                    // İlk kez giren kullanıcı
+                    welcomeModal.style.display = 'flex';
                 }
-            }, (err) => console.error("Sync Error:", err));
+            });
         }
 
         async function saveToCloud() {
@@ -292,11 +324,26 @@
             await setDoc(docRef, {
                 walletBalance: totalWalletBalance,
                 lastClaimTime: lastClaimTime,
-                tonixBalance: tonixBalance,
+                dragonBalance: dragonBalance,
                 ghsSpeed: ghsSpeed,
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
+
+        // Welcome Reward Logic
+        document.getElementById('collect-reward-btn').addEventListener('click', async () => {
+            totalWalletBalance = 0.05;
+            dragonBalance = 50;
+            lastClaimTime = Date.now();
+            ghsSpeed = 11.0;
+            
+            await saveToCloud();
+            welcomeModal.style.display = 'none';
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
+        });
 
         // Claim Logic
         document.getElementById('claim-btn').addEventListener('click', () => {
@@ -311,7 +358,7 @@
             }
         });
 
-        // Boost Modal Logic
+        // Boost Logic
         document.getElementById('boost-trigger').onclick = () => boostModal.style.display = 'flex';
         document.getElementById('close-boost-btn').onclick = () => boostModal.style.display = 'none';
 
@@ -319,29 +366,16 @@
             watchAdBtn.disabled = true;
             watchAdBtn.style.opacity = '0.5';
             adSimulation.classList.remove('hidden');
-            
-            // Start progress bar
             setTimeout(() => adProgress.style.width = '100%', 10);
 
-            // Wait 3 seconds (simulated ad)
             setTimeout(async () => {
                 ghsSpeed += 0.01;
                 await saveToCloud();
-                
-                // Reset UI
                 adSimulation.classList.add('hidden');
                 adProgress.style.width = '0';
                 watchAdBtn.disabled = false;
                 watchAdBtn.style.opacity = '1';
-                
-                if (window.Telegram?.WebApp?.HapticFeedback) {
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                }
-                
-                // Success feedback
-                const originalText = ghsDisplay.parentElement.innerHTML;
-                ghsDisplay.parentElement.classList.add('text-green-400');
-                setTimeout(() => ghsDisplay.parentElement.classList.remove('text-green-400'), 1000);
+                if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
             }, 3000);
         });
 
