@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TeleTap Pro - Miner</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -68,10 +70,10 @@
         <!-- Üst Panel -->
         <div class="glass w-full p-4 rounded-2xl flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white">T</div>
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-xl">?</div>
                 <div>
-                    <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Kullanıcı Bilgisi</p>
-                    <p id="tg-id-display" class="text-white text-sm font-semibold">ID: Bağlanıyor...</p>
+                    <p id="user-name" class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Yükleniyor...</p>
+                    <p id="tg-id-display" class="text-white text-sm font-semibold italic">ID: Bağlanıyor...</p>
                 </div>
             </div>
             <div id="connection-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
@@ -126,7 +128,14 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Değişkenleri Al
+        // Telegram WebApp Başlat
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand(); // Uygulamayı tam ekran yap
+            tg.ready();
+        }
+
+        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
@@ -138,9 +147,9 @@
                 appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
             };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-teletap-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-teletap-v1';
 
-        // Firebase Başlat
+        // Firebase Servislerini Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -151,19 +160,25 @@
 
         const display = document.getElementById('counter-display');
         const tgDisplay = document.getElementById('tg-id-display');
+        const userNameDisplay = document.getElementById('user-name');
+        const userAvatar = document.getElementById('user-avatar');
         const tapArea = document.getElementById('tap-area');
         const progressFill = document.getElementById('progress-fill');
         const status = document.getElementById('status-indicator');
         const connDot = document.getElementById('connection-dot');
 
-        // Cloud Güncelleme (RULE 1: /artifacts/{appId}/users/{userId}/{collectionName})
+        // Cloud Güncelleme (RULE 1)
         async function updateCloud(val) {
             if (!currentUser) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'counter');
-                await setDoc(docRef, { value: val, lastActive: serverTimestamp() }, { merge: true });
+                await setDoc(docRef, { 
+                    value: val, 
+                    lastActive: serverTimestamp(),
+                    telegramData: tg?.initDataUnsafe?.user || null 
+                }, { merge: true });
             } catch (e) {
-                console.error("Yazma hatası:", e);
+                console.error("Firebase Yazma Hatası:", e);
             }
         }
 
@@ -173,8 +188,19 @@
             currentUser = user;
             syncActive = true;
             
-            status.textContent = "Bağlantı Başarılı";
+            status.textContent = "Buluta Bağlandı";
             connDot.classList.replace('bg-red-500', 'bg-green-500');
+
+            // Telegram Kullanıcı Bilgilerini Göster
+            const tgUser = tg?.initDataUnsafe?.user;
+            if (tgUser) {
+                userNameDisplay.textContent = tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '');
+                tgDisplay.textContent = `ID: ${tgUser.id}`;
+                userAvatar.textContent = tgUser.first_name[0];
+            } else {
+                userNameDisplay.textContent = "Misafir Kullanıcı";
+                tgDisplay.textContent = "ID: Web Modu";
+            }
 
             // Sayaç Verisi (RULE 1)
             const counterRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'counter');
@@ -190,37 +216,23 @@
                     updateCloud(0);
                 }
             }, (err) => {
-                status.textContent = "Veri Erişim Hatası";
-                console.error(err);
-            });
-
-            // Profil Verisi (RULE 1)
-            const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info');
-            onSnapshot(profileRef, (snap) => {
-                if (snap.exists() && snap.data().telegramId) {
-                    tgDisplay.textContent = `ID: ${snap.data().telegramId}`;
-                } else {
-                    tgDisplay.textContent = "ID: Tanımlanmadı";
-                }
+                status.textContent = "Veri Erişim Hatası (Firestore)";
             });
         }
 
-        // Giriş Akışı (RULE 3 - Robust Fallback)
+        // Giriş Akışı (RULE 3)
         const initAuth = async () => {
             try {
+                // Canvas ortamı token'ı varsa kullan
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (tokenErr) {
-                        console.warn("Custom token failed, falling back to anonymous:", tokenErr);
-                        await signInAnonymously(auth);
-                    }
+                    await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
+                    // Telegram veya normal web ortamında anonim giriş
                     await signInAnonymously(auth);
                 }
             } catch (e) {
-                console.error("Auth Hatası:", e);
-                status.textContent = "Giriş Hatası: " + e.code;
+                console.error("Giriş Hatası:", e);
+                status.textContent = "Giriş Hatası: " + (e.code === 'auth/configuration-not-found' ? "Firebase Ayarı Eksik" : e.code);
             }
         };
 
@@ -228,7 +240,8 @@
             if (user) {
                 startSync(user);
             } else {
-                status.textContent = "Oturum bekleniyor...";
+                status.textContent = "Oturum açılıyor...";
+                connDot.classList.replace('bg-green-500', 'bg-red-500');
             }
         });
 
@@ -243,15 +256,21 @@
             setTimeout(() => p.remove(), 800);
         }
 
-        // Tıklama
+        // Tıklama Eventi
         tapArea.addEventListener('pointerdown', (e) => {
             if (!currentUser) return;
             count++;
             display.textContent = count.toLocaleString();
             updateCloud(count);
             createParticle(e.clientX, e.clientY);
+            
+            // Telegram titreşim desteği
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         });
 
+        // Modal Yönetimi
         const modal = document.getElementById('reset-modal');
         document.getElementById('reset-trigger').onclick = () => modal.style.display = 'flex';
         document.getElementById('cancel-reset').onclick = () => modal.style.display = 'none';
