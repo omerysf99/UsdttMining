@@ -94,8 +94,8 @@
         <!-- TON Card -->
         <div class="balance-card flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#0088cc] flex items-center justify-center">
-                    <img src="ton.jpg" alt="TON" class="w-6 h-6" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                <div class="w-10 h-10 rounded-full bg-[#0088cc] flex items-center justify-center overflow-hidden">
+                    <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-semibold">Balance</p>
@@ -111,7 +111,7 @@
         <div class="balance-card flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-orange-900/30 flex items-center justify-center overflow-hidden border border-orange-500/20">
-                    <img src="dragon.jpg" alt="$DRAGON" class="w-10 h-10 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
+                    <img src="dragon.jpg" alt="$DRAGON" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-semibold">Balance</p>
@@ -165,19 +165,25 @@
     <!-- Welcome Reward Modal -->
     <div id="welcome-modal" class="modal-overlay">
         <div class="modal-content p-8 flex flex-col items-center reward-animate">
-            <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mb-4">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mb-4 overflow-hidden border border-yellow-500/30">
+                <img src="dragon.jpg" alt="Reward Dragon" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
             </div>
             <h3 class="text-2xl font-black mb-2 text-center">HOŞ GELDİN!</h3>
             <p class="text-gray-400 text-sm text-center mb-6 leading-relaxed">Madencilik macerana başlaman için sana bir başlangıç hediyesi hazırladık!</p>
             
             <div class="w-full space-y-3 mb-8">
                 <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
-                    <span class="text-xs font-bold text-gray-400 uppercase">TON Ödülü</span>
+                    <div class="flex items-center gap-2">
+                        <img src="ton.jpg" class="w-5 h-5 rounded-full" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                        <span class="text-xs font-bold text-gray-400 uppercase">TON Ödülü</span>
+                    </div>
                     <span class="text-green-400 font-black">+0.05 TON</span>
                 </div>
                 <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
-                    <span class="text-xs font-bold text-gray-400 uppercase">$DRAGON Ödülü</span>
+                    <div class="flex items-center gap-2">
+                        <img src="dragon.jpg" class="w-5 h-5 rounded-full" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
+                        <span class="text-xs font-bold text-gray-400 uppercase">$DRAGON Ödülü</span>
+                    </div>
                     <span class="text-orange-400 font-black">+50 $DRAGON</span>
                 </div>
             </div>
@@ -191,8 +197,8 @@
     <!-- Boost Modal -->
     <div id="boost-modal" class="modal-overlay">
         <div class="modal-content p-6 flex flex-col items-center">
-            <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mb-4 overflow-hidden border border-indigo-500/30">
+                <img src="dragon.jpg" alt="Boost Dragon" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
             </div>
             <h3 class="text-xl font-bold mb-1">Hızını Artır!</h3>
             <p class="text-gray-500 text-xs text-center mb-6">Bir reklam izleyerek kalıcı olarak 0.01 GH/s kazanabilirsin.</p>
@@ -259,7 +265,7 @@
         let totalWalletBalance = 0;
         let lastClaimTime = Date.now();
         let currentMiningBalance = 0;
-        let dragonBalance = 0; // Yeni kullanıcı için 0'dan başlar, ödülle artar
+        let dragonBalance = 0; 
         let currentUser = null;
 
         const miningDisplay = document.getElementById('mining-display');
@@ -312,7 +318,6 @@
                     dragonBalance = data.dragonBalance || 0;
                     ghsSpeed = data.ghsSpeed || 11.0;
                 } else {
-                    // İlk kez giren kullanıcı
                     welcomeModal.style.display = 'flex';
                 }
             });
