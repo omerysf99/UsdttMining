@@ -435,7 +435,7 @@
                     </div>
                 </div>
 
-                <!-- Reklam Görevi (GÜNCELLENDİ) -->
+                <!-- Reklam Görevi -->
                 <div class="mission-card" id="mission-ad-card">
                     <div class="mission-icon">📺</div>
                     <div class="mission-info-text">
@@ -541,7 +541,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v4';
+        // REFERANS VE VERİ SIFIRLAMA: Versiyon v5'e yükseltildi.
+        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v5';
 
         const tg = window.Telegram?.WebApp;
         const isTelegram = tg && tg.initData && tg.initData !== "";
@@ -566,7 +567,7 @@
         let myReferralCode = "";
         
         let mission_channel_completed = false;
-        let mission_ad_last_time = 0; // Son reklam izleme zamanı (timestamp)
+        let mission_ad_last_time = 0;
 
         function startSync(user) {
             if (!isTelegram) return;
@@ -597,6 +598,9 @@
                     if (referredBy) {
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
+                    } else {
+                        document.getElementById('referral-input-container').classList.remove('hidden');
+                        document.getElementById('referral-used-container').classList.add('hidden');
                     }
                     updateMissionUI();
                 } else {
@@ -640,7 +644,6 @@
         }
 
         function updateMissionUI() {
-            // Kanal görevi UI
             const channelBtn = document.getElementById('mission-action-btn');
             if (mission_channel_completed) {
                 channelBtn.textContent = "TAMAMLANDI ✅";
@@ -648,10 +651,9 @@
                 channelBtn.disabled = true;
             }
 
-            // Reklam görevi UI (Cooldown)
             const adBtn = document.getElementById('mission-ad-btn');
             const now = Date.now();
-            const cooldown = 5 * 60 * 1000; // 5 dakika ms
+            const cooldown = 5 * 60 * 1000;
             const diff = now - mission_ad_last_time;
 
             if (diff < cooldown) {
@@ -668,20 +670,15 @@
             }
         }
 
-        // Timer Loop for mining AND mission UI updates
         setInterval(() => {
             if (!isTelegram) return;
             const now = Date.now();
-            
-            // Mining Logic
             const elapsed = (now - lastClaimTime) / 1000;
             const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
             document.getElementById('mining-display').textContent = currentMining.toFixed(10);
             document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(8);
             document.getElementById('dragon-balance').textContent = dragonBalance;
             document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
-            
-            // Update Mission timers
             updateMissionUI();
         }, 1000);
 
@@ -694,7 +691,9 @@
         };
 
         document.getElementById('collect-reward-btn').onclick = async () => {
-            totalWalletBalance = 0.05; dragonBalance = 50; lastClaimTime = Date.now();
+            totalWalletBalance = 0.05; 
+            dragonBalance = 50; 
+            lastClaimTime = Date.now();
             await save();
             document.getElementById('welcome-modal').style.display = 'none';
         };
@@ -709,7 +708,6 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
-        // CHANNEL MISSION
         document.getElementById('mission-action-btn').onclick = function() {
             if (mission_channel_completed) return;
             const btn = this;
@@ -740,27 +738,21 @@
             }, 1000);
         };
 
-        // AD MISSION (RECURRING EVERY 5 MINS) - Updated Rewards
         document.getElementById('mission-ad-btn').onclick = function() {
             const btn = this;
             const now = Date.now();
             if (now - mission_ad_last_time < 5 * 60 * 1000) return;
 
-            // Trigger SDK Ad
             if (typeof show_10839932 === 'function') {
                 show_10839932().then(() => {
-                    // Reward user: 0.0003 ton ve 3 $dragon
                     mission_ad_last_time = Date.now();
                     totalWalletBalance += 0.0003;
                     dragonBalance += 3;
                     save();
                     updateMissionUI();
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                }).catch(err => {
-                    console.error("Ad failed:", err);
-                });
+                }).catch(err => { console.error("Ad failed:", err); });
             } else {
-                // Fallback for simulation/preview
                 mission_ad_last_time = Date.now();
                 totalWalletBalance += 0.0003;
                 dragonBalance += 3;
