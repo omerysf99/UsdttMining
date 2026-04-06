@@ -182,7 +182,7 @@
     <div id="telegram-only-overlay">
         <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse">
         <h2 class="text-xl font-black mb-2 uppercase" style="color:white">Giriş Engellendi</h2>
-        <p class="text-gray-400 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
+        <p class="text-gray-500 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
     </div>
 
     <div class="app-container" id="main-app-container">
@@ -386,7 +386,8 @@
                 </div>
 
                 <div class="mt-8 space-y-3">
-                    <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-5 rounded-2xl opacity-40 pointer-events-none uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20">Send</button>
+                    <!-- BUTON HER ZAMAN AKTİF -->
+                    <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20 active:scale-95 transition-all">Send</button>
                     <button onclick="window.closeWithdraw()" class="w-full bg-[#1a1a1a] text-gray-500 font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em]">Not Now</button>
                 </div>
             </div>
@@ -522,23 +523,15 @@
         const updateWdReceive = () => {
             const amountInput = document.getElementById('wd-amount');
             const receiveEl = document.getElementById('wd-receive');
-            const sendBtn = document.getElementById('wd-send-btn');
             
-            if(!amountInput || !receiveEl || !sendBtn) return;
+            if(!amountInput || !receiveEl) return;
 
             const amount = parseFloat(amountInput.value) || 0;
             const fee = 0.01;
             const receive = Math.max(0, amount - fee);
             receiveEl.textContent = amount > fee ? receive.toFixed(4) : "0";
             
-            const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
-            if (amount >= 10 && amount <= balance) {
-                sendBtn.style.opacity = "1";
-                sendBtn.style.pointerEvents = "auto";
-            } else {
-                sendBtn.style.opacity = "0.4";
-                sendBtn.style.pointerEvents = "none";
-            }
+            // Buton her zaman aktif kaldığı için burada sadece hesaplama yapılır, state değiştirilmez.
         };
 
         // Firebase Sync
@@ -647,7 +640,7 @@
                 const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
                 if(gained > 0) {
                     totalWalletBalance += gained; totalMinedStats += gained; lastClaimTime = now;
-                    save(); showToast(`+${gained.toFixed(6)} TON`);
+                    save(); showToast(`+${gained.toFixed(6)} TON AKTARILDI`);
                     if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 }
             };
@@ -682,27 +675,54 @@
                 const amount = parseFloat(amountInput.value);
                 const address = addrInput.value.trim();
                 
+                // Durum 1: Boş veri
+                if (!amount || amount <= 0 || !address) {
+                    showToast("LÜTFEN TÜM ALANLARI DOLDURUN", "⚠️");
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+                    return;
+                }
+
+                // Buton görsel geri bildirimi (yükleniyor)
+                const originalText = wdSendBtn.textContent;
                 wdSendBtn.disabled = true;
-                wdSendBtn.style.opacity = "0.5";
                 wdSendBtn.textContent = "WAIT...";
+                wdSendBtn.style.opacity = "0.7";
 
                 try {
-                    if (address.length < 8) { throw new Error("GEÇERSİZ ADRES"); }
+                    // Durum 2: Minimum tutar kontrolü
+                    if (amount < 10) {
+                        throw new Error("MİNİMUM ÇEKİM: 10 TON");
+                    }
+
+                    // Durum 3: Geçersiz adres formatı
+                    if (address.length < 8) {
+                        throw new Error("GEÇERSİZ ADRES FORMATI");
+                    }
+
+                    // Durum 4: Bakiye kontrolü
                     const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
-                    if (amount > balance) { throw new Error("YETERSİZ BAKİYE"); }
+                    if (amount > balance) {
+                        throw new Error("YETERSİZ BAKİYE!");
+                    }
+
+                    // TÜM ŞARTLAR OK: İŞLEM ONAYI
                     if (currentWdAsset === 'TON') totalWalletBalance -= amount;
                     else dragonBalance -= amount;
 
                     await save();
                     closeWithdraw();
-                    showToast("ÇEKİM ONAYLANDI!", "✅");
+                    showToast("ÇEKİM TALEBİ ALINDI!", "✅");
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
                 } catch (error) {
+                    // REDDEDİLDİ: Hata Toast'ı
                     showToast(error.message, "❌");
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                 } finally {
+                    // Butonu eski haline getir
                     wdSendBtn.disabled = false;
-                    wdSendBtn.textContent = "SEND";
+                    wdSendBtn.textContent = originalText;
+                    wdSendBtn.style.opacity = "1";
                     updateWdReceive();
                 }
             };
