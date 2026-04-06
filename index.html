@@ -200,7 +200,7 @@
 <body>
 
     <div class="app-container">
-        <div id="saveStatus">Initializing...</div>
+        <div id="saveStatus">Bağlanıyor...</div>
         <div class="content">
             <!-- Üst Bakiye Kartları -->
             <div class="balance-card">
@@ -260,11 +260,26 @@
 
         <!-- Alt Navigasyon -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item"><span class="nav-icon">👛</span><span>Wallet</span></a>
-            <a href="#" class="nav-item"><span class="nav-icon">👥</span><span>Friends</span></a>
-            <a href="#" class="nav-item active"><span class="nav-icon">🏠</span><span>Home</span></a>
-            <a href="#" class="nav-item"><span class="nav-icon">🎯</span><span>Missions</span></a>
-            <a href="#" class="nav-item"><span class="nav-icon">⚙️</span><span>More</span></a>
+            <div class="nav-item">
+                <span class="nav-icon">👛</span>
+                <span>Wallet</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span>Friends</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🎯</span>
+                <span>Missions</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span>More</span>
+            </div>
         </nav>
     </div>
 
@@ -274,14 +289,16 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Firebase Yapılandırmasını ortam değişkenlerinden alıyoruz
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "",
+            apiKey: "", 
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
             projectId: "studio-9241589115-a403e",
             storageBucket: "studio-9241589115-a403e.firebasestorage.app",
             messagingSenderId: "1010284036381",
             appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
         };
+        
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-v1';
 
         const app = initializeApp(firebaseConfig);
@@ -290,14 +307,14 @@
 
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON (11 GH/s)
+        const incrementPerSecond = 0.11 / 86400; 
 
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const saveStatus = document.getElementById('saveStatus');
         const miningFan = document.getElementById('miningFan');
 
-        // Daha hassas sayaç döngüsü
+        // Sayaç döngüsü
         let lastTick = Date.now();
         setInterval(() => {
             const now = Date.now();
@@ -308,7 +325,7 @@
             balanceElement.textContent = currentBalance.toFixed(10);
         }, 50);
 
-        // Auth başlatma
+        // Kimlik doğrulama başlatma
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -317,14 +334,15 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.error("Auth initialization failed:", err);
+                console.error("Auth hatası:", err);
+                saveStatus.textContent = "Auth Hatası";
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
             
-            saveStatus.textContent = "Syncing...";
+            saveStatus.textContent = "Eşitleniyor...";
             const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'mining', 'data');
             
             try {
@@ -340,7 +358,6 @@
                     const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
                     
-                    // Mevcut bakiyeyi bulut verisiyle güncelle
                     currentBalance = savedMiningBalance + offlineGain;
                 } else {
                     await setDoc(userDocRef, {
@@ -350,17 +367,17 @@
                     });
                 }
 
-                saveStatus.textContent = "Cloud Active";
+                saveStatus.textContent = "Bulut Aktif";
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 
-                // Kayıt döngüsü
+                // Periyodik kayıt
                 setInterval(async () => {
                     await saveToCloud(userDocRef);
                 }, 30000);
 
             } catch (err) {
-                console.error("Firebase sync error:", err);
-                saveStatus.textContent = "Offline Mode";
+                console.error("Firestore hatası:", err);
+                saveStatus.textContent = "Yerel Mod";
             }
         });
 
@@ -372,14 +389,14 @@
                     currentBalance: currentBalance,
                     lastUpdateTime: Date.now()
                 });
-                saveStatus.textContent = "Saved";
-                setTimeout(() => { saveStatus.textContent = "Cloud Active"; }, 2000);
+                saveStatus.textContent = "Kaydedildi";
+                setTimeout(() => { saveStatus.textContent = "Bulut Aktif"; }, 2000);
             } catch (e) {
-                saveStatus.textContent = "Sync Error";
+                saveStatus.textContent = "Eşitleme Hatası";
             }
         }
 
-        // Claim logic
+        // İşlem Tetikleyicileri
         document.getElementById('claimBtn').addEventListener('click', async () => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
@@ -399,7 +416,6 @@
             }
         });
 
-        // Boost logic
         document.getElementById('boostBtn').addEventListener('click', () => {
             miningFan.style.animationDuration = '0.4s';
             const btn = document.getElementById('boostBtn');
