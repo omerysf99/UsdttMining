@@ -541,8 +541,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // REFERANS VE VERİ SIFIRLAMA: Versiyon v5'e yükseltildi.
-        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v5';
+        // VERİ SIFIRLAMA: Versiyon v6'ya yükseltildi.
+        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v6';
 
         const tg = window.Telegram?.WebApp;
         const isTelegram = tg && tg.initData && tg.initData !== "";
