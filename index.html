@@ -222,6 +222,26 @@
             margin-top: 12px;
             text-align: center;
         }
+
+        /* Modal Styles */
+        #invite-modal {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #1a1a1a;
+            width: 100%;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #333;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -229,9 +249,22 @@
     <div class="app-container">
         <div id="saveStatus">Bağlanıyor...</div>
         
+        <!-- Invite Modal -->
+        <div id="invite-modal">
+            <div class="modal-card">
+                <h3 class="text-xl font-bold mb-2">Hoş Geldiniz!</h3>
+                <p class="text-gray-400 text-sm mb-6">Sizi kim davet etti? Lütfen davet kodunu giriniz.</p>
+                <input type="text" id="referral-input" placeholder="Örn: Drg123x45678" class="w-full bg-black border border-gray-700 rounded-xl p-4 mb-4 text-white outline-none focus:border-[#6d5dfc]">
+                <div class="flex flex-col gap-2">
+                    <button class="btn btn-claim w-full" onclick="window.submitReferral()">Onayla</button>
+                    <button class="text-gray-500 text-xs mt-2" onclick="window.skipReferral()">Davet kodum yok</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Main Content Area -->
         <div id="page-content" class="content">
-            <!-- Content will be rendered here via JS -->
+            <!-- İçerik JS ile buraya yüklenecek -->
         </div>
 
         <!-- Alt Navigasyon -->
@@ -289,12 +322,13 @@
         let currentBalance = 0.0;
         let walletBalance = 0.0;
         let currentPage = 'home';
+        let hasAnsweredInvite = false;
         const incrementPerSecond = 0.11 / 86400; 
 
-        // Rastgele Davet Kodu Üret (Drg111x12345 formatında)
+        // Rastgele Davet Kodu Üret
         const generateRandomCode = () => {
-            const part1 = Math.floor(100 + Math.random() * 900); // 3 rakam
-            const part2 = Math.floor(10000 + Math.random() * 90000); // 5 rakam
+            const part1 = Math.floor(100 + Math.random() * 900);
+            const part2 = Math.floor(10000 + Math.random() * 90000);
             return `Drg${part1}x${part2}`;
         };
         const userInviteCode = generateRandomCode();
@@ -307,24 +341,42 @@
             lastTick = now;
             
             currentBalance += deltaSeconds * incrementPerSecond;
-            
-            // Eğer Home sayfasındaysak bakiye elementini güncelle
             const balanceEl = document.getElementById('tonBalance');
             if (balanceEl) balanceEl.textContent = currentBalance.toFixed(10);
         }, 100);
 
-        // Sayfa Değiştirme Fonksiyonu
+        // Sayfa Değiştirme
         window.changePage = (page) => {
             currentPage = page;
             render();
-            
-            // Navigasyon sınıflarını güncelle
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (page === 'home') document.getElementById('nav-home').classList.add('active');
             if (page === 'friends') document.getElementById('nav-friends').classList.add('active');
-            if (page === 'wallet') document.querySelectorAll('.nav-item')[0].classList.add('active');
-            if (page === 'missions') document.querySelectorAll('.nav-item')[3].classList.add('active');
-            if (page === 'more') document.querySelectorAll('.nav-item')[4].classList.add('active');
+        };
+
+        // Modal İşlemleri
+        window.submitReferral = async () => {
+            const val = document.getElementById('referral-input').value;
+            if (val.trim() === "") return alert("Lütfen bir kod girin veya atlayın.");
+            await completeInvite(val);
+        };
+
+        window.skipReferral = async () => {
+            await completeInvite("none");
+        };
+
+        const completeInvite = async (code) => {
+            if (!auth.currentUser) return;
+            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', auth.currentUser.uid);
+            try {
+                await updateDoc(userDocRef, {
+                    hasAnsweredInvite: true,
+                    invitedBy: code
+                });
+                document.getElementById('invite-modal').style.display = 'none';
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const render = () => {
@@ -383,40 +435,29 @@
                                 <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
                             </button>
                         </div>
-                        
                         <div class="flex gap-2">
                             <button class="btn btn-claim flex-1" onclick="window.handleInvite()">
                                 <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M13 8c0-2.21-1.79-4-4-4S5 5.79 5 8s1.79 4 4 4 4-1.79 4-4zm2 2v2h2v-2h2V8h-2V6h-2v2h-2v2h2zM1 18v2h16v-2c0-2.66-5.33-4-8-4s-8 1.34-8 4z"/></svg>
                                 Invite a friend
                             </button>
-                            <button class="bg-gray-800 p-4 rounded-2xl" onclick="window.copyToClipboard('${userInviteCode}')">
-                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
-                            </button>
                         </div>
                     </div>
-
                     <button class="btn btn-claim w-full mt-4 !bg-blue-600" onclick="window.alert('Arkadaşlar listesi şu an boş.')">
-                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
                          Open Friends List
                     </button>
-
                     <div class="referral-card mt-8">
                          <p class="text-sm text-gray-500 mb-1">Referrals</p>
                          <h3 class="text-3xl font-extrabold">0</h3>
                          <p class="text-xs text-gray-600 mt-2">Kaç referansım var?</p>
                     </div>
                 `;
-            } else {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500">
-                    <p class="text-xl font-bold">${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)} sekmesi yakında!</p>
-                </div>`;
             }
         };
 
         // Firebase Logic
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== "") {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
@@ -440,8 +481,14 @@
                     const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
                     currentBalance = savedMiningBalance + offlineGain;
+                    
+                    // Modal gösterme kontrolü
+                    if (!data.hasAnsweredInvite) {
+                        document.getElementById('invite-modal').style.display = 'flex';
+                    }
                 } else {
-                    await setDoc(userDocRef, { walletBalance: 0, currentBalance: 0, lastUpdateTime: now });
+                    await setDoc(userDocRef, { walletBalance: 0, currentBalance: 0, lastUpdateTime: now, hasAnsweredInvite: false });
+                    document.getElementById('invite-modal').style.display = 'flex';
                 }
                 saveStatus.textContent = "Bulut Aktif";
                 render();
@@ -458,7 +505,6 @@
             } catch (e) { saveStatus.textContent = "Eşitleme Hatası"; }
         }
 
-        // Global Handlers
         window.handleClaim = async (e) => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
@@ -495,7 +541,7 @@
         };
 
         initAuth();
-        render(); // Initial render
+        render();
     </script>
 </body>
 </html>
