@@ -29,6 +29,7 @@
             display: flex;
             justify-content: center;
         }
+        /* Telegram zorunluluk ekranı */
         #telegram-only-overlay {
             position: fixed;
             inset: 0;
@@ -179,41 +180,26 @@
         .admin-card {
             background: #111; border: 1px solid #333; border-radius: 20px; padding: 20px; margin-top: 20px;
         }
-
-        .sync-indicator {
-            position: fixed; top: 15px; right: 15px; 
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 100px;
-            border: 1px solid rgba(16, 185, 129, 0.2); z-index: 100;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Bildirim Baloncuğu -->
     <div id="toast">
         <span id="toast-emoji">✅</span>
         <span id="toast-text" class="text-xs font-bold uppercase tracking-widest">İşlem Başarılı</span>
     </div>
 
-    <!-- Senkronizasyon Göstergesi -->
-    <div class="sync-indicator">
-        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-tighter">Live Sync</span>
-    </div>
-
     <div id="telegram-only-overlay">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=dragon" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse">
+        <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse">
         <h2 class="text-xl font-black mb-2 uppercase" style="color:white">Giriş Engellendi</h2>
         <p class="text-gray-500 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
     </div>
 
     <div class="app-container" id="main-app-container">
         <header class="header-section">
-            <!-- TON Bakiye Kartı -->
             <div class="balance-card flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="w-10 h-10 rounded-full shadow-lg shadow-blue-500/20">
+                    <img src="ton.jpg" class="w-10 h-10 rounded-full shadow-lg shadow-blue-500/20" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     <div>
                         <p class="text-[8px] text-gray-500 font-black uppercase">TON Bakiye</p>
                         <p class="text-white font-black text-sm tracking-tight"><span id="total-ton-balance">0.0000</span></p>
@@ -224,10 +210,9 @@
                 </button>
             </div>
 
-            <!-- DRAGON Bakiye Kartı -->
             <div class="balance-card flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=dragon" class="w-10 h-10 rounded-full shadow-lg shadow-orange-500/20">
+                    <img src="dragon.jpg" class="w-10 h-10 rounded-full shadow-lg shadow-orange-500/20">
                     <div>
                         <p class="text-[8px] text-gray-500 font-black uppercase">$DRAGON</p>
                         <p class="text-white font-black text-sm tracking-tight"><span id="dragon-balance">0</span></p>
@@ -244,7 +229,7 @@
             <section id="tab-home" class="tab-content active items-center justify-center">
                 <div class="status-badge"><div class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-2 shadow-[0_0_8px_#22c55e]"></div>7/24 AKTİF BULUT KAZIM</div>
                 <div class="flex-1 flex flex-col items-center justify-center min-h-[250px]">
-                    <div class="fan-container"><img src="https://api.dicebear.com/7.x/identicon/svg?seed=fan" class="fan-image"></div>
+                    <div class="fan-container"><img src="fan.jpg" class="fan-image"></div>
                     <div class="text-center">
                         <h2 class="text-3xl font-black text-white tracking-tighter mb-1"><span id="mining-display">0.0000000000</span> <span class="text-blue-500 text-lg">TON</span></h2>
                         <div class="flex flex-col items-center gap-1.5">
@@ -268,4 +253,655 @@
             <section id="tab-wallet" class="tab-content py-4">
                 <h3 class="text-lg font-black uppercase mb-4 tracking-tight">Cüzdan Özeti</h3>
                 <div class="bg-[#111] p-6 rounded-2xl border border-white/5 space-y-4">
-                    <div class="flex justify-between text-
+                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Toplam Kazılan</span><span id="stats-total-mined" class="text-white">0.0000 TON</span></div>
+                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Günlük Sabit Gelir</span><span id="stats-daily" class="text-green-400">0.11 TON</span></div>
+                </div>
+                <div class="mt-8">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-3 ml-2 tracking-widest">Geçmiş İşlemler</p>
+                    <div class="bg-[#111] rounded-[24px] border border-white/5 p-10 text-center text-gray-600 text-[10px] uppercase font-black tracking-widest">
+                        Henüz bir işlem yok
+                    </div>
+                </div>
+            </section>
+
+            <!-- DAVET SEKMESİ -->
+            <section id="tab-friends" class="tab-content py-6 space-y-6">
+                <div class="text-center">
+                    <h2 class="text-3xl font-black tracking-tighter mb-1 uppercase text-white">Invite Friends!</h2>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest leading-none">You and your friend will receive bonuses</p>
+                </div>
+
+                <div class="bg-[#111] p-6 rounded-[30px] border border-white/5 shadow-2xl space-y-4">
+                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Your Invite Code</h4>
+                    <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div id="referral-code-display" class="text-lg font-black tracking-[0.2em] text-indigo-400 uppercase">YÜKLENİYOR...</div>
+                        <button id="copy-code-btn" class="text-gray-500 active:scale-90 transition-transform">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button id="invite-friend-btn" class="invite-btn-purple text-xs tracking-widest flex-1">
+                            <span class="text-lg">✨</span> INVITE A FRIEND
+                        </button>
+                        <button id="copy-code-btn-square" style="background:var(--accent-color); width:55px; height:55px; border-radius:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0" class="active:scale-90 transition-all shadow-lg shadow-indigo-900/20">
+                            📋
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-[#111] p-6 rounded-[28px] border border-white/5" id="referral-entry-card">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">Sizi kim davet etti?</p>
+                    <div id="referral-input-container" class="flex gap-2">
+                        <input type="text" id="referral-input" placeholder="DAVET KODUNU BURAYA YAZ" class="flex-1 bg-black rounded-xl p-4 text-[10px] font-bold uppercase outline-none border border-white/5 focus:border-indigo-500 transition-colors">
+                        <button id="apply-referral-btn" class="bg-white text-black font-black px-6 rounded-xl text-[10px] active:scale-95 transition-all">OK</button>
+                    </div>
+                    <div id="referral-used-container" class="hidden py-3 bg-green-500/10 rounded-xl border border-green-500/20 text-center">
+                        <p class="text-green-500 text-[10px] font-black uppercase">Başarıyla Uygulandı ✅</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#111] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[9px] text-gray-500 font-black uppercase mb-1">Referans Kazancı</p>
+                        <p class="text-green-400 font-black text-sm tracking-tight" id="referral-earnings-display">0.00 TON</p>
+                    </div>
+                    <div class="bg-[#111] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[9px] text-gray-500 font-black uppercase mb-1">Ödül (Başına)</p>
+                        <p class="text-white font-black text-sm tracking-tight">+0.03 TON</p>
+                    </div>
+                </div>
+
+                <button onclick="window.openFriendsList()" class="invite-btn-purple !bg-[#1a1a1a] !shadow-none border border-white/5 text-[10px]">
+                    <span class="text-lg">📋</span> OPEN FRIENDS LIST
+                </button>
+            </section>
+
+            <!-- GÖREVLER SEKMESİ -->
+            <section id="tab-missions" class="tab-content py-6 space-y-4">
+                <h3 class="text-xl font-extrabold tracking-tight mb-2 uppercase">Aktif Görevler</h3>
+                
+                <div class="mission-card" id="mission-channel-card">
+                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner">📢</div>
+                    <div class="flex-1">
+                        <p class="text-white text-[11px] font-black uppercase">Resmi Kanala Katıl</p>
+                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.001 TON | +1 $DRAGON</p>
+                    </div>
+                    <button id="mission-action-btn" class="bg-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-indigo-900/30 active:scale-95 transition-all">KATIL</button>
+                </div>
+
+                <div class="mission-card" id="mission-ad-card">
+                    <div class="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner">📺</div>
+                    <div class="flex-1">
+                        <p class="text-white text-[11px] font-black uppercase">Reklam İzle</p>
+                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.0003 TON | +3 $DRAGON</p>
+                    </div>
+                    <button id="mission-ad-btn" class="bg-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-indigo-900/30 active:scale-95 transition-all">İZLE</button>
+                </div>
+
+                <p class="text-[9px] text-gray-600 text-center font-black tracking-widest mt-12">Yakında yeni görevler...</p>
+            </section>
+
+            <!-- ADMIN TAB -->
+            <section id="tab-admin" class="tab-content py-6 space-y-4">
+                <h3 class="text-xl font-black uppercase text-indigo-400">Ejderha Paneli (ADMIN)</h3>
+                
+                <div class="admin-card">
+                    <p class="text-[10px] font-black uppercase text-gray-500 mb-3">Kullanıcı Sorgula (TG ID veya Ref Kod)</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="admin-search-input" placeholder="ID veya Kod" class="admin-input flex-1 !mb-0">
+                        <button id="admin-search-btn" class="bg-indigo-600 px-6 rounded-xl font-black text-xs">ARA</button>
+                    </div>
+                </div>
+
+                <div id="admin-user-details" class="hidden admin-card !mt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 id="admin-user-name" class="text-sm font-black uppercase">---</h4>
+                        <span id="admin-user-id" class="text-[9px] text-gray-500 font-bold">ID: ---</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">TON Bakiyesi</p>
+                            <input type="number" id="admin-edit-ton" class="admin-input">
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">$DRAGON Bakiyesi</p>
+                            <input type="number" id="admin-edit-dragon" class="admin-input">
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">GH/S Hızı</p>
+                            <input type="number" id="admin-edit-ghs" class="admin-input">
+                        </div>
+                        
+                        <button id="admin-save-btn" class="w-full bg-green-600 py-4 rounded-xl font-black text-xs uppercase tracking-widest mt-4">VERİLERİ GÜNCELLE</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-more" class="tab-content py-4">
+                <h3 class="text-lg font-black uppercase mb-4 tracking-tight">Ayarlar</h3>
+                <div class="bg-[#111] p-6 rounded-2xl border border-white/5 text-center">
+                    <p class="text-gray-500 text-[10px] font-black uppercase mb-4 tracking-widest">Hesap Yönetimi</p>
+                    <button id="reset-data-btn" class="w-full bg-red-600/10 text-red-500 border border-red-500/20 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">⚠️ Verileri Sıfırla</button>
+                </div>
+            </section>
+        </main>
+
+        <nav class="nav-bar">
+            <button onclick="window.switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="text-[7px] font-black uppercase tracking-tight">Cüzdan</span></button>
+            <button onclick="window.switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="text-[7px] font-black uppercase tracking-tight">Davet</span></button>
+            <button onclick="window.switchTab('home')" class="nav-btn nav-active" id="nav-home"><span class="nav-emoji">🏠</span><span class="text-[7px] font-black uppercase tracking-tight">Ev</span></button>
+            <button onclick="window.switchTab('missions')" class="nav-btn" id="nav-missions"><span class="nav-emoji">🎯</span><span class="text-[7px] font-black uppercase tracking-tight">Görevler</span></button>
+            <button onclick="window.switchTab('more')" class="nav-btn" id="nav-more"><span class="nav-emoji">⚙️</span><span class="text-[7px] font-black uppercase tracking-tight">Daha</span></button>
+            <button id="nav-admin" onclick="window.switchTab('admin')" class="nav-btn hidden"><span class="nav-emoji">👑</span><span class="text-[7px] font-black uppercase tracking-tight">Admin</span></button>
+        </nav>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdraw-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="flex gap-2 mb-6">
+                    <div class="bg-[#111] rounded-xl py-3 px-4 border border-white/5 flex-1 flex items-center gap-3">
+                        <img src="ton.jpg" class="w-4 h-4 rounded-full"><span class="text-[10px] font-black text-white" id="wd-ton-bal">0.00 TON</span>
+                    </div>
+                    <div class="bg-[#111] rounded-xl py-3 px-4 border border-white/5 flex-1 flex items-center gap-3">
+                        <img src="dragon.jpg" class="w-4 h-4 rounded-full"><span class="text-[10px] font-black text-white" id="wd-dragon-bal">0 $D</span>
+                    </div>
+                </div>
+                <h3 class="text-lg font-black text-center uppercase mb-1 tracking-tight" id="wd-title">Withdrawal</h3>
+                <p class="text-center text-gray-500 text-[10px] font-bold mb-8 uppercase tracking-widest">Min: 10 <span id="wd-min-asset">TON</span> | Fee: 0.01</p>
+                
+                <div class="space-y-4">
+                    <div class="withdraw-input-group">
+                        <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
+                            <img src="ton.jpg" class="w-4 h-4 rounded-full" id="wd-tag-img">
+                            <span id="wd-tag-text" class="text-[10px] font-black uppercase">TON</span>
+                        </div>
+                        <div class="flex-grow"></div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    <div class="withdraw-input-group"><input type="text" id="wd-address" placeholder="YOUR WALLET ADDRESS" class="text-xs uppercase placeholder:text-gray-700"></div>
+                    <div class="withdraw-input-group">
+                        <input type="number" id="wd-amount" placeholder="AMOUNT" class="text-xs placeholder:text-gray-700">
+                        <button class="text-indigo-500 font-black text-[10px] uppercase" id="wd-max-btn">MAX</button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8 p-5 bg-white/5 rounded-[24px] border border-white/5">
+                    <p class="text-white text-[11px] font-black uppercase tracking-widest">Net Receive: <span id="wd-receive" class="text-blue-400">0</span> <span id="wd-receive-asset">TON</span></p>
+                </div>
+
+                <div class="mt-8 space-y-3">
+                    <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20 active:scale-95 transition-all">Send</button>
+                    <button onclick="window.closeWithdraw()" class="w-full bg-[#1a1a1a] text-gray-500 font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em]">Not Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friends List Modal -->
+    <div id="friends-list-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#0a0a0a]">
+                <h3 class="font-black uppercase text-sm tracking-widest text-white">Davetli Listesi</h3>
+                <button onclick="window.closeFriendsList()" class="text-gray-500 font-bold text-2xl">×</button>
+            </div>
+            <div class="modal-body bg-black" id="friends-list-render">
+                <p class="text-center text-gray-600 text-[10px] py-16 uppercase font-black tracking-widest">Henüz kimse yok</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="modal-overlay">
+        <div class="modal-content p-8 flex flex-col items-center text-center">
+            <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-orange-500/20 shadow-2xl">
+            <h2 class="text-2xl font-black mb-1 uppercase tracking-tighter text-white">Hoş Geldin!</h2>
+            <p class="text-gray-500 text-[10px] mb-8 font-bold uppercase tracking-widest">Hediye paketini hemen al!</p>
+            <div class="w-full space-y-3 mb-10">
+                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">TON</span><span class="text-green-400 font-black text-base">+0.05</span></div>
+                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase">$DRAGON</span><span class="text-orange-400 font-black text-base">+50</span></div>
+            </div>
+            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-blue-900/30">Al ve Başla</button>
+        </div>
+    </div>
+
+    <!-- Boost Modal -->
+    <div id="boost-modal" class="modal-overlay">
+        <div class="modal-content p-6 flex flex-col items-center">
+            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-500/20 text-xl">⚡</div>
+            <h3 class="text-lg font-black mb-1 uppercase">Hızlandırıcı</h3>
+            <p class="text-gray-500 text-[9px] text-center mb-6 px-2 font-bold uppercase leading-relaxed text-white">REKLAM İZLE VE <span class="text-white">+0.01 GH/S</span> KAZAN</p>
+            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg shadow-indigo-900/30">HIZLANDIRICIYI BAŞLAT</button>
+            <button onclick="document.getElementById('boost-modal').style.display='none'" class="mt-4 text-gray-600 text-[9px] font-black uppercase">Kapat</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, serverTimestamp, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
+            authDomain: "studio-9241589115-a403e.firebaseapp.com",
+            projectId: "studio-9241589115-a403e",
+            storageBucket: "studio-9241589115-a403e.firebasestorage.app",
+            messagingSenderId: "1010284036381",
+            appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const contextAppId = 'dragon-miner-pro-v7';
+
+        const ADMIN_ID = "83924792"; 
+
+        const tg = window.Telegram?.WebApp;
+        if (tg?.initData && tg.initData !== "") {
+            document.getElementById('telegram-only-overlay').style.display = 'none';
+            document.getElementById('main-app-container').style.display = 'flex';
+            tg.expand();
+        }
+
+        const tgUserId = (tg?.initDataUnsafe?.user?.id || "guest_mode").toString();
+        const tgName = tg?.initDataUnsafe?.user?.first_name || "Misafir";
+
+        // Admin Kontrolü
+        if (tgUserId === ADMIN_ID) {
+            const adminBtn = document.getElementById('nav-admin');
+            if (adminBtn) adminBtn.classList.remove('hidden');
+        }
+
+        // Global State
+        let ghsSpeed = 11.0;
+        let totalWalletBalance = 0;
+        let lastClaimTime = Date.now();
+        let dragonBalance = 0; 
+        let referralEarnings = 0;
+        let referredBy = null;
+        let totalMinedStats = 0;
+        let currentUser = null;
+        let currentWdAsset = 'TON';
+        let mission_channel_completed = false;
+        let mission_ad_last_time = 0;
+
+        let adminTargetTgId = null;
+
+        function showToast(text, emoji = '✅') {
+            const t = document.getElementById('toast');
+            if(t) {
+                document.getElementById('toast-text').textContent = text;
+                document.getElementById('toast-emoji').textContent = emoji;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2500);
+            }
+        }
+
+        window.switchTab = (tabId) => {
+            const tabs = document.querySelectorAll('.tab-content');
+            const btns = document.querySelectorAll('.nav-btn');
+            const targetTab = document.getElementById('tab-' + tabId);
+            const targetBtn = document.getElementById('nav-' + tabId);
+            
+            if(targetTab && targetBtn) {
+                tabs.forEach(t => t.classList.remove('active'));
+                targetTab.classList.add('active');
+                btns.forEach(b => b.classList.remove('nav-active'));
+                targetBtn.classList.add('nav-active');
+                if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            }
+        };
+
+        window.openWithdraw = (asset) => {
+            currentWdAsset = asset;
+            const modal = document.getElementById('withdraw-modal');
+            if(modal) {
+                modal.style.display = 'flex';
+                document.getElementById('wd-title').textContent = `${asset} Withdrawal`;
+                document.getElementById('wd-min-asset').textContent = asset;
+                document.getElementById('wd-receive-asset').textContent = asset;
+                document.getElementById('wd-tag-text').textContent = asset;
+                document.getElementById('wd-tag-img').src = asset === 'TON' ? 'ton.jpg' : 'dragon.jpg';
+                document.getElementById('wd-amount').value = '';
+                document.getElementById('wd-address').value = '';
+                updateWdReceive();
+            }
+        };
+
+        window.closeWithdraw = () => { 
+            const modal = document.getElementById('withdraw-modal');
+            if(modal) modal.style.display = 'none'; 
+        };
+
+        window.openFriendsList = () => {
+            const modal = document.getElementById('friends-list-modal');
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeFriendsList = () => {
+            const modal = document.getElementById('friends-list-modal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        const updateWdReceive = () => {
+            const amountInput = document.getElementById('wd-amount');
+            const receiveEl = document.getElementById('wd-receive');
+            if(!amountInput || !receiveEl) return;
+            const amount = parseFloat(amountInput.value) || 0;
+            const fee = 0.01;
+            const receive = Math.max(0, amount - fee);
+            receiveEl.textContent = amount > fee ? receive.toFixed(4) : "0";
+        };
+
+        // Firebase Sync
+        async function startSync(user) {
+            currentUser = user;
+            const myRefCode = tgUserId.substring(0, 8).toUpperCase();
+            const refDisplay = document.getElementById('referral-code-display');
+            if(refDisplay) refDisplay.textContent = myRefCode;
+            
+            // Kullanıcı Kaydı
+            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
+            setDoc(regRef, { ownerTgId: tgUserId, ownerName: tgName }, { merge: true });
+
+            // Kullanıcı Profili (Telegram ID tabanlı senkron)
+            const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
+            
+            onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    totalWalletBalance = data.walletBalance || 0;
+                    lastClaimTime = data.lastClaimTime || Date.now();
+                    dragonBalance = data.dragonBalance || 0;
+                    ghsSpeed = data.ghsSpeed || 11.0;
+                    referralEarnings = data.referralEarnings || 0;
+                    referredBy = data.referredBy || null;
+                    totalMinedStats = data.totalMinedStats || 0;
+                    mission_channel_completed = data.mission_channel_completed || false;
+                    mission_ad_last_time = data.mission_ad_last_time || 0;
+
+                    if(document.getElementById('total-ton-balance')) document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(4);
+                    if(document.getElementById('dragon-balance')) document.getElementById('dragon-balance').textContent = dragonBalance;
+                    if(document.getElementById('stats-total-mined')) document.getElementById('stats-total-mined').textContent = totalMinedStats.toFixed(4) + " TON";
+                    if(document.getElementById('referral-earnings-display')) document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2) + " TON";
+                    
+                    if(document.getElementById('wd-ton-bal')) document.getElementById('wd-ton-bal').textContent = totalWalletBalance.toFixed(4) + " TON";
+                    if(document.getElementById('wd-dragon-bal')) document.getElementById('wd-dragon-bal').textContent = dragonBalance + " $D";
+
+                    if (referredBy) {
+                        const inputCont = document.getElementById('referral-input-container');
+                        const usedCont = document.getElementById('referral-used-container');
+                        if(inputCont) inputCont.classList.add('hidden');
+                        if(usedCont) usedCont.classList.remove('hidden');
+                    }
+                    updateMissionUI();
+                } else {
+                    const welcome = document.getElementById('welcome-modal');
+                    if(welcome) welcome.style.display = 'flex';
+                }
+            }, (error) => {
+                console.error("Firestore loading error:", error);
+            });
+
+            // Davetli listesi
+            const refListRef = collection(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId, 'referrals');
+            onSnapshot(refListRef, (snap) => {
+                const listEl = document.getElementById('friends-list-render');
+                if(!listEl) return;
+                if (snap.empty) { listEl.innerHTML = '<p class="text-center text-gray-600 text-[10px] py-16 uppercase font-black tracking-widest">Henüz kimse yok</p>'; return; }
+                listEl.innerHTML = '';
+                snap.forEach(d => {
+                    const item = d.data();
+                    const div = document.createElement('div');
+                    div.className = 'friend-item p-4 bg-white/5 rounded-2xl mb-2 flex justify-between items-center border border-white/5';
+                    div.innerHTML = `<div><p class="text-white text-[11px] font-black uppercase">${item.name}</p><p class="text-gray-500 text-[8px] uppercase font-bold tracking-widest">ID: ${item.tgId}</p></div><span class="text-green-500 text-[11px] font-black">+0.03 TON</span>`;
+                    listEl.appendChild(div);
+                });
+            }, (error) => {
+                console.error("Referral list loading error:", error);
+            });
+        }
+
+        async function save() {
+            if (!currentUser) return;
+            const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
+            await setDoc(docRef, {
+                walletBalance: totalWalletBalance, lastClaimTime: lastClaimTime, dragonBalance: dragonBalance,
+                ghsSpeed: ghsSpeed, referralEarnings: referralEarnings, referredBy: referredBy,
+                totalMinedStats: totalMinedStats, updatedAt: serverTimestamp(),
+                mission_channel_completed: mission_channel_completed, mission_ad_last_time: mission_ad_last_time
+            }, { merge: true });
+        }
+
+        // Timer Loop
+        setInterval(() => {
+            const now = Date.now();
+            const elapsed = (now - lastClaimTime) / 1000;
+            const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
+            const dailyYield = ghsSpeed * 0.01;
+            
+            const miningEl = document.getElementById('mining-display');
+            const speedEl = document.getElementById('ghs-speed-display');
+            const dailyYieldEl = document.getElementById('daily-yield-display');
+            const statDaily = document.getElementById('stats-daily');
+            
+            if(miningEl) miningEl.textContent = currentMining.toFixed(10);
+            if(speedEl) speedEl.textContent = ghsSpeed.toFixed(2);
+            if(dailyYieldEl) dailyYieldEl.textContent = dailyYield.toFixed(2);
+            if(statDaily) statDaily.textContent = dailyYield.toFixed(2) + " TON";
+        }, 100);
+
+        // Safe Assignments
+        const setup = () => {
+            const claimBtn = document.getElementById('claim-btn');
+            if (claimBtn) claimBtn.onclick = () => {
+                const now = Date.now();
+                const elapsed = (now - lastClaimTime) / 1000;
+                const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
+                if(gained > 0) {
+                    totalWalletBalance += gained; totalMinedStats += gained; lastClaimTime = now;
+                    save(); showToast(`+${gained.toFixed(6)} TON AKTARILDI`);
+                    if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                }
+            };
+
+            const rewardBtn = document.getElementById('collect-reward-btn');
+            if (rewardBtn) rewardBtn.onclick = async () => {
+                totalWalletBalance = 0.05; dragonBalance = 50; totalMinedStats = 0.05;
+                lastClaimTime = Date.now(); await save();
+                const welcome = document.getElementById('welcome-modal');
+                if (welcome) welcome.style.display = 'none';
+            };
+
+            const wdMax = document.getElementById('wd-max-btn');
+            if (wdMax) wdMax.onclick = () => {
+                const bal = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
+                const amtInput = document.getElementById('wd-amount');
+                if (amtInput) {
+                    amtInput.value = bal.toFixed(4);
+                    updateWdReceive();
+                }
+            };
+
+            const wdSend = document.getElementById('wd-send-btn');
+            if (wdSend) wdSend.onclick = async () => {
+                const amountInput = document.getElementById('wd-amount');
+                const addrInput = document.getElementById('wd-address');
+                if(!amountInput || !addrInput) return;
+                
+                const amount = parseFloat(amountInput.value);
+                const address = addrInput.value.trim();
+                
+                if (!amount || amount <= 0 || !address) { showToast("Alanları doldurun", "⚠️"); return; }
+                
+                wdSend.disabled = true; wdSend.textContent = "WAIT...";
+                try {
+                    if (amount < 10) throw new Error("MİN: 10 TON");
+                    const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
+                    if (amount > balance) throw new Error("YETERSİZ BAKİYE!");
+                    if (currentWdAsset === 'TON') totalWalletBalance -= amount;
+                    else dragonBalance -= amount;
+                    await save(); closeWithdraw(); showToast("TALEBİNİZ ALINDI!", "✅");
+                } catch (e) { showToast(e.message, "❌"); }
+                finally { wdSend.disabled = false; wdSend.textContent = "SEND"; updateWdReceive(); }
+            };
+
+            const copyBtn = document.getElementById('copy-code-btn');
+            const copyBtnSq = document.getElementById('copy-code-btn-square');
+            const handleCopy = () => {
+                const code = tgUserId.substring(0, 8).toUpperCase();
+                const temp = document.createElement('textarea');
+                temp.value = code; document.body.appendChild(temp); temp.select();
+                document.execCommand('copy'); document.body.removeChild(temp);
+                showToast("Kopyalandı", "📋");
+            };
+            if (copyBtn) copyBtn.onclick = handleCopy;
+            if (copyBtnSq) copyBtnSq.onclick = handleCopy;
+
+            const inviteBtn = document.getElementById('invite-friend-btn');
+            if (inviteBtn) inviteBtn.onclick = () => {
+                const code = tgUserId.substring(0, 8).toUpperCase();
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + code)}`;
+                if (tg) tg.openTelegramLink(shareUrl);
+            };
+
+            const applyRef = document.getElementById('apply-referral-btn');
+            if (applyRef) applyRef.onclick = async () => {
+                if (referredBy) return;
+                const refInput = document.getElementById('referral-input');
+                const code = refInput ? refInput.value.trim().toUpperCase() : "";
+                if (!code || code === tgUserId.substring(0, 8).toUpperCase()) return;
+                
+                const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
+                const regSnap = await getDoc(regRef);
+                if (regSnap.exists()) {
+                    const target = regSnap.data();
+                    const referrerRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', target.ownerTgId);
+                    const rSnap = await getDoc(referrerRef);
+                    if (rSnap.exists()) {
+                        const rData = rSnap.data();
+                        await updateDoc(referrerRef, { walletBalance: (rData.walletBalance || 0) + 0.03, referralEarnings: (rData.referralEarnings || 0) + 0.03 });
+                        const refListCol = collection(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', target.ownerTgId, 'referrals');
+                        await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
+                        referredBy = target.ownerTgId; await save(); showToast("Başarılı!");
+                    }
+                } else showToast("Geçersiz Kod", "❌");
+            };
+
+            const mAction = document.getElementById('mission-action-btn');
+            if (mAction) mAction.onclick = function() {
+                if (mission_channel_completed) return;
+                const link = "https://t.me/+8WTu-FmvmCxhNzE1";
+                if (tg) tg.openTelegramLink(link); else window.open(link, '_blank');
+                let t = 10; mAction.disabled = true;
+                const timer = setInterval(() => {
+                    mAction.textContent = t + "S"; t--;
+                    if (t < 0) {
+                        clearInterval(timer); mAction.disabled = false; mAction.textContent = "AL";
+                        mAction.onclick = async () => {
+                            mission_channel_completed = true; totalWalletBalance += 0.001; dragonBalance += 1;
+                            await save(); updateMissionUI(); showToast("Ödül Alındı!");
+                        };
+                    }
+                }, 1000);
+            };
+
+            const mAd = document.getElementById('mission-ad-btn');
+            if (mAd) mAd.onclick = function() {
+                if (typeof show_10839932 === 'function') {
+                    show_10839932().then(() => {
+                        totalWalletBalance += 0.0003; dragonBalance += 3; save(); showToast("+3 $D & +0.0003 TON");
+                    });
+                }
+            };
+
+            const boostTrigger = document.getElementById('boost-trigger');
+            if (boostTrigger) boostTrigger.onclick = () => {
+                const modal = document.getElementById('boost-modal');
+                if (modal) modal.style.display = 'flex';
+            };
+
+            const boostWatch = document.getElementById('watch-ad-btn');
+            if (boostWatch) boostWatch.onclick = () => {
+                if (typeof show_10839932 === 'function') {
+                    show_10839932().then(async () => {
+                        ghsSpeed += 0.01; await save();
+                        const modal = document.getElementById('boost-modal');
+                        if (modal) modal.style.display = 'none';
+                        showToast("Güç Artırıldı!", "⚡");
+                    });
+                }
+            };
+
+            const resetBtn = document.getElementById('reset-data-btn');
+            if (resetBtn) resetBtn.onclick = () => {
+                if (confirm("Emin misin? Tüm verilerin silinecek.")) {
+                    const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
+                    deleteDoc(docRef).then(() => { window.location.reload(); });
+                }
+            };
+
+            // Admin Logic
+            const adminSearch = document.getElementById('admin-search-btn');
+            if (adminSearch) adminSearch.onclick = async () => {
+                const searchIn = document.getElementById('admin-search-input');
+                const search = searchIn ? searchIn.value.trim().toUpperCase() : "";
+                if(!search) return;
+                showToast("Aranıyor...", "🔍");
+                try {
+                    let targetTgId = search;
+                    if(search.length === 8) {
+                        const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', search);
+                        const regSnap = await getDoc(regRef);
+                        if(regSnap.exists()) targetTgId = regSnap.data().ownerTgId;
+                    }
+                    const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', targetTgId);
+                    const userSnap = await getDoc(userRef);
+                    if(userSnap.exists()){
+                        const u = userSnap.data();
+                        adminTargetTgId = targetTgId;
+                        document.getElementById('admin-user-details').classList.remove('hidden');
+                        document.getElementById('admin-user-name').textContent = "Kullanıcı";
+                        document.getElementById('admin-user-id').textContent = "ID: " + targetTgId;
+                        document.getElementById('admin-edit-ton').value = u.walletBalance || 0;
+                        document.getElementById('admin-edit-dragon').value = u.dragonBalance || 0;
+                        document.getElementById('admin-edit-ghs').value = u.ghsSpeed || 11.0;
+                        showToast("Veriler Geldi");
+                    } else throw new Error("BULUNAMADI");
+                } catch(e) { showToast(e.message, "❌"); }
+            };
+
+            const adminSave = document.getElementById('admin-save-btn');
+            if (adminSave) adminSave.onclick = async () => {
+                if(!adminTargetTgId) return;
+                const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', adminTargetTgId);
+                await updateDoc(userRef, {
+                    walletBalance: parseFloat(document.getElementById('admin-edit-ton').value),
+                    dragonBalance: parseInt(document.getElementById('admin-edit-dragon').value),
+                    ghsSpeed: parseFloat(document.getElementById('admin-edit-ghs').value),
+                    updatedAt: serverTimestamp()
+                });
+                showToast("GÜNCELLENDİ", "🔥");
+            };
+        };
+
+        function updateMissionUI() {
+            const channelBtn = document.getElementById('mission-action-btn');
+            if (channelBtn && mission_channel_completed) {
+                channelBtn.textContent = "OK ✅";
+                channelBtn.className = "bg-green-500/10 text-green-500 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-none pointer-events-none";
+                channelBtn.disabled = true;
+            }
+        }
+
+        signInAnonymously(auth).then(res => {
+            startSync(res.user);
+            setup();
+        });
+    </script>
+</body>
+</html>
