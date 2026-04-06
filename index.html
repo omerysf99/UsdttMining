@@ -290,15 +290,22 @@
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Yapılandırması
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "", 
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
             projectId: "studio-9241589115-a403e",
             storageBucket: "studio-9241589115-a403e.firebasestorage.app",
             messagingSenderId: "1010284036381",
             appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
         };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
         
+        // Ortam değişkenlerinden apiKey boş gelirse varsayılanı kullan (auth/configuration-not-found hatasını önlemek için)
+        if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
+            firebaseConfig.apiKey = defaultFirebaseConfig.apiKey;
+        }
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-v1';
 
         const app = initializeApp(firebaseConfig);
@@ -308,14 +315,14 @@
         // Değişkenler
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        const incrementPerSecond = 0.11 / 86400; // 11 GH/s = Günde 0.11 TON
+        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON (11 GH/s)
 
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const saveStatus = document.getElementById('saveStatus');
         const miningFan = document.getElementById('miningFan');
 
-        // Madencilik Döngüsü (Hassas Zamanlama)
+        // Madencilik Döngüsü (Hemen Başlar)
         let lastTick = Date.now();
         setInterval(() => {
             const now = Date.now();
@@ -324,24 +331,35 @@
             
             currentBalance += deltaSeconds * incrementPerSecond;
             balanceElement.textContent = currentBalance.toFixed(10);
-        }, 50);
+        }, 100);
 
-        // Kimlik Doğrulama
+        // Kimlik Doğrulama Başlatma
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth hatası:", err);
+                // Custom token hatası durumunda anonim girişi dene
+                try {
+                    await signInAnonymously(auth);
+                } catch (anonErr) {
+                    console.error("Anonim giriş hatası:", anonErr);
+                    saveStatus.textContent = "Bağlantı Hatası";
+                }
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
             
-            saveStatus.textContent = "Veriler Eşitleniyor...";
+            saveStatus.textContent = "Eşitleniyor...";
             
-            // Veri yolu: artifacts/{appId}/users/{userId}/data/mining (6 parça)
-            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'mining');
+            // Kural 1: 6 segmentli doküman yolu (artifacts/{appId}/public/data/users/{userId})
+            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
             
             try {
                 const userDoc = await getDoc(userDocRef);
@@ -354,13 +372,13 @@
                     const savedMiningBalance = parseFloat(data.currentBalance) || 0;
                     const savedUpdateTime = data.lastUpdateTime || now;
                     
-                    // Offline kazancı hesapla
+                    // Offline (çevrimdışı) kazancı hesapla
                     const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
                     
                     currentBalance = savedMiningBalance + offlineGain;
                 } else {
-                    // Yeni kullanıcı kaydı
+                    // Yeni kullanıcı kaydı oluştur
                     await setDoc(userDocRef, {
                         walletBalance: 0,
                         currentBalance: 0,
@@ -371,13 +389,13 @@
                 saveStatus.textContent = "Bulut Aktif";
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 
-                // Her 30 saniyede bir otomatik kayıt
+                // Her 30 saniyede bir otomatik buluta yedekleme
                 setInterval(async () => {
                     await saveToCloud(userDocRef);
                 }, 30000);
 
             } catch (err) {
-                console.error("Firestore yükleme hatası:", err);
+                console.error("Firestore hatası:", err);
                 saveStatus.textContent = "Yerel Mod";
             }
         });
@@ -393,11 +411,12 @@
                 saveStatus.textContent = "Kaydedildi";
                 setTimeout(() => { saveStatus.textContent = "Bulut Aktif"; }, 2000);
             } catch (e) {
+                console.error("Kaydetme hatası:", e);
                 saveStatus.textContent = "Eşitleme Hatası";
             }
         }
 
-        // Claim Butonu
+        // Claim (Talep Et) İşlemi
         document.getElementById('claimBtn').addEventListener('click', async () => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
@@ -407,17 +426,18 @@
                 balanceElement.textContent = "0.0000000000";
                 
                 if (auth.currentUser) {
-                    const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'data', 'mining');
+                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', auth.currentUser.uid);
                     await saveToCloud(userDocRef);
                 }
 
+                // Buton geri bildirimi
                 const btn = document.getElementById('claimBtn');
                 btn.style.transform = "scale(0.95)";
                 setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
             }
         });
 
-        // Boost Butonu
+        // Boost (Hızlandır) İşlemi
         document.getElementById('boostBtn').addEventListener('click', () => {
             miningFan.style.animationDuration = '0.4s';
             const btn = document.getElementById('boostBtn');
