@@ -273,6 +273,26 @@
             color: #555;
             pointer-events: none;
         }
+        /* Offline Mining Status Badge */
+        .status-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 800;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+        }
     </style>
 </head>
 <body>
@@ -305,9 +325,11 @@
                         <p class="text-white font-extrabold text-sm leading-none"><span id="total-ton-balance">0.0000</span></p>
                     </div>
                 </div>
-                <button class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                </button>
+                <!-- Mining Status Badge -->
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    7/24 AKTİF
+                </div>
             </div>
 
             <div class="balance-card flex items-center justify-between">
@@ -345,6 +367,8 @@
                             <span class="text-orange-500">⚡</span>
                         </div>
                     </div>
+                    
+                    <p class="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] mb-4">Kazım Çevrimdışı Devam Ediyor</p>
                 </div>
 
                 <div class="w-full flex gap-3 mb-6">
@@ -390,11 +414,10 @@
             
             <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
             
-            <!-- GÖREVLER TAB (AKTİF EDİLDİ) -->
+            <!-- GÖREVLER TAB -->
             <section id="tab-missions" class="tab-content py-6 space-y-4">
                 <h3 class="text-xl font-extrabold tracking-tight mb-4 uppercase">Aktif Görevler</h3>
                 
-                <!-- Kanal Görevi -->
                 <div class="mission-card" id="mission-channel-card">
                     <div class="mission-icon">📢</div>
                     <div class="mission-info-text">
@@ -522,8 +545,6 @@
         let referredBy = null;
         let currentUser = null;
         let myReferralCode = "";
-        
-        // Mission States
         let mission_channel_completed = false;
 
         function startSync(user) {
@@ -555,7 +576,6 @@
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
                     }
-                    
                     updateMissionUI();
                 } else {
                     document.getElementById('welcome-modal').style.display = 'flex';
@@ -604,11 +624,15 @@
             }
         }
 
+        // --- KAZIM DÖNGÜSÜ ---
+        // Uygulama kapalı olsa bile lastClaimTime üzerinden hesap yapar
         setInterval(() => {
             if (!isTelegram) return;
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
+            // 1 Gh/s = günde 0.01 ton -> Saniyede kazanç: (ghsSpeed * 0.01) / 86400
             const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
+            
             document.getElementById('mining-display').textContent = currentMining.toFixed(10);
             document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(8);
             document.getElementById('dragon-balance').textContent = dragonBalance;
@@ -624,7 +648,9 @@
         };
 
         document.getElementById('collect-reward-btn').onclick = async () => {
-            totalWalletBalance = 0.05; dragonBalance = 50; lastClaimTime = Date.now();
+            totalWalletBalance = 0.05; 
+            dragonBalance = 50; 
+            lastClaimTime = Date.now();
             await save();
             document.getElementById('welcome-modal').style.display = 'none';
         };
@@ -633,32 +659,26 @@
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
             const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
+            
             totalWalletBalance += gained;
-            lastClaimTime = now;
+            lastClaimTime = now; // Kazanç toplandığında zamanı şimdiki zaman olarak günceller
             save();
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
-        // CHANNEL MISSION LOGIC
         document.getElementById('mission-action-btn').onclick = function() {
             if (mission_channel_completed) return;
-            
             const btn = this;
             const channelLink = "https://t.me/+8WTu-FmvmCxhNzE1";
-            
-            // Linki aç
             if (tg) tg.openTelegramLink(channelLink);
             else window.open(channelLink, '_blank');
             
-            // Sayaç başlat
             let timeLeft = 10;
             btn.disabled = true;
             btn.style.opacity = "0.5";
-            
             const timer = setInterval(() => {
                 btn.textContent = timeLeft + "s";
                 timeLeft--;
-                
                 if (timeLeft < 0) {
                     clearInterval(timer);
                     btn.disabled = false;
@@ -677,7 +697,6 @@
         };
 
         document.getElementById('invite-friend-btn').onclick = () => {
-            const message = `http://t.me/DragTon_bot/Xc1 bedava ton kazanıyorum işte referans kodum: "${myReferralCode}"`;
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('bedava ton kazanıyorum işte referans kodum: ' + myReferralCode)}`;
             if (tg) tg.openTelegramLink(shareUrl);
             else window.open(shareUrl, '_blank');
@@ -694,10 +713,8 @@
         document.getElementById('apply-referral-btn').onclick = async () => {
             const code = document.getElementById('referral-input').value.trim().toUpperCase();
             if (!code || code === myReferralCode || referredBy) return;
-
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
             const regSnap = await getDoc(regRef);
-
             if (regSnap.exists()) {
                 const target = regSnap.data();
                 const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
