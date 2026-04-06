@@ -26,11 +26,10 @@
             overflow: hidden;
         }
 
-        /* 9:16 Oranı için Konteyner */
         .app-container {
             width: 100%;
             height: 100%;
-            max-width: calc(100vh * 9 / 16); /* Yüksekliğe göre 9:16 genişlik */
+            max-width: calc(100vh * 9 / 16);
             max-height: 100vh;
             background-color: #0c0c0c;
             display: flex;
@@ -39,17 +38,15 @@
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
-        /* İçerik Alanı */
         .content {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 20px;
             overflow-y: auto;
-            padding-bottom: 100px; /* Navigasyon için boşluk */
+            padding-bottom: 100px;
         }
 
-        /* Üst Kartlar */
         .balance-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,7 +77,6 @@
             justify-content: center;
         }
 
-        /* Fan Alanı */
         .mining-section {
             flex: 1;
             display: flex;
@@ -110,7 +106,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Sayılar */
         .main-balance {
             font-size: clamp(1.8rem, 8vw, 2.5rem);
             font-weight: 800;
@@ -130,7 +125,6 @@
             margin-top: 10px;
         }
 
-        /* Butonlar */
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -150,13 +144,13 @@
             gap: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            user-select: none;
         }
 
         .btn:active { transform: scale(0.95); }
         .btn-claim { background: #6d5dfc; color: white; }
         .btn-boost { background: #8e80ff; color: white; }
 
-        /* Alt Menü */
         .bottom-nav {
             position: absolute;
             bottom: 0;
@@ -191,12 +185,28 @@
         }
 
         .svg-icon { width: 20px; height: 20px; fill: currentColor; }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        
+        <div id="loadingOverlay">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6d5dfc] mb-4"></div>
+            <p class="text-[#aaa] text-sm">Veriler Yükleniyor...</p>
+        </div>
+
         <div class="content">
             <!-- Üst Bakiye Kartları -->
             <div class="balance-card">
@@ -254,66 +264,149 @@
             </div>
         </div>
 
-        <!-- Alt Navigasyon (Her Zaman Sabit) -->
+        <!-- Alt Navigasyon -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item">
-                <span class="nav-icon">👛</span>
-                <span>Wallet</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">👥</span>
-                <span>Friends</span>
-            </a>
-            <a href="#" class="nav-item active">
-                <span class="nav-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🎯</span>
-                <span>Missions</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">⚙️</span>
-                <span>More</span>
-            </a>
+            <a href="#" class="nav-item"><span class="nav-icon">👛</span><span>Wallet</span></a>
+            <a href="#" class="nav-item"><span class="nav-icon">👥</span><span>Friends</span></a>
+            <a href="#" class="nav-item active"><span class="nav-icon">🏠</span><span>Home</span></a>
+            <a href="#" class="nav-item"><span class="nav-icon">🎯</span><span>Missions</span></a>
+            <a href="#" class="nav-item"><span class="nav-icon">⚙️</span><span>More</span></a>
         </nav>
-
     </div>
 
-    <script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Yapılandırması (Kullanıcı tarafından sağlanan veya ortamdan gelen)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
+            authDomain: "studio-9241589115-a403e.firebaseapp.com",
+            projectId: "studio-9241589115-a403e",
+            storageBucket: "studio-9241589115-a403e.firebasestorage.app",
+            messagingSenderId: "1010284036381",
+            appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-app';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         let currentBalance = 0.0;
         let walletBalance = 0.0;
+        let isSyncing = false;
         
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
-        const increment = 0.0000001273148; 
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const incrementPerSecond = 0.000001273148; // 11 GH/s = 0.11 TON / 86400s
 
-        setInterval(() => {
-            currentBalance += increment;
-            balanceElement.textContent = currentBalance.toFixed(10);
-        }, 100);
+        // Firebase Auth & Data Init
+        const init = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth Error:", err);
+            }
+        };
 
-        function handleClaim() {
-            if (currentBalance > 0) {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'miningData');
+                
+                // İlk veri çekme ve Offline Kazanç hesaplama
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    walletBalance = data.walletBalance || 0;
+                    const lastMiningBalance = data.lastMiningBalance || 0;
+                    const lastUpdateTime = data.lastUpdateTime || Date.now();
+                    
+                    // Offline kazanç hesapla
+                    const now = Date.now();
+                    const secondsPassed = (now - lastUpdateTime) / 1000;
+                    const offlineGain = secondsPassed * incrementPerSecond;
+                    
+                    currentBalance = lastMiningBalance + offlineGain;
+                } else {
+                    // Yeni kullanıcı
+                    await setDoc(userDocRef, {
+                        walletBalance: 0,
+                        lastMiningBalance: 0,
+                        lastUpdateTime: Date.now()
+                    });
+                }
+
+                // Arayüzü güncelle
+                walletElement.textContent = walletBalance.toFixed(10) + " TON";
+                loadingOverlay.style.display = 'none';
+
+                // Madencilik Döngüsü
+                startMining(userDocRef);
+                // Periyodik Sync (Her 30 saniyede bir veya çıkışta)
+                setInterval(() => syncToFirebase(userDocRef), 30000);
+            }
+        });
+
+        function startMining(docRef) {
+            setInterval(() => {
+                currentBalance += (incrementPerSecond / 10); // Her 100ms için
+                balanceElement.textContent = currentBalance.toFixed(10);
+            }, 100);
+        }
+
+        async function syncToFirebase(docRef) {
+            if (!auth.currentUser || isSyncing) return;
+            isSyncing = true;
+            try {
+                await updateDoc(docRef, {
+                    lastMiningBalance: currentBalance,
+                    walletBalance: walletBalance,
+                    lastUpdateTime: Date.now()
+                });
+            } catch (err) {
+                console.error("Sync Error:", err);
+            }
+            isSyncing = false;
+        }
+
+        // Global fonksiyonlar butonlar için
+        window.handleClaim = async () => {
+            if (currentBalance > 0 && auth.currentUser) {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'miningData');
+                
                 walletBalance += currentBalance;
                 currentBalance = 0;
                 
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 balanceElement.textContent = "0.0000000000";
                 
+                // Anında kaydet
+                await syncToFirebase(userDocRef);
+                
+                // Buton efekti
                 const btn = event.currentTarget;
                 btn.style.transform = "scale(0.9)";
                 setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
             }
-        }
+        };
 
-        function handleBoost() {
+        window.handleBoost = () => {
             const fan = document.getElementById('miningFan');
             fan.style.animationDuration = '0.5s';
             setTimeout(() => {
                 fan.style.animationDuration = '3s';
             }, 2500);
-        }
+        };
+
+        init();
     </script>
 </body>
 </html>
