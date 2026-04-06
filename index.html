@@ -312,7 +312,7 @@
                     </div>
                 </div>
 
-                <button id="open-friends-list-btn" class="invite-btn-purple !bg-[#1a1a1a] !shadow-none border border-white/5 text-[10px]">
+                <button onclick="window.openFriendsList()" class="invite-btn-purple !bg-[#1a1a1a] !shadow-none border border-white/5 text-[10px]">
                     <span class="text-lg">📋</span> OPEN FRIENDS LIST
                 </button>
             </section>
@@ -342,7 +342,7 @@
                 <p class="text-[9px] text-gray-600 text-center font-black tracking-widest mt-12">Yakında yeni görevler...</p>
             </section>
 
-            <!-- ADMIN TAB (Sadece sana özel) -->
+            <!-- ADMIN TAB -->
             <section id="tab-admin" class="tab-content py-6 space-y-4">
                 <h3 class="text-xl font-black uppercase text-indigo-400">Ejderha Paneli (ADMIN)</h3>
                 
@@ -446,7 +446,7 @@
         <div class="modal-content">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#0a0a0a]">
                 <h3 class="font-black uppercase text-sm tracking-widest text-white">Davetli Listesi</h3>
-                <button onclick="document.getElementById('friends-list-modal').style.display='none'" class="text-gray-500 font-bold text-2xl">×</button>
+                <button onclick="window.closeFriendsList()" class="text-gray-500 font-bold text-2xl">×</button>
             </div>
             <div class="modal-body bg-black" id="friends-list-render">
                 <p class="text-center text-gray-600 text-[10px] py-16 uppercase font-black tracking-widest">Henüz kimse yok</p>
@@ -496,9 +496,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const contextAppId = 'dragon-miner-pro-v7'; // Versiyonu Telegram ID eşleşmesi için güncelledik
+        const contextAppId = 'dragon-miner-pro-v7';
 
-        const ADMIN_ID = "83924792"; // Telegram ID dizesi
+        const ADMIN_ID = "83924792"; 
 
         const tg = window.Telegram?.WebApp;
         if (tg?.initData && tg.initData !== "") {
@@ -512,7 +512,8 @@
 
         // Admin Kontrolü
         if (tgUserId === ADMIN_ID) {
-            document.getElementById('nav-admin').classList.remove('hidden');
+            const adminBtn = document.getElementById('nav-admin');
+            if (adminBtn) adminBtn.classList.remove('hidden');
         }
 
         // Global State
@@ -576,6 +577,16 @@
             if(modal) modal.style.display = 'none'; 
         };
 
+        window.openFriendsList = () => {
+            const modal = document.getElementById('friends-list-modal');
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeFriendsList = () => {
+            const modal = document.getElementById('friends-list-modal');
+            if (modal) modal.style.display = 'none';
+        };
+
         const updateWdReceive = () => {
             const amountInput = document.getElementById('wd-amount');
             const receiveEl = document.getElementById('wd-receive');
@@ -586,18 +597,18 @@
             receiveEl.textContent = amount > fee ? receive.toFixed(4) : "0";
         };
 
-        // Firebase Sync (Telegram ID tabanlı veri senkronizasyonu)
+        // Firebase Sync
         async function startSync(user) {
             currentUser = user;
             const myRefCode = tgUserId.substring(0, 8).toUpperCase();
             const refDisplay = document.getElementById('referral-code-display');
             if(refDisplay) refDisplay.textContent = myRefCode;
             
-            // Kullanıcı Kaydı (Registry - Kamu verisi için)
+            // Kullanıcı Kaydı
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
             setDoc(regRef, { ownerTgId: tgUserId, ownerName: tgName }, { merge: true });
 
-            // Kullanıcı Profili (Telegram ID tabanlı kamu verisi - her yerden erişim için)
+            // Kullanıcı Profili (Telegram ID tabanlı senkron)
             const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
             
             onSnapshot(docRef, (snap) => {
@@ -632,9 +643,11 @@
                     const welcome = document.getElementById('welcome-modal');
                     if(welcome) welcome.style.display = 'flex';
                 }
+            }, (error) => {
+                console.error("Firestore loading error:", error);
             });
 
-            // Davetli listesi (Telegram ID bazlı senkron)
+            // Davetli listesi
             const refListRef = collection(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId, 'referrals');
             onSnapshot(refListRef, (snap) => {
                 const listEl = document.getElementById('friends-list-render');
@@ -648,6 +661,8 @@
                     div.innerHTML = `<div><p class="text-white text-[11px] font-black uppercase">${item.name}</p><p class="text-gray-500 text-[8px] uppercase font-bold tracking-widest">ID: ${item.tgId}</p></div><span class="text-green-500 text-[11px] font-black">+0.03 TON</span>`;
                     listEl.appendChild(div);
                 });
+            }, (error) => {
+                console.error("Referral list loading error:", error);
             });
         }
 
@@ -680,38 +695,50 @@
             if(statDaily) statDaily.textContent = dailyYield.toFixed(2) + " TON";
         }, 100);
 
-        // UI Setup
+        // Safe Assignments
         const setup = () => {
-            document.getElementById('claim-btn').onclick = () => {
+            const claimBtn = document.getElementById('claim-btn');
+            if (claimBtn) claimBtn.onclick = () => {
                 const now = Date.now();
                 const elapsed = (now - lastClaimTime) / 1000;
                 const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
                 if(gained > 0) {
                     totalWalletBalance += gained; totalMinedStats += gained; lastClaimTime = now;
-                    save(); showToast(`+${gained.toFixed(6)} TON`);
+                    save(); showToast(`+${gained.toFixed(6)} TON AKTARILDI`);
                     if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 }
             };
 
-            document.getElementById('collect-reward-btn').onclick = async () => {
+            const rewardBtn = document.getElementById('collect-reward-btn');
+            if (rewardBtn) rewardBtn.onclick = async () => {
                 totalWalletBalance = 0.05; dragonBalance = 50; totalMinedStats = 0.05;
                 lastClaimTime = Date.now(); await save();
-                document.getElementById('welcome-modal').style.display = 'none';
+                const welcome = document.getElementById('welcome-modal');
+                if (welcome) welcome.style.display = 'none';
             };
 
-            document.getElementById('wd-max-btn').onclick = () => {
+            const wdMax = document.getElementById('wd-max-btn');
+            if (wdMax) wdMax.onclick = () => {
                 const bal = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
-                document.getElementById('wd-amount').value = bal.toFixed(4);
-                updateWdReceive();
+                const amtInput = document.getElementById('wd-amount');
+                if (amtInput) {
+                    amtInput.value = bal.toFixed(4);
+                    updateWdReceive();
+                }
             };
 
-            document.getElementById('wd-send-btn').onclick = async () => {
-                const btn = document.getElementById('wd-send-btn');
-                const amount = parseFloat(document.getElementById('wd-amount').value);
-                const address = document.getElementById('wd-address').value.trim();
+            const wdSend = document.getElementById('wd-send-btn');
+            if (wdSend) wdSend.onclick = async () => {
+                const amountInput = document.getElementById('wd-amount');
+                const addrInput = document.getElementById('wd-address');
+                if(!amountInput || !addrInput) return;
+                
+                const amount = parseFloat(amountInput.value);
+                const address = addrInput.value.trim();
+                
                 if (!amount || amount <= 0 || !address) { showToast("Alanları doldurun", "⚠️"); return; }
                 
-                btn.disabled = true; btn.textContent = "WAIT...";
+                wdSend.disabled = true; wdSend.textContent = "WAIT...";
                 try {
                     if (amount < 10) throw new Error("MİN: 10 TON");
                     const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
@@ -720,24 +747,33 @@
                     else dragonBalance -= amount;
                     await save(); closeWithdraw(); showToast("TALEBİNİZ ALINDI!", "✅");
                 } catch (e) { showToast(e.message, "❌"); }
-                finally { btn.disabled = false; btn.textContent = "SEND"; updateWdReceive(); }
+                finally { wdSend.disabled = false; wdSend.textContent = "SEND"; updateWdReceive(); }
             };
 
-            document.getElementById('copy-code-btn').onclick = () => {
+            const copyBtn = document.getElementById('copy-code-btn');
+            const copyBtnSq = document.getElementById('copy-code-btn-square');
+            const handleCopy = () => {
+                const code = tgUserId.substring(0, 8).toUpperCase();
                 const temp = document.createElement('textarea');
-                temp.value = tgUserId.substring(0, 8).toUpperCase(); document.body.appendChild(temp); temp.select();
+                temp.value = code; document.body.appendChild(temp); temp.select();
                 document.execCommand('copy'); document.body.removeChild(temp);
                 showToast("Kopyalandı", "📋");
             };
+            if (copyBtn) copyBtn.onclick = handleCopy;
+            if (copyBtnSq) copyBtnSq.onclick = handleCopy;
 
-            document.getElementById('invite-friend-btn').onclick = () => {
-                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + tgUserId.substring(0, 8).toUpperCase())}`;
+            const inviteBtn = document.getElementById('invite-friend-btn');
+            if (inviteBtn) inviteBtn.onclick = () => {
+                const code = tgUserId.substring(0, 8).toUpperCase();
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + code)}`;
                 if (tg) tg.openTelegramLink(shareUrl);
             };
 
-            document.getElementById('apply-referral-btn').onclick = async () => {
+            const applyRef = document.getElementById('apply-referral-btn');
+            if (applyRef) applyRef.onclick = async () => {
                 if (referredBy) return;
-                const code = document.getElementById('referral-input').value.trim().toUpperCase();
+                const refInput = document.getElementById('referral-input');
+                const code = refInput ? refInput.value.trim().toUpperCase() : "";
                 if (!code || code === tgUserId.substring(0, 8).toUpperCase()) return;
                 
                 const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
@@ -756,16 +792,17 @@
                 } else showToast("Geçersiz Kod", "❌");
             };
 
-            document.getElementById('mission-action-btn').onclick = function() {
+            const mAction = document.getElementById('mission-action-btn');
+            if (mAction) mAction.onclick = function() {
                 if (mission_channel_completed) return;
-                const btn = this; const link = "https://t.me/+8WTu-FmvmCxhNzE1";
+                const link = "https://t.me/+8WTu-FmvmCxhNzE1";
                 if (tg) tg.openTelegramLink(link); else window.open(link, '_blank');
-                let t = 10; btn.disabled = true;
+                let t = 10; mAction.disabled = true;
                 const timer = setInterval(() => {
-                    btn.textContent = t + "S"; t--;
+                    mAction.textContent = t + "S"; t--;
                     if (t < 0) {
-                        clearInterval(timer); btn.disabled = false; btn.textContent = "AL";
-                        btn.onclick = async () => {
+                        clearInterval(timer); mAction.disabled = false; mAction.textContent = "AL";
+                        mAction.onclick = async () => {
                             mission_channel_completed = true; totalWalletBalance += 0.001; dragonBalance += 1;
                             await save(); updateMissionUI(); showToast("Ödül Alındı!");
                         };
@@ -773,7 +810,8 @@
                 }, 1000);
             };
 
-            document.getElementById('mission-ad-btn').onclick = function() {
+            const mAd = document.getElementById('mission-ad-btn');
+            if (mAd) mAd.onclick = function() {
                 if (typeof show_10839932 === 'function') {
                     show_10839932().then(() => {
                         totalWalletBalance += 0.0003; dragonBalance += 3; save(); showToast("+3 $D & +0.0003 TON");
@@ -781,61 +819,64 @@
                 }
             };
 
-            document.getElementById('boost-trigger').onclick = () => document.getElementById('boost-modal').style.display = 'flex';
-            document.getElementById('watch-ad-btn').onclick = () => {
+            const boostTrigger = document.getElementById('boost-trigger');
+            if (boostTrigger) boostTrigger.onclick = () => {
+                const modal = document.getElementById('boost-modal');
+                if (modal) modal.style.display = 'flex';
+            };
+
+            const boostWatch = document.getElementById('watch-ad-btn');
+            if (boostWatch) boostWatch.onclick = () => {
                 if (typeof show_10839932 === 'function') {
                     show_10839932().then(async () => {
                         ghsSpeed += 0.01; await save();
-                        document.getElementById('boost-modal').style.display = 'none';
+                        const modal = document.getElementById('boost-modal');
+                        if (modal) modal.style.display = 'none';
                         showToast("Güç Artırıldı!", "⚡");
                     });
                 }
             };
 
-            document.getElementById('reset-data-btn').onclick = () => {
+            const resetBtn = document.getElementById('reset-data-btn');
+            if (resetBtn) resetBtn.onclick = () => {
                 if (confirm("Emin misin? Tüm verilerin silinecek.")) {
                     const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
                     deleteDoc(docRef).then(() => { window.location.reload(); });
                 }
             };
 
-            // --- ADMIN LOGIC ---
-            document.getElementById('admin-search-btn').onclick = async () => {
-                const search = document.getElementById('admin-search-input').value.trim().toUpperCase();
+            // Admin Logic
+            const adminSearch = document.getElementById('admin-search-btn');
+            if (adminSearch) adminSearch.onclick = async () => {
+                const searchIn = document.getElementById('admin-search-input');
+                const search = searchIn ? searchIn.value.trim().toUpperCase() : "";
                 if(!search) return;
-
                 showToast("Aranıyor...", "🔍");
-                
                 try {
                     let targetTgId = search;
-                    // Ref kodu ise ID'ye dönüştür
                     if(search.length === 8) {
                         const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', search);
                         const regSnap = await getDoc(regRef);
                         if(regSnap.exists()) targetTgId = regSnap.data().ownerTgId;
                     }
-
                     const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', targetTgId);
                     const userSnap = await getDoc(userRef);
-
                     if(userSnap.exists()){
                         const u = userSnap.data();
                         adminTargetTgId = targetTgId;
-                        
                         document.getElementById('admin-user-details').classList.remove('hidden');
                         document.getElementById('admin-user-name').textContent = "Kullanıcı";
                         document.getElementById('admin-user-id').textContent = "ID: " + targetTgId;
-                        
                         document.getElementById('admin-edit-ton').value = u.walletBalance || 0;
                         document.getElementById('admin-edit-dragon').value = u.dragonBalance || 0;
                         document.getElementById('admin-edit-ghs').value = u.ghsSpeed || 11.0;
-                        
                         showToast("Veriler Geldi");
                     } else throw new Error("BULUNAMADI");
                 } catch(e) { showToast(e.message, "❌"); }
             };
 
-            document.getElementById('admin-save-btn').onclick = async () => {
+            const adminSave = document.getElementById('admin-save-btn');
+            if (adminSave) adminSave.onclick = async () => {
                 if(!adminTargetTgId) return;
                 const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', adminTargetTgId);
                 await updateDoc(userRef, {
