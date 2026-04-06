@@ -200,7 +200,7 @@
 <body>
 
     <div class="app-container">
-        <div id="saveStatus">Başlatılıyor...</div>
+        <div id="saveStatus">Initializing...</div>
         <div class="content">
             <!-- Üst Bakiye Kartları -->
             <div class="balance-card">
@@ -274,7 +274,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "",
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
@@ -289,35 +288,43 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Değişkenler
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON
+        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON (11 GH/s)
 
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const saveStatus = document.getElementById('saveStatus');
         const miningFan = document.getElementById('miningFan');
 
-        // Sayaç Döngüsü (Hemen başlar)
+        // Daha hassas sayaç döngüsü
+        let lastTick = Date.now();
         setInterval(() => {
-            currentBalance += (incrementPerSecond / 10);
+            const now = Date.now();
+            const deltaSeconds = (now - lastTick) / 1000;
+            lastTick = now;
+            
+            currentBalance += deltaSeconds * incrementPerSecond;
             balanceElement.textContent = currentBalance.toFixed(10);
-        }, 100);
+        }, 50);
 
-        // Auth Başlatma
+        // Auth başlatma
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth initialization failed:", err);
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
             
-            saveStatus.textContent = "Veriler yükleniyor...";
+            saveStatus.textContent = "Syncing...";
             const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'mining', 'data');
             
             try {
@@ -328,13 +335,13 @@
                     const data = userDoc.data();
                     walletBalance = parseFloat(data.walletBalance) || 0;
                     
-                    // Mevcut bakiyeyi ve offline kazancı hesapla
-                    const lastMiningBalance = parseFloat(data.currentBalance) || 0;
-                    const lastUpdateTime = data.lastUpdateTime || now;
-                    const secondsPassed = (now - lastUpdateTime) / 1000;
+                    const savedMiningBalance = parseFloat(data.currentBalance) || 0;
+                    const savedUpdateTime = data.lastUpdateTime || now;
+                    const secondsPassed = (now - savedUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
                     
-                    currentBalance = lastMiningBalance + offlineGain;
+                    // Mevcut bakiyeyi bulut verisiyle güncelle
+                    currentBalance = savedMiningBalance + offlineGain;
                 } else {
                     await setDoc(userDocRef, {
                         walletBalance: 0,
@@ -343,17 +350,17 @@
                     });
                 }
 
-                saveStatus.textContent = "Bulut Senkronize";
+                saveStatus.textContent = "Cloud Active";
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 
-                // Kayıt Döngüsü (30 saniyede bir)
+                // Kayıt döngüsü
                 setInterval(async () => {
                     await saveToCloud(userDocRef);
                 }, 30000);
 
             } catch (err) {
-                console.error("Depolama Hatası:", err);
-                saveStatus.textContent = "Çevrimdışı Mod";
+                console.error("Firebase sync error:", err);
+                saveStatus.textContent = "Offline Mode";
             }
         });
 
@@ -365,14 +372,14 @@
                     currentBalance: currentBalance,
                     lastUpdateTime: Date.now()
                 });
-                saveStatus.textContent = "İlerleme Kaydedildi";
-                setTimeout(() => { saveStatus.textContent = "Bulut Senkronize"; }, 2000);
+                saveStatus.textContent = "Saved";
+                setTimeout(() => { saveStatus.textContent = "Cloud Active"; }, 2000);
             } catch (e) {
-                saveStatus.textContent = "Senkronizasyon Hatası";
+                saveStatus.textContent = "Sync Error";
             }
         }
 
-        // Buton Dinleyicileri
+        // Claim logic
         document.getElementById('claimBtn').addEventListener('click', async () => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
@@ -386,17 +393,17 @@
                     await saveToCloud(userDocRef);
                 }
 
-                // Efekt
                 const btn = document.getElementById('claimBtn');
-                btn.style.transform = "scale(0.9)";
+                btn.style.transform = "scale(0.95)";
                 setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
             }
         });
 
+        // Boost logic
         document.getElementById('boostBtn').addEventListener('click', () => {
-            miningFan.style.animationDuration = '0.5s';
+            miningFan.style.animationDuration = '0.4s';
             const btn = document.getElementById('boostBtn');
-            btn.style.transform = "scale(0.9)";
+            btn.style.transform = "scale(0.95)";
             setTimeout(() => {
                 miningFan.style.animationDuration = '3s';
                 btn.style.transform = "scale(1)";
