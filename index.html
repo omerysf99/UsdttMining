@@ -164,7 +164,7 @@
 
     <div id="telegram-only-overlay">
         <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse">
-        <h2 class="text-xl font-black mb-2 uppercase">Giriş Engellendi</h2>
+        <h2 class="text-xl font-black mb-2 uppercase" style="color:white">Giriş Engellendi</h2>
         <p class="text-gray-500 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
     </div>
 
@@ -216,29 +216,74 @@
                 </div>
             </section>
 
-            <!-- Diğer Sekmeler (İçerik dolacak) -->
+            <!-- Cüzdan Sekmesi -->
             <section id="tab-wallet" class="tab-content py-4">
                 <h3 class="text-lg font-black uppercase mb-4">Cüzdan Özeti</h3>
                 <div class="bg-[#111] p-5 rounded-2xl border border-white/5 space-y-3">
-                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Toplam Kazım</span><span id="stats-total-mined">0 TON</span></div>
+                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Toplam Kazılan</span><span id="stats-total-mined">0 TON</span></div>
                     <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Günlük Gelir</span><span id="stats-daily" class="text-green-400">0.11 TON</span></div>
+                </div>
+                <div class="mt-6">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2 ml-2">İşlem Geçmişi</p>
+                    <div class="bg-[#111] rounded-2xl border border-white/5 p-8 text-center text-gray-600 text-[10px] uppercase font-black">
+                        Geçmiş bulunmuyor
+                    </div>
                 </div>
             </section>
 
-            <section id="tab-friends" class="tab-content py-4 items-center">
-                <h3 class="text-lg font-black uppercase mb-6">Referans Sistemi</h3>
-                <div class="bg-[#111] p-6 rounded-[24px] border border-white/5 w-full text-center mb-4">
-                    <p class="text-[9px] text-gray-500 font-black uppercase mb-2">Kodun</p>
-                    <div id="referral-code-display" class="text-xl font-black tracking-widest text-blue-400">---</div>
+            <!-- DAVET SEKMESİ (GELİŞTİRİLDİ) -->
+            <section id="tab-friends" class="tab-content py-6 space-y-6">
+                <div class="text-center">
+                    <h3 class="text-2xl font-extrabold tracking-tight mb-1 uppercase">Arkadaşlarını Çağır</h3>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">Birlikte Daha Hızlı Kazan</p>
                 </div>
-                <button id="invite-friend-btn" class="w-full bg-indigo-600 py-4 rounded-2xl font-black text-xs uppercase mb-4">🚀 Arkadaşını Davet Et</button>
-                <div class="bg-[#111] p-5 rounded-2xl border border-white/5 w-full">
-                    <p class="text-[9px] text-gray-500 font-black uppercase mb-3">Referans Kodu Gir</p>
-                    <div id="referral-input-container" class="flex gap-2">
-                        <input type="text" id="referral-input" placeholder="KOD" class="flex-1 bg-black rounded-xl p-3 text-xs font-bold uppercase outline-none border border-white/5">
-                        <button id="apply-referral-btn" class="bg-white text-black px-6 rounded-xl font-black text-xs">OK</button>
+
+                <!-- Referral Code Area -->
+                <div class="bg-gradient-to-br from-[#111] to-[#0a0a0a] p-6 rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-3 tracking-widest">Senin Özel Davet Kodun</p>
+                    <div class="flex items-center gap-4">
+                        <div id="referral-code-display" class="flex-1 text-2xl font-black tracking-[0.2em] text-indigo-400 uppercase py-2">---</div>
+                        <button id="copy-code-btn" class="bg-white/5 p-3 rounded-2xl active:scale-90 transition-transform border border-white/5">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
                     </div>
                 </div>
+
+                <!-- Invite Button -->
+                <button id="invite-friend-btn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 py-5 rounded-[24px] font-black text-sm uppercase tracking-widest shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                    <span>🚀</span> ARKADAŞINI DAVET ET
+                </button>
+
+                <!-- Stats Area -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#111] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[9px] text-gray-500 font-black uppercase mb-1">Davet Başı</p>
+                        <p class="text-green-400 font-extrabold text-sm">+0.03 TON</p>
+                    </div>
+                    <div class="bg-[#111] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[9px] text-gray-500 font-black uppercase mb-1">Toplam Kazanç</p>
+                        <p class="text-white font-extrabold text-sm" id="referral-earnings-display">0.00 TON</p>
+                    </div>
+                </div>
+
+                <!-- Referral Input Section -->
+                <div class="bg-[#111] p-6 rounded-[28px] border border-white/5" id="referral-entry-card">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">Sizi kim davet etti?</p>
+                    <div id="referral-input-container" class="flex gap-2">
+                        <input type="text" id="referral-input" placeholder="DAVET KODUNU YAZ" class="flex-1 bg-black rounded-xl p-4 text-xs font-bold uppercase outline-none border border-white/5 focus:border-indigo-500 transition-colors">
+                        <button id="apply-referral-btn" class="bg-white text-black px-6 rounded-xl font-black text-xs active:scale-95 transition-all">OK</button>
+                    </div>
+                    <div id="referral-used-container" class="hidden py-3 bg-green-500/10 rounded-xl border border-green-500/20 text-center">
+                        <p class="text-green-500 text-[10px] font-black uppercase">Referans Başarıyla Kaydedildi ✅</p>
+                    </div>
+                </div>
+
+                <!-- List Button -->
+                <button id="open-friends-list-btn" class="w-full py-4 rounded-2xl border border-white/10 text-gray-400 font-black text-[10px] uppercase tracking-widest active:bg-white/5 transition-colors flex items-center justify-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    DAVETLİ LİSTESİNİ GÖR
+                </button>
             </section>
 
             <section id="tab-missions" class="tab-content py-4">
@@ -282,8 +327,8 @@
                         <img src="dragon.jpg" class="w-4 h-4 rounded-full"><span class="text-[9px] font-black text-white" id="wd-dragon-bal">0 $D</span>
                     </div>
                 </div>
-                <h3 class="text-base font-black text-center uppercase mb-1" id="wd-title">Enter Address</h3>
-                <p class="text-center text-gray-500 text-[9px] font-bold mb-6">Min: 10 <span id="wd-min-asset">TON</span> | Fee: 0.01</p>
+                <h3 class="text-base font-black text-center uppercase mb-1" id="wd-title">Cüzdan Adresi</h3>
+                <p class="text-center text-gray-500 text-[9px] font-bold mb-6">Min: 10 <span id="wd-min-asset">TON</span> | Ücret: 0.01</p>
                 
                 <div class="space-y-3">
                     <div class="withdraw-input-group">
@@ -316,7 +361,7 @@
         <div class="modal-content p-6 flex flex-col items-center text-center">
             <img src="dragon.jpg" class="w-16 h-16 rounded-full mb-4 shadow-xl">
             <h3 class="text-xl font-black mb-1 uppercase tracking-tighter">Hoş Geldin!</h3>
-            <p class="text-gray-500 text-[10px] mb-6 font-bold">Kayıt hediyesini hemen al!</p>
+            <p class="text-gray-500 text-[10px] mb-6 font-bold uppercase">Madencilik paketini topla!</p>
             <div class="w-full space-y-2 mb-8">
                 <div class="flex justify-between bg-[#111] p-4 rounded-xl border border-white/5"><span class="text-[9px] font-black text-gray-500 uppercase">TON</span><span class="text-green-400 font-black">+0.05</span></div>
                 <div class="flex justify-between bg-[#111] p-4 rounded-xl border border-white/5"><span class="text-[9px] font-black text-gray-500 uppercase">$DRAGON</span><span class="text-orange-400 font-black">+50</span></div>
@@ -366,7 +411,6 @@
         let mission_channel_completed = false;
         let mission_ad_last_time = 0;
 
-        // Functions
         function showToast(text, emoji = '✅') {
             const t = document.getElementById('toast');
             document.getElementById('toast-text').textContent = text;
@@ -405,7 +449,6 @@
             document.getElementById('wd-receive').textContent = amount > fee ? receive.toFixed(4) : "0";
             const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
             const sendBtn = document.getElementById('wd-send-btn');
-            
             if (amount >= 10 && amount <= balance) {
                 sendBtn.style.opacity = "1";
                 sendBtn.style.pointerEvents = "auto";
@@ -422,7 +465,6 @@
             updateWdReceive();
         };
 
-        // Firebase Sync
         async function startSync(user) {
             currentUser = user;
             const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
@@ -448,11 +490,15 @@
                     document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(4);
                     document.getElementById('dragon-balance').textContent = dragonBalance;
                     document.getElementById('stats-total-mined').textContent = totalMinedStats.toFixed(4) + " TON";
-                    document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
+                    document.getElementById('stats-daily').textContent = (ghsSpeed * 0.01).toFixed(2) + " TON";
+                    document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2) + " TON";
                     document.getElementById('wd-ton-bal').textContent = totalWalletBalance.toFixed(4) + " TON";
                     document.getElementById('wd-dragon-bal').textContent = dragonBalance + " $D";
 
-                    if (referredBy) document.getElementById('referral-input-container').classList.add('hidden');
+                    if (referredBy) {
+                        document.getElementById('referral-input-container').classList.add('hidden');
+                        document.getElementById('referral-used-container').classList.remove('hidden');
+                    }
                 } else {
                     document.getElementById('welcome-modal').style.display = 'flex';
                 }
@@ -470,7 +516,6 @@
             }, { merge: true });
         }
 
-        // Loops
         setInterval(() => {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
@@ -479,7 +524,6 @@
             document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
         }, 100);
 
-        // Actions
         document.getElementById('claim-btn').onclick = () => {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
@@ -495,6 +539,20 @@
             totalWalletBalance = 0.05; dragonBalance = 50; totalMinedStats = 0.05;
             lastClaimTime = Date.now(); await save();
             document.getElementById('welcome-modal').style.display = 'none';
+        };
+
+        document.getElementById('copy-code-btn').onclick = () => {
+            const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
+            const temp = document.createElement('textarea');
+            temp.value = myRefCode; document.body.appendChild(temp); temp.select();
+            document.execCommand('copy'); document.body.removeChild(temp);
+            showToast("Kod Kopyalandı", "📋");
+        };
+
+        document.getElementById('invite-friend-btn').onclick = () => {
+            const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + myRefCode)}`;
+            if (tg) tg.openTelegramLink(shareUrl);
         };
 
         document.getElementById('apply-referral-btn').onclick = async () => {
@@ -519,8 +577,10 @@
                     await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
                     referredBy = target.ownerTgId; await save(); showToast("Başarılı!");
                 }
-            }
+            } else { showToast("Geçersiz Kod!", "❌"); }
         };
+
+        document.getElementById('open-friends-list-btn').onclick = () => document.getElementById('friends-list-modal').style.display = 'flex';
 
         signInAnonymously(auth).then(res => startSync(res.user));
     </script>
