@@ -186,7 +186,6 @@
 
         .svg-icon { width: 20px; height: 20px; fill: currentColor; }
         
-        /* Status Indicator */
         #syncStatus {
             position: absolute;
             top: 5px;
@@ -194,20 +193,21 @@
             font-size: 10px;
             color: #444;
             pointer-events: none;
+            z-index: 200;
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="syncStatus">Syncing...</div>
+        <div id="syncStatus">Bağlanıyor...</div>
         <div class="content">
             <!-- Üst Bakiye Kartları -->
             <div class="balance-card">
                 <div class="flex items-center">
                     <img src="ton.jpg" alt="TON" class="coin-icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Balance</div>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
                         <div class="font-bold text-sm" id="mainWalletBalance">0.0000000000 TON</div>
                     </div>
                 </div>
@@ -220,7 +220,7 @@
                 <div class="flex items-center">
                     <img src="dragon.jpg" alt="TONIX" class="coin-icon" onerror="this.src='https://via.placeholder.com/32/333/fff?text=T'">
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Balance</div>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
                         <div class="font-bold text-sm">0 TONIX</div>
                     </div>
                 </div>
@@ -274,6 +274,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Kullanıcı yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
@@ -296,9 +297,13 @@
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const syncStatus = document.getElementById('syncStatus');
-        const incrementPerSecond = 0.000001273148; // Günde 0.11 TON
+        
+        // 11 GH/s = Günde 0.11 TON
+        // Saniyede = 0.11 / 86400 ≈ 0.000001273148148
+        const incrementPerSecond = 0.11 / 86400; 
 
-        const init = async () => {
+        // Firebase Auth başlatma
+        const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -306,56 +311,70 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.error("Auth Error:", err);
+                console.error("Firebase Auth Hatası:", err);
+                syncStatus.textContent = "Hata: Bağlanamadı";
+                syncStatus.style.color = "#ff4444";
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (user && !isMiningStarted) {
                 isMiningStarted = true;
+                syncStatus.textContent = "Veriler yükleniyor...";
+                
+                // 6 segment kuralı: artifacts/{appId}/users/{userId}/data/mining
                 const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'mining');
                 
                 try {
                     const userDoc = await getDoc(userDocRef);
+                    const now = Date.now();
+
                     if (userDoc.exists()) {
                         const data = userDoc.data();
                         walletBalance = parseFloat(data.walletBalance) || 0;
                         const lastMiningBalance = parseFloat(data.lastMiningBalance) || 0;
-                        const lastUpdateTime = data.lastUpdateTime || Date.now();
+                        const lastUpdateTime = data.lastUpdateTime || now;
                         
-                        const now = Date.now();
+                        // Offline süreyi hesapla ve bakiyeye ekle
                         const secondsPassed = (now - lastUpdateTime) / 1000;
                         const offlineGain = secondsPassed * incrementPerSecond;
                         
                         currentBalance = lastMiningBalance + offlineGain;
                     } else {
+                        // Yeni kullanıcı dokümanı oluştur
+                        currentBalance = 0;
+                        walletBalance = 0;
                         await setDoc(userDocRef, {
                             walletBalance: 0,
                             lastMiningBalance: 0,
-                            lastUpdateTime: Date.now()
+                            lastUpdateTime: now
                         });
                     }
 
-                    // UI'yı anında güncelle
+                    // UI Güncelleme
                     walletElement.textContent = walletBalance.toFixed(10) + " TON";
                     balanceElement.textContent = currentBalance.toFixed(10);
                     
-                    syncStatus.textContent = "Online";
+                    syncStatus.textContent = "Çevrimiçi";
                     syncStatus.style.color = "#4CAF50";
 
-                    startMiningLoop(userDocRef);
-                    setInterval(() => syncToFirebase(userDocRef), 30000); // 30 sn'de bir oto-sync
+                    // Döngüleri Başlat
+                    startMiningLoop();
+                    setInterval(() => syncToFirebase(userDocRef), 30000); // 30 saniyede bir kaydet
                 } catch (error) {
-                    console.error("Data Fetch Error:", error);
-                    syncStatus.textContent = "Offline / Error";
-                    syncStatus.style.color = "#F44336";
+                    console.error("Veri Çekme Hatası:", error);
+                    syncStatus.textContent = "Veri Hatası";
+                    syncStatus.style.color = "#ff4444";
+                    // Hata olsa bile en azından yerel olarak başlat
+                    startMiningLoop();
                 }
             }
         });
 
-        function startMiningLoop(docRef) {
+        function startMiningLoop() {
+            // Görsel olarak her 100ms'de bir güncelle
             setInterval(() => {
-                currentBalance += (incrementPerSecond / 10); // Her 100ms için artış
+                currentBalance += (incrementPerSecond / 10);
                 balanceElement.textContent = currentBalance.toFixed(10);
             }, 100);
         }
@@ -363,21 +382,25 @@
         async function syncToFirebase(docRef) {
             if (!auth.currentUser || isSyncing) return;
             isSyncing = true;
-            syncStatus.textContent = "Syncing...";
+            const originalStatus = syncStatus.textContent;
+            syncStatus.textContent = "Kaydediliyor...";
+            
             try {
                 await updateDoc(docRef, {
                     lastMiningBalance: currentBalance,
                     walletBalance: walletBalance,
                     lastUpdateTime: Date.now()
                 });
-                syncStatus.textContent = "Online";
+                syncStatus.textContent = "Kaydedildi";
+                setTimeout(() => { syncStatus.textContent = "Çevrimiçi"; }, 2000);
             } catch (err) {
-                console.error("Sync Error:", err);
-                syncStatus.textContent = "Sync Error";
+                console.error("Senkronizasyon Hatası:", err);
+                syncStatus.textContent = "Kayıt Hatası";
             }
             isSyncing = false;
         }
 
+        // Global buton fonksiyonları
         window.handleClaim = async (e) => {
             if (currentBalance > 0 && auth.currentUser) {
                 const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'data', 'mining');
@@ -388,8 +411,10 @@
                 walletElement.textContent = walletBalance.toFixed(10) + " TON";
                 balanceElement.textContent = "0.0000000000";
                 
+                // Hemen senkronize et
                 await syncToFirebase(userDocRef);
                 
+                // Basit animasyon
                 const btn = e.currentTarget;
                 btn.style.transform = "scale(0.9)";
                 setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
@@ -398,13 +423,14 @@
 
         window.handleBoost = () => {
             const fan = document.getElementById('miningFan');
+            // Fanı 2.5 saniye boyunca hızlandır
             fan.style.animationDuration = '0.5s';
             setTimeout(() => {
                 fan.style.animationDuration = '3s';
             }, 2500);
         };
 
-        init();
+        initAuth();
     </script>
 </body>
 </html>
