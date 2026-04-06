@@ -2,418 +2,318 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TONIX Miner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TON Madencilik Arayüzü</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --tg-viewport-height: 100vh;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
+            font-family: 'Inter', sans-serif;
             background-color: #000;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100dvh;
-            margin: 0;
             overflow: hidden;
-            user-select: none;
-            touch-action: manipulation;
         }
 
-        /* 9:16 Mobil Oranı */
+        /* 9:16 Oranı için Konteyner */
         .app-container {
             width: 100%;
-            max-width: 420px;
-            height: 100dvh;
-            background-color: #0f0f0f;
-            position: relative;
+            height: 100%;
+            max-width: calc(100vh * 9 / 16); /* Yüksekliğe göre 9:16 genişlik */
+            max-height: 100vh;
+            background-color: #0c0c0c;
             display: flex;
             flex-direction: column;
-            padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
-            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
-        @media (min-height: 750px) and (min-width: 450px) {
-            .app-container {
-                height: 90vh;
-                border-radius: 2.5rem;
-                box-shadow: 0 0 100px rgba(0,0,0,0.9);
-            }
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.25rem;
-        }
-
-        /* Sekme İçerik Yönetimi */
-        .tab-content {
-            display: none !important; 
+        /* İçerik Alanı */
+        .content {
+            flex: 1;
+            display: flex;
             flex-direction: column;
-            flex-grow: 1;
-            width: 100%;
-            height: 100%;
+            padding: 20px;
             overflow-y: auto;
-            animation: fadeIn 0.2s ease-in-out;
+            padding-bottom: 100px; /* Navigasyon için boşluk */
         }
 
-        .tab-content.active {
-            display: flex !important; 
+        /* Üst Kartlar */
+        .balance-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .coin-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        .wallet-btn {
+            background: #6d5dfc;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Fan Alanı */
+        .mining-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 300px;
         }
 
         .fan-container {
             position: relative;
-            width: min(60vw, 200px);
-            height: min(60vw, 200px);
-            margin: 2rem auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            shrink-0;
+            width: min(70vw, 260px);
+            height: min(70vw, 260px);
+            margin-bottom: 20px;
         }
 
-        .fan-image {
+        .fan-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover;
-            animation: rotate-fan 4s linear infinite;
-            box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
+            animation: rotateFan 3s linear infinite;
         }
 
-        @keyframes rotate-fan {
+        @keyframes rotateFan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        .mining-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 700;
+        /* Sayılar */
+        .main-balance {
+            font-size: clamp(1.8rem, 8vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 4px;
             letter-spacing: -1px;
         }
 
-        .btn-primary {
-            background: #8b5cf6;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .stats-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #aaa;
+            margin-top: 10px;
         }
 
-        .btn-primary:active {
-            transform: scale(0.95);
+        /* Butonlar */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn-claim { background: #6d5dfc; color: white; }
+        .btn-boost { background: #8e80ff; color: white; }
+
+        /* Alt Menü */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.98);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 24px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 100;
         }
 
         .nav-item {
-            color: #4b5563;
-            transition: color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #888;
+            text-decoration: none;
+            width: 20%;
         }
 
         .nav-item.active {
-            color: #a78bfa;
+            color: #8e80ff;
         }
 
-        .toast {
-            animation: slideUp 0.3s ease-out;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
         }
 
-        @keyframes slideUp {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
-        }
-
-        ::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Invite Kart Stili */
-        .invite-card {
-            background: #1c1c1e;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .invite-input-container {
-            background: #2c2c2e;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            margin-top: 1rem;
-            margin-bottom: 1.5rem;
-        }
+        .svg-icon { width: 20px; height: 20px; fill: currentColor; }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="app">
-        <!-- ÜST PANEL -->
-        <div id="header" class="space-y-2 shrink-0 z-50">
-            <!-- TON Bakiye -->
-            <div class="glass-card p-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-sky-500 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg">
-                        <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-gem text-lg\'></i>'">
-                    </div>
+    <div class="app-container">
+        
+        <div class="content">
+            <!-- Üst Bakiye Kartları -->
+            <div class="balance-card">
+                <div class="flex items-center">
+                    <img src="ton.jpg" alt="TON" class="coin-icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     <div>
-                        <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
-                        <p class="font-bold text-lg leading-tight"><span id="ton-balance">0.0000</span> TON</p>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Balance</div>
+                        <div class="font-bold text-sm" id="mainWalletBalance">0.0000000000 TON</div>
                     </div>
                 </div>
-                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
+                <div class="wallet-btn">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg>
                 </div>
             </div>
 
-            <!-- TONIX Bakiye -->
-            <div class="glass-card p-3 relative overflow-hidden">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center border border-white/10 shadow-lg">
-                            <img src="dragon.jpg" class="w-full h-full object-cover" alt="TONIX" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-dragon text-lg\'></i>'">
-                        </div>
-                        <div>
-                            <p class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Bakiye</p>
-                            <p class="font-bold text-lg leading-tight"><span id="tonix-balance">0</span> TONIX</p>
-                        </div>
-                    </div>
-                    <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-wallet text-gray-600 text-sm"></i>
+            <div class="balance-card">
+                <div class="flex items-center">
+                    <img src="dragon.jpg" alt="TONIX" class="coin-icon" onerror="this.src='https://via.placeholder.com/32/333/fff?text=T'">
+                    <div>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Balance</div>
+                        <div class="font-bold text-sm">0 TONIX</div>
                     </div>
                 </div>
+                <div class="wallet-btn">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg>
+                </div>
             </div>
-        </div>
 
-        <!-- ANA İÇERİK ALANI -->
-        <div class="flex-grow flex flex-col overflow-hidden relative mt-2">
-            
-            <!-- HOME TAB -->
-            <div id="home-tab" class="tab-content active text-center py-4">
-                
-                <!-- Fan Bölümü -->
+            <!-- Fan Alanı -->
+            <div class="mining-section">
                 <div class="fan-container">
-                    <img src="fan.jpg" onerror="this.src='https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2069&auto=format&fit=crop'" class="fan-image" alt="Fan">
+                    <img src="fan.jpg" alt="Fan" class="fan-img" id="miningFan" onerror="this.src='https://img.freepik.com/premium-photo/3d-render-electric-fan-ventilator-blue-color-isolated-black-background_1020697-2384.jpg'">
                 </div>
 
-                <!-- Sayaç Bölümü -->
-                <div class="my-4">
-                    <h1 class="text-3xl sm:text-4xl mining-text mb-1 tracking-tighter" id="mining-counter">0.0000000000</h1>
-                    <p class="text-xl font-bold text-white/70 mb-3">TON</p>
-                    <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full text-xs border border-white/10">
-                        <span class="text-gray-400 font-medium"><strong class="text-white" id="hash-rate">1.0</strong> GH/s</span>
-                        <i class="fa-solid fa-bolt text-orange-400"></i>
-                    </div>
-                </div>
-
-                <!-- Butonlar Bölümü -->
-                <div class="grid grid-cols-2 gap-3 px-2 shrink-0">
-                    <button onclick="claimMining()" class="btn-primary p-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-500/20">
-                        <i class="fa-solid fa-coins"></i> Claim
-                    </button>
-                    <button class="bg-gray-800 text-gray-600 p-4 rounded-xl flex items-center justify-center gap-2 font-bold cursor-not-allowed">
-                        <i class="fa-solid fa-rocket"></i> Boost
-                    </button>
+                <div class="main-balance" id="tonBalance">0.0000000000</div>
+                <div class="text-xl font-extrabold text-white mb-2">TON</div>
+                
+                <div class="stats-badge">
+                    <span style="font-size: 14px; opacity: 0.6;">ℹ️</span>
+                    <span class="font-bold text-white">11 GH/s</span>
+                    <span style="color: #ff9d00;">⚡</span>
                 </div>
             </div>
 
-            <!-- ARKADAŞLAR TAB (YENİ TASARIM) -->
-            <div id="friends-tab" class="tab-content px-4 py-8">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold mb-2">Invite Friends!</h2>
-                    <p class="text-gray-400 text-sm">You and your friend will receive bonuses</p>
+            <!-- İşlem Butonları -->
+            <div class="action-buttons">
+                <div class="btn btn-claim" onclick="handleClaim()">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                    Claim
                 </div>
-
-                <!-- Invite Card -->
-                <div class="invite-card">
-                    <h3 class="text-lg font-bold text-white">Your Invite Code</h3>
-                    
-                    <div class="invite-input-container">
-                        <input id="invite-code-input" type="text" readonly value="Drg123Ton45" class="bg-transparent border-none text-gray-300 font-medium outline-none flex-grow text-sm">
-                        <button onclick="copyInviteCode()" class="text-gray-500 hover:text-white">
-                            <i class="fa-regular fa-copy text-xl"></i>
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="showToast('Invite sent!')" class="btn-primary flex-grow py-3 rounded-2xl font-bold flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-user-plus"></i> Invite a friend
-                        </button>
-                        <button onclick="copyInviteCode()" class="btn-primary w-14 py-3 rounded-2xl font-bold flex items-center justify-center">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
+                <div class="btn btn-boost" onclick="handleBoost()">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14H11V21L20 10H13Z"/></svg>
+                    Boost
                 </div>
-
-                <!-- Friends List Button -->
-                <button onclick="showToast('Friends list is empty')" class="btn-primary w-full py-4 mt-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-list-ul"></i> Open Friends List
-                </button>
-            </div>
-
-            <!-- GÖREVLER TAB -->
-            <div id="missions-tab" class="tab-content px-2 pt-6">
-                <div class="text-center py-4">
-                    <h2 class="text-xl font-bold">Görevler</h2>
-                    <p class="text-gray-400 text-xs mt-1">Ekstra TONIX kazanmak için tamamla.</p>
-                </div>
-                <div class="space-y-3">
-                    <div class="glass-card p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400"><i class="fa-brands fa-telegram text-xl"></i></div>
-                            <div><p class="font-bold text-xs">Kanala Katıl</p><p class="text-[10px] text-green-400 font-bold">+100 TONIX</p></div>
-                        </div>
-                        <button onclick="showToast('Kontrol ediliyor...')" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">Yap</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WALLET TAB -->
-            <div id="wallet-tab" class="tab-content items-center justify-center text-center px-6">
-                <i class="fa-solid fa-wallet text-5xl text-purple-500 mb-4 opacity-30"></i>
-                <h2 class="text-lg font-bold">Cüzdan</h2>
-                <p class="text-gray-500 text-xs">Çok Yakında!</p>
-            </div>
-
-            <!-- MORE TAB -->
-            <div id="more-tab" class="tab-content items-center justify-center text-center px-6">
-                <i class="fa-solid fa-gear text-5xl text-gray-700 mb-4 opacity-30"></i>
-                <h2 class="text-lg font-bold">Ayarlar</h2>
-                <p class="text-gray-500 text-xs">Geliştirme Aşamasında.</p>
             </div>
         </div>
 
-        <!-- ALT NAVİGASYON -->
-        <div id="footer" class="shrink-0 glass-card flex justify-around items-center p-1.5 mt-auto relative z-50 shadow-2xl">
-            <button onclick="switchTab('wallet', this)" class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full outline-none">
-                <i class="fa-solid fa-wallet text-lg"></i>
-                <span class="text-[8px] font-bold uppercase tracking-tighter">Wallet</span>
-            </button>
-            <button onclick="switchTab('friends', this)" class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full outline-none">
-                <i class="fa-solid fa-users text-lg"></i>
-                <span class="text-[8px] font-bold uppercase tracking-tighter">Friends</span>
-            </button>
-            <button onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center gap-0.5 p-1.5 w-full outline-none">
-                <div class="bg-purple-600/20 w-9 h-9 rounded-lg flex items-center justify-center mb-[-2px]">
-                     <i class="fa-solid fa-fan text-lg text-purple-400"></i>
-                </div>
-                <span class="text-[8px] font-bold uppercase tracking-tighter mt-1">Home</span>
-            </button>
-            <button onclick="switchTab('missions', this)" class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full outline-none">
-                <i class="fa-solid fa-bullseye text-lg"></i>
-                <span class="text-[8px] font-bold uppercase tracking-tighter">Missions</span>
-            </button>
-            <button onclick="switchTab('more', this)" class="nav-item flex flex-col items-center gap-0.5 p-1.5 w-full outline-none">
-                <i class="fa-solid fa-bars-staggered text-lg"></i>
-                <span class="text-[8px] font-bold uppercase tracking-tighter">More</span>
-            </button>
-        </div>
+        <!-- Alt Navigasyon (Her Zaman Sabit) -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item">
+                <span class="nav-icon">👛</span>
+                <span>Wallet</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span>Friends</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">🎯</span>
+                <span>Missions</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span>More</span>
+            </a>
+        </nav>
+
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        const webapp = window.Telegram.WebApp;
-        if (webapp) {
-            webapp.expand();
-            webapp.ready();
-        }
+        let currentBalance = 0.0;
+        let walletBalance = 0.0;
+        
+        const balanceElement = document.getElementById('tonBalance');
+        const walletElement = document.getElementById('mainWalletBalance');
+        const increment = 0.0000001273148; 
 
-        const DAILY_RATE_PER_GH = 1.0;
-        const SECONDS_IN_DAY = 86400;
-        const TICK_MS = 100;
+        setInterval(() => {
+            currentBalance += increment;
+            balanceElement.textContent = currentBalance.toFixed(10);
+        }, 100);
 
-        let state = {
-            tonBalance: 0.0,
-            tonixBalance: 0,
-            miningValue: 0.0,
-            hashRate: 1.0,
-            isMining: true,
-            inviteCode: ""
-        };
-
-        // Rastgele Davet Kodu Üret (DrgXㄧTonYY formatı)
-        function generateInviteCode() {
-            const drgNum = Math.floor(Math.random() * 99) + 10;
-            const tonNum = Math.floor(Math.random() * 99) + 10;
-            state.inviteCode = `Drg${drgNum}Ton${tonNum}`;
-            document.getElementById('invite-code-input').value = state.inviteCode;
-        }
-
-        function startMining() {
-            setInterval(() => {
-                if (state.isMining) {
-                    const increment = (DAILY_RATE_PER_GH / SECONDS_IN_DAY / (1000 / TICK_MS)) * state.hashRate;
-                    state.miningValue += increment;
-                    document.getElementById('mining-counter').innerText = state.miningValue.toFixed(10);
-                }
-            }, TICK_MS);
-        }
-
-        function claimMining() {
-            if (state.miningValue <= 0.0000000001) return;
-            state.tonBalance += state.miningValue;
-            state.miningValue = 0;
-            document.getElementById('ton-balance').innerText = state.tonBalance.toFixed(4);
-            document.getElementById('mining-counter').innerText = "0.0000000000";
-            
-            state.tonixBalance += Math.floor(Math.random() * 3) + 1;
-            document.getElementById('tonix-balance').innerText = state.tonixBalance;
-            
-            showToast("TON Başarıyla Toplandı!");
-        }
-
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            
-            const targetTab = document.getElementById(tabId + '-tab');
-            if (targetTab) targetTab.classList.add('active');
-            element.classList.add('active');
-        }
-
-        function copyInviteCode() {
-            const input = document.getElementById('invite-code-input');
-            input.select();
-            input.setSelectionRange(0, 99999);
-            
-            try {
-                document.execCommand('copy');
-                showToast("Code Copied!");
-            } catch (err) {
-                showToast("Failed to copy");
+        function handleClaim() {
+            if (currentBalance > 0) {
+                walletBalance += currentBalance;
+                currentBalance = 0;
+                
+                walletElement.textContent = walletBalance.toFixed(10) + " TON";
+                balanceElement.textContent = "0.0000000000";
+                
+                const btn = event.currentTarget;
+                btn.style.transform = "scale(0.9)";
+                setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
             }
         }
 
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = "toast fixed bottom-28 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-xs z-[100]";
-            toast.innerText = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+        function handleBoost() {
+            const fan = document.getElementById('miningFan');
+            fan.style.animationDuration = '0.5s';
+            setTimeout(() => {
+                fan.style.animationDuration = '3s';
+            }, 2500);
         }
-
-        window.onload = () => {
-            startMining();
-            generateInviteCode();
-            if (webapp) {
-                const adjustHeight = () => {
-                    document.getElementById('app').style.height = webapp.viewportHeight + 'px';
-                };
-                webapp.onEvent('viewportChanged', adjustHeight);
-                adjustHeight();
-            }
-        };
     </script>
 </body>
 </html>
