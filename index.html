@@ -2,121 +2,121 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Bot Sayaç</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TeleTap Pro - Miner</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top, #1e293b, #0f172a);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .coin-btn {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-        }
-        .counter-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 340px;
-        }
-        #counter-display {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-            transition: transform 0.1s ease;
-        }
-        .btn-increment {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-            border-radius: 1rem;
             cursor: pointer;
-            width: 100%;
-            transition: all 0.2s ease;
+            transition: transform 0.05s;
             user-select: none;
         }
-        .btn-increment:disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
+        .coin-btn:active {
+            transform: scale(0.95);
         }
-        .btn-increment:hover:not(:disabled) {
-            background-color: #2563eb;
-            transform: translateY(-2px);
+        .floating-text {
+            position: absolute;
+            color: #60a5fa;
+            font-weight: 800;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 100;
         }
-        .btn-increment:active:not(:disabled) {
-            transform: translateY(0) scale(0.95);
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
         }
-        #status-indicator {
-            font-size: 0.75rem;
-            margin-top: 1rem;
-            color: #6b7280;
-            word-break: break-word;
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
         }
-        .telegram-info {
-            background: #f0f7ff;
-            border-radius: 0.75rem;
-            padding: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-            color: #1d4ed8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .loading-pulse {
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        #reset-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4 text-white">
 
-    <div class="counter-card">
-        <div class="telegram-info">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
-            <span id="tg-id-display">TG ID: Bekleniyor...</span>
+    <div class="max-w-md w-full flex flex-col items-center gap-8">
+        <!-- Üst Panel -->
+        <div class="glass w-full p-4 rounded-2xl flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white">T</div>
+                <div>
+                    <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Kullanıcı Bilgisi</p>
+                    <p id="tg-id-display" class="text-white text-sm font-semibold">ID: Bağlanıyor...</p>
+                </div>
+            </div>
+            <div id="connection-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
         </div>
-        
-        <h2 class="text-gray-500 text-xs font-bold tracking-widest mb-2 uppercase">Toplam Puan</h2>
-        <div id="counter-display" class="loading-pulse">0</div>
-        
-        <button id="increment-btn" class="btn-increment" disabled>
-            Bağlanıyor...
-        </button>
-        
-        <button id="reset-trigger" class="mt-4 text-gray-400 hover:text-red-500 text-xs underline transition-colors">Verileri Sıfırla</button>
-        <div id="status-indicator">Sistem başlatılıyor...</div>
+
+        <!-- Ana Skor -->
+        <div class="text-center">
+            <h1 id="counter-display" class="text-6xl font-extrabold text-white mb-2 tracking-tight">0</h1>
+            <p class="text-blue-400 font-medium text-sm tracking-widest uppercase">Toplam Puan</p>
+        </div>
+
+        <!-- Tıklama Alanı -->
+        <div id="tap-area" class="coin-btn">
+            <svg class="text-white w-24 h-24 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        </div>
+
+        <!-- İlerleme Paneli -->
+        <div class="glass w-full p-6 rounded-3xl">
+            <div class="flex justify-between text-xs font-bold text-gray-400 mb-2">
+                <span>SEVİYE 1</span>
+                <span id="level-text">0 / 1000</span>
+            </div>
+            <div class="progress-bar mb-4">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="flex justify-center gap-4">
+                <button id="reset-trigger" class="text-gray-500 hover:text-red-400 text-[10px] uppercase font-bold transition-colors underline">Verileri Temizle</button>
+            </div>
+        </div>
+
+        <div id="status-indicator" class="text-gray-500 text-[10px] uppercase font-bold tracking-widest text-center px-4">
+            Bağlantı Kuruluyor...
+        </div>
     </div>
 
-    <div id="reset-modal">
-        <div class="bg-white p-6 rounded-xl shadow-xl max-w-xs w-full mx-4">
-            <h3 class="text-lg font-bold mb-2">Emin misiniz?</h3>
-            <p class="text-gray-600 mb-4 text-sm">Tüm ilerlemeniz silinecek. Onaylıyor musunuz?</p>
-            <div class="flex gap-2">
-                <button id="confirm-reset" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex-1">Sıfırla</button>
-                <button id="cancel-reset" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold flex-1">Kapat</button>
+    <!-- Onay Modalı -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-6 z-[200]">
+        <div class="glass bg-slate-900 p-8 rounded-3xl w-full max-w-xs text-center border-red-500/20">
+            <h3 class="text-white text-xl font-bold mb-2">Sıfırlansın mı?</h3>
+            <p class="text-gray-400 text-sm mb-6">Tüm kazancınız silinecektir.</p>
+            <div class="flex flex-col gap-2">
+                <button id="confirm-reset" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl">EVET, SIFIRLA</button>
+                <button id="cancel-reset" class="text-gray-400 font-bold py-2">VAZGEÇ</button>
             </div>
         </div>
     </div>
@@ -126,8 +126,7 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ÖNEMLİ: Sistem tarafından sağlanan __firebase_config değişkenini kullanıyoruz.
-        // Eğer bu değişken yoksa kullanıcının sağladığı config'e geri dönüyoruz.
+        // Global Değişkenleri Al
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
@@ -139,114 +138,129 @@
                 appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
             };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-counter-bot-01';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-teletap-v2';
 
+        // Firebase Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         let count = 0;
         let currentUser = null;
-        let unsubCounter = null;
-        let unsubProfile = null;
+        let syncActive = false;
 
         const display = document.getElementById('counter-display');
         const tgDisplay = document.getElementById('tg-id-display');
-        const btn = document.getElementById('increment-btn');
-        const resetTrigger = document.getElementById('reset-trigger');
+        const tapArea = document.getElementById('tap-area');
+        const progressFill = document.getElementById('progress-fill');
         const status = document.getElementById('status-indicator');
-        const resetModal = document.getElementById('reset-modal');
+        const connDot = document.getElementById('connection-dot');
 
-        async function updateCloud(newCount) {
+        // Cloud Güncelleme (RULE 1: /artifacts/{appId}/users/{userId}/{collectionName})
+        async function updateCloud(val) {
             if (!currentUser) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'counter');
-                await setDoc(docRef, { value: newCount, updatedAt: serverTimestamp() }, { merge: true });
+                await setDoc(docRef, { value: val, lastActive: serverTimestamp() }, { merge: true });
             } catch (e) {
                 console.error("Yazma hatası:", e);
             }
         }
 
-        function startSyncing(user) {
+        // Senkronizasyon Başlat
+        function startSync(user) {
+            if (syncActive) return;
             currentUser = user;
-            status.textContent = "Bağlantı kuruldu, veriler alınıyor...";
+            syncActive = true;
             
-            // Sayaç Verisi
+            status.textContent = "Bağlantı Başarılı";
+            connDot.classList.replace('bg-red-500', 'bg-green-500');
+
+            // Sayaç Verisi (RULE 1)
             const counterRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'counter');
-            unsubCounter = onSnapshot(counterRef, (snap) => {
+            onSnapshot(counterRef, (snap) => {
                 if (snap.exists()) {
                     count = snap.data().value || 0;
-                    display.textContent = count;
-                    display.classList.remove('loading-pulse');
-                    btn.disabled = false;
-                    btn.textContent = "Artır +1";
-                    status.textContent = "Veriler güncel.";
+                    display.textContent = count.toLocaleString();
+                    
+                    const progress = (count % 1000) / 1000 * 100;
+                    progressFill.style.width = `${progress}%`;
+                    document.getElementById('level-text').textContent = `${(count % 1000)} / 1000`;
                 } else {
                     updateCloud(0);
-                    display.textContent = "0";
-                    display.classList.remove('loading-pulse');
-                    btn.disabled = false;
                 }
             }, (err) => {
-                console.error("Sayaç hatası:", err);
-                status.textContent = "Veri okunamadı (Firestore Kuralları).";
+                status.textContent = "Veri Erişim Hatası";
+                console.error(err);
             });
 
-            // Telegram Profil Bilgisi
+            // Profil Verisi (RULE 1)
             const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info');
-            unsubProfile = onSnapshot(profileRef, (snap) => {
+            onSnapshot(profileRef, (snap) => {
                 if (snap.exists() && snap.data().telegramId) {
                     tgDisplay.textContent = `ID: ${snap.data().telegramId}`;
                 } else {
-                    tgDisplay.textContent = "TG ID: Tanımlanmadı";
+                    tgDisplay.textContent = "ID: Tanımlanmadı";
                 }
-            }, (err) => {
-                console.error("Profil hatası:", err);
-                tgDisplay.textContent = "ID Alınamadı";
             });
         }
 
-        const performLogin = async () => {
+        // Giriş Akışı (RULE 3 - Robust Fallback)
+        const initAuth = async () => {
             try {
-                // Kural 3: Önce __initial_auth_token ile giriş yapmayı dene
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (tokenErr) {
+                        console.warn("Custom token failed, falling back to anonymous:", tokenErr);
+                        await signInAnonymously(auth);
+                    }
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (e) {
-                console.error("Auth hatası:", e);
-                status.textContent = `Giriş Hatası: ${e.code}. Firebase Auth yapılandırmasını kontrol edin.`;
+                console.error("Auth Hatası:", e);
+                status.textContent = "Giriş Hatası: " + e.code;
             }
         };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                startSyncing(user);
+                startSync(user);
             } else {
-                if (unsubCounter) unsubCounter();
-                if (unsubProfile) unsubProfile();
-                currentUser = null;
-                status.textContent = "Oturum kapalı.";
+                status.textContent = "Oturum bekleniyor...";
             }
         });
 
-        btn.addEventListener('click', () => {
-            const next = count + 1;
-            display.textContent = next; 
-            updateCloud(next);
-            display.style.transform = 'scale(1.1)';
-            setTimeout(() => display.style.transform = 'scale(1)', 100);
+        // Efektler
+        function createParticle(x, y) {
+            const p = document.createElement('div');
+            p.className = 'floating-text';
+            p.textContent = '+1';
+            p.style.left = `${x}px`;
+            p.style.top = `${y}px`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+        }
+
+        // Tıklama
+        tapArea.addEventListener('pointerdown', (e) => {
+            if (!currentUser) return;
+            count++;
+            display.textContent = count.toLocaleString();
+            updateCloud(count);
+            createParticle(e.clientX, e.clientY);
         });
 
-        resetTrigger.addEventListener('click', () => resetModal.style.display = 'flex');
-        document.getElementById('cancel-reset').addEventListener('click', () => resetModal.style.display = 'none');
-        document.getElementById('confirm-reset').addEventListener('click', () => {
+        const modal = document.getElementById('reset-modal');
+        document.getElementById('reset-trigger').onclick = () => modal.style.display = 'flex';
+        document.getElementById('cancel-reset').onclick = () => modal.style.display = 'none';
+        document.getElementById('confirm-reset').onclick = () => {
             updateCloud(0);
-            resetModal.style.display = 'none';
-        });
+            modal.style.display = 'none';
+        };
 
-        performLogin();
+        initAuth();
     </script>
 </body>
 </html>
