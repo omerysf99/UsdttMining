@@ -33,9 +33,10 @@
             cursor: pointer;
             transition: transform 0.05s;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         .coin-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
         .floating-text {
             position: absolute;
@@ -45,22 +46,24 @@
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
             z-index: 100;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-100px); }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
         }
         .progress-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
             overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #3b82f6, #60a5fa);
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     </style>
 </head>
@@ -68,57 +71,60 @@
 
     <div class="max-w-md w-full flex flex-col items-center gap-8">
         <!-- Üst Panel -->
-        <div class="glass w-full p-4 rounded-2xl flex justify-between items-center">
+        <div class="glass w-full p-4 rounded-2xl flex justify-between items-center border border-white/10">
             <div class="flex items-center gap-3">
-                <div id="user-avatar" class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-xl">?</div>
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-blue-500/20">?</div>
                 <div>
-                    <p id="user-name" class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Yükleniyor...</p>
-                    <p id="tg-id-display" class="text-white text-sm font-semibold italic">ID: Bağlanıyor...</p>
+                    <p id="user-name" class="text-gray-400 text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Yükleniyor...</p>
+                    <p id="tg-id-display" class="text-blue-400 text-xs font-semibold">ID: Bağlanıyor...</p>
                 </div>
             </div>
-            <div id="connection-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+            <div id="connection-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.6)] animate-pulse"></div>
         </div>
 
         <!-- Ana Skor -->
         <div class="text-center">
-            <h1 id="counter-display" class="text-6xl font-extrabold text-white mb-2 tracking-tight">0</h1>
-            <p class="text-blue-400 font-medium text-sm tracking-widest uppercase">Toplam Puan</p>
+            <h1 id="counter-display" class="text-7xl font-black text-white mb-1 tracking-tighter drop-shadow-2xl">0</h1>
+            <p class="text-blue-400 font-bold text-xs tracking-[0.2em] uppercase opacity-80">Toplam Kazanç</p>
         </div>
 
         <!-- Tıklama Alanı -->
         <div id="tap-area" class="coin-btn">
-            <svg class="text-white w-24 h-24 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <div class="absolute inset-0 rounded-full border-4 border-white/10"></div>
+            <svg class="text-white w-24 h-24 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
         </div>
 
-        <!-- İlerleme Paneli -->
-        <div class="glass w-full p-6 rounded-3xl">
-            <div class="flex justify-between text-xs font-bold text-gray-400 mb-2">
-                <span>SEVİYE 1</span>
+        <!-- Alt İlerleme Paneli -->
+        <div class="glass w-full p-6 rounded-[2.5rem] border border-white/10">
+            <div class="flex justify-between text-[10px] font-black text-gray-400 mb-3 tracking-widest">
+                <span id="level-title">SEVİYE 1: ÇAYLAK</span>
                 <span id="level-text">0 / 1000</span>
             </div>
-            <div class="progress-bar mb-4">
+            <div class="progress-bar mb-6">
                 <div id="progress-fill" class="progress-fill"></div>
             </div>
-            <div class="flex justify-center gap-4">
-                <button id="reset-trigger" class="text-gray-500 hover:text-red-400 text-[10px] uppercase font-bold transition-colors underline">Verileri Temizle</button>
+            <div class="flex flex-col items-center gap-3">
+                <button id="reset-trigger" class="text-gray-500 hover:text-red-400 text-[10px] uppercase font-bold transition-all hover:tracking-wider">Verileri Sıfırla</button>
+                <div id="status-indicator" class="text-gray-600 text-[9px] uppercase font-bold tracking-widest text-center">
+                    Sistem Hazırlanıyor
+                </div>
             </div>
-        </div>
-
-        <div id="status-indicator" class="text-gray-500 text-[10px] uppercase font-bold tracking-widest text-center px-4">
-            Bağlantı Kuruluyor...
         </div>
     </div>
 
     <!-- Onay Modalı -->
-    <div id="reset-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-6 z-[200]">
-        <div class="glass bg-slate-900 p-8 rounded-3xl w-full max-w-xs text-center border-red-500/20">
-            <h3 class="text-white text-xl font-bold mb-2">Sıfırlansın mı?</h3>
-            <p class="text-gray-400 text-sm mb-6">Tüm kazancınız silinecektir.</p>
-            <div class="flex flex-col gap-2">
-                <button id="confirm-reset" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl">EVET, SIFIRLA</button>
-                <button id="cancel-reset" class="text-gray-400 font-bold py-2">VAZGEÇ</button>
+    <div id="reset-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-6 z-[200]">
+        <div class="glass bg-slate-900/50 p-8 rounded-[2.5rem] w-full max-w-xs text-center border border-white/5">
+            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="text-red-500 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 class="text-white text-xl font-extrabold mb-2 uppercase tracking-tight">Emin misiniz?</h3>
+            <p class="text-gray-400 text-sm mb-8 leading-relaxed">Tüm puanlarınız ve ilerlemeniz kalıcı olarak silinecek.</p>
+            <div class="flex flex-col gap-3">
+                <button id="confirm-reset" class="bg-red-500 hover:bg-red-600 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-red-500/20 active:scale-95">EVET, SIFIRLA</button>
+                <button id="cancel-reset" class="text-gray-500 font-bold text-sm py-2 hover:text-white transition-colors">VAZGEÇ</button>
             </div>
         </div>
     </div>
@@ -128,14 +134,13 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Telegram WebApp Başlat
         const tg = window.Telegram?.WebApp;
         if (tg) {
-            tg.expand(); // Uygulamayı tam ekran yap
+            tg.expand();
             tg.ready();
+            if (tg.setHeaderColor) tg.setHeaderColor('#1e293b');
         }
 
-        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
@@ -147,9 +152,8 @@
                 appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
             };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-teletap-v1';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'teletap-pro-v1';
 
-        // Firebase Servislerini Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -167,7 +171,6 @@
         const status = document.getElementById('status-indicator');
         const connDot = document.getElementById('connection-dot');
 
-        // Cloud Güncelleme (RULE 1)
         async function updateCloud(val) {
             if (!currentUser) return;
             try {
@@ -175,77 +178,79 @@
                 await setDoc(docRef, { 
                     value: val, 
                     lastActive: serverTimestamp(),
-                    telegramData: tg?.initDataUnsafe?.user || null 
+                    client: tg?.platform || 'web'
                 }, { merge: true });
             } catch (e) {
-                console.error("Firebase Yazma Hatası:", e);
+                console.error("Buluta yazılamadı:", e);
             }
         }
 
-        // Senkronizasyon Başlat
+        function updateUI(val) {
+            count = val;
+            display.textContent = val.toLocaleString();
+            
+            const nextLevel = 1000;
+            const progress = (val % nextLevel) / nextLevel * 100;
+            progressFill.style.width = `${progress}%`;
+            document.getElementById('level-text').textContent = `${(val % nextLevel)} / ${nextLevel}`;
+            
+            const levelNum = Math.floor(val / 1000) + 1;
+            document.getElementById('level-title').textContent = `SEVİYE ${levelNum}: ${levelNum > 5 ? 'ELİT' : 'ÇAYLAK'}`;
+        }
+
         function startSync(user) {
             if (syncActive) return;
             currentUser = user;
             syncActive = true;
             
-            status.textContent = "Buluta Bağlandı";
+            status.textContent = "Bağlantı Aktif ✅";
             connDot.classList.replace('bg-red-500', 'bg-green-500');
+            connDot.classList.remove('animate-pulse');
 
-            // Telegram Kullanıcı Bilgilerini Göster
             const tgUser = tg?.initDataUnsafe?.user;
             if (tgUser) {
-                userNameDisplay.textContent = tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '');
+                userNameDisplay.textContent = `${tgUser.first_name} ${tgUser.last_name || ''}`.trim();
                 tgDisplay.textContent = `ID: ${tgUser.id}`;
-                userAvatar.textContent = tgUser.first_name[0];
+                userAvatar.textContent = tgUser.first_name[0].toUpperCase();
             } else {
                 userNameDisplay.textContent = "Misafir Kullanıcı";
-                tgDisplay.textContent = "ID: Web Modu";
+                tgDisplay.textContent = "Web Önizleme";
             }
 
-            // Sayaç Verisi (RULE 1)
             const counterRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'counter');
             onSnapshot(counterRef, (snap) => {
                 if (snap.exists()) {
-                    count = snap.data().value || 0;
-                    display.textContent = count.toLocaleString();
-                    
-                    const progress = (count % 1000) / 1000 * 100;
-                    progressFill.style.width = `${progress}%`;
-                    document.getElementById('level-text').textContent = `${(count % 1000)} / 1000`;
+                    updateUI(snap.data().value || 0);
                 } else {
                     updateCloud(0);
+                    updateUI(0);
                 }
             }, (err) => {
-                status.textContent = "Veri Erişim Hatası (Firestore)";
+                status.textContent = "Veri Yetki Hatası";
+                console.error(err);
             });
         }
 
-        // Giriş Akışı (RULE 3)
         const initAuth = async () => {
             try {
-                // Canvas ortamı token'ı varsa kullan
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    // Telegram veya normal web ortamında anonim giriş
                     await signInAnonymously(auth);
                 }
             } catch (e) {
                 console.error("Giriş Hatası:", e);
-                status.textContent = "Giriş Hatası: " + (e.code === 'auth/configuration-not-found' ? "Firebase Ayarı Eksik" : e.code);
+                status.textContent = e.code === 'auth/configuration-not-found' 
+                    ? "HATA: Firebase'den Anonim Girişi Açın!" 
+                    : "Bağlantı Hatası: " + e.code;
             }
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                startSync(user);
-            } else {
-                status.textContent = "Oturum açılıyor...";
-                connDot.classList.replace('bg-green-500', 'bg-red-500');
-            }
+            if (user) startSync(user);
+            else status.textContent = "Oturum bekleniyor...";
         });
 
-        // Efektler
         function createParticle(x, y) {
             const p = document.createElement('div');
             p.className = 'floating-text';
@@ -256,26 +261,24 @@
             setTimeout(() => p.remove(), 800);
         }
 
-        // Tıklama Eventi
         tapArea.addEventListener('pointerdown', (e) => {
             if (!currentUser) return;
             count++;
-            display.textContent = count.toLocaleString();
+            updateUI(count);
             updateCloud(count);
             createParticle(e.clientX, e.clientY);
             
-            // Telegram titreşim desteği
             if (tg?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
+                tg.HapticFeedback.impactOccurred('medium');
             }
         });
 
-        // Modal Yönetimi
         const modal = document.getElementById('reset-modal');
         document.getElementById('reset-trigger').onclick = () => modal.style.display = 'flex';
         document.getElementById('cancel-reset').onclick = () => modal.style.display = 'none';
         document.getElementById('confirm-reset').onclick = () => {
             updateCloud(0);
+            updateUI(0);
             modal.style.display = 'none';
         };
 
