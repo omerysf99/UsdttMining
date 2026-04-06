@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DRAGON Miner Pro</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Reklam SDK -->
+    <script src='//libtl.com/sdk.js' data-zone='10839932' data-sdk='show_10839932'></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -263,6 +266,8 @@
             font-size: 10px;
             text-transform: uppercase;
             transition: all 0.2s;
+            min-width: 80px;
+            text-align: center;
         }
         .mission-btn-active {
             background: #5b5df2;
@@ -418,6 +423,7 @@
             <section id="tab-missions" class="tab-content py-6 space-y-4">
                 <h3 class="text-xl font-extrabold tracking-tight mb-4 uppercase">Aktif Görevler</h3>
                 
+                <!-- Kanal Görevi -->
                 <div class="mission-card" id="mission-channel-card">
                     <div class="mission-icon">📢</div>
                     <div class="mission-info-text">
@@ -426,6 +432,19 @@
                     </div>
                     <div id="mission-status-container">
                         <button id="mission-action-btn" class="mission-btn mission-btn-active">KATIL</button>
+                    </div>
+                </div>
+
+                <!-- Reklam Görevi (YENİ) -->
+                <div class="mission-card" id="mission-ad-card">
+                    <div class="mission-icon">📺</div>
+                    <div class="mission-info-text">
+                        <p class="text-white text-xs font-black uppercase">Reklam İzle</p>
+                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.001 TON | +1 $DRAGON</p>
+                        <p class="text-[8px] text-gray-500 uppercase mt-0.5 italic">Her 5 dakikada bir</p>
+                    </div>
+                    <div>
+                        <button id="mission-ad-btn" class="mission-btn mission-btn-active">İZLE</button>
                     </div>
                 </div>
 
@@ -545,7 +564,9 @@
         let referredBy = null;
         let currentUser = null;
         let myReferralCode = "";
+        
         let mission_channel_completed = false;
+        let mission_ad_last_time = 0; // Son reklam izleme zamanı (timestamp)
 
         function startSync(user) {
             if (!isTelegram) return;
@@ -569,6 +590,7 @@
                     referralEarnings = data.referralEarnings || 0;
                     referredBy = data.referredBy || null;
                     mission_channel_completed = data.mission_channel_completed || false;
+                    mission_ad_last_time = data.mission_ad_last_time || 0;
 
                     document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
                     
@@ -612,32 +634,56 @@
                 referralEarnings: referralEarnings,
                 referredBy: referredBy,
                 mission_channel_completed: mission_channel_completed,
+                mission_ad_last_time: mission_ad_last_time,
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
 
         function updateMissionUI() {
-            const btn = document.getElementById('mission-action-btn');
+            // Kanal görevi UI
+            const channelBtn = document.getElementById('mission-action-btn');
             if (mission_channel_completed) {
-                btn.textContent = "TAMAMLANDI ✅";
-                btn.className = "mission-btn mission-btn-completed";
+                channelBtn.textContent = "TAMAMLANDI ✅";
+                channelBtn.className = "mission-btn mission-btn-completed";
+                channelBtn.disabled = true;
+            }
+
+            // Reklam görevi UI (Cooldown)
+            const adBtn = document.getElementById('mission-ad-btn');
+            const now = Date.now();
+            const cooldown = 5 * 60 * 1000; // 5 dakika ms
+            const diff = now - mission_ad_last_time;
+
+            if (diff < cooldown) {
+                const remaining = Math.ceil((cooldown - diff) / 1000);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                adBtn.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                adBtn.className = "mission-btn mission-btn-completed";
+                adBtn.disabled = true;
+            } else {
+                adBtn.textContent = "İZLE";
+                adBtn.className = "mission-btn mission-btn-active";
+                adBtn.disabled = false;
             }
         }
 
-        // --- KAZIM DÖNGÜSÜ ---
-        // Uygulama kapalı olsa bile lastClaimTime üzerinden hesap yapar
+        // Timer Loop for mining AND mission UI updates
         setInterval(() => {
             if (!isTelegram) return;
             const now = Date.now();
-            const elapsed = (now - lastClaimTime) / 1000;
-            // 1 Gh/s = günde 0.01 ton -> Saniyede kazanç: (ghsSpeed * 0.01) / 86400
-            const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
             
+            // Mining Logic
+            const elapsed = (now - lastClaimTime) / 1000;
+            const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
             document.getElementById('mining-display').textContent = currentMining.toFixed(10);
             document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(8);
             document.getElementById('dragon-balance').textContent = dragonBalance;
             document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
-        }, 100);
+            
+            // Update Mission timers
+            updateMissionUI();
+        }, 1000);
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -648,9 +694,7 @@
         };
 
         document.getElementById('collect-reward-btn').onclick = async () => {
-            totalWalletBalance = 0.05; 
-            dragonBalance = 50; 
-            lastClaimTime = Date.now();
+            totalWalletBalance = 0.05; dragonBalance = 50; lastClaimTime = Date.now();
             await save();
             document.getElementById('welcome-modal').style.display = 'none';
         };
@@ -659,13 +703,13 @@
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
             const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
-            
             totalWalletBalance += gained;
-            lastClaimTime = now; // Kazanç toplandığında zamanı şimdiki zaman olarak günceller
+            lastClaimTime = now;
             save();
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
+        // CHANNEL MISSION
         document.getElementById('mission-action-btn').onclick = function() {
             if (mission_channel_completed) return;
             const btn = this;
@@ -694,6 +738,35 @@
                     };
                 }
             }, 1000);
+        };
+
+        // AD MISSION (RECURRING EVERY 5 MINS)
+        document.getElementById('mission-ad-btn').onclick = function() {
+            const btn = this;
+            const now = Date.now();
+            if (now - mission_ad_last_time < 5 * 60 * 1000) return;
+
+            // Trigger SDK Ad
+            if (typeof show_10839932 === 'function') {
+                show_10839932().then(() => {
+                    // Reward user
+                    mission_ad_last_time = Date.now();
+                    totalWalletBalance += 0.001;
+                    dragonBalance += 1;
+                    save();
+                    updateMissionUI();
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                }).catch(err => {
+                    console.error("Ad failed:", err);
+                });
+            } else {
+                // Fallback for simulation/preview
+                mission_ad_last_time = Date.now();
+                totalWalletBalance += 0.001;
+                dragonBalance += 1;
+                save();
+                updateMissionUI();
+            }
         };
 
         document.getElementById('invite-friend-btn').onclick = () => {
