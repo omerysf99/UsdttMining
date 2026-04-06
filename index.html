@@ -44,19 +44,11 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: 10px;
         }
-        .balance-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 140px;
-        }
         .main-content {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
-            overflow: hidden;
+            overflow-y: auto;
             padding: 0 24px;
         }
         .fan-container {
@@ -66,6 +58,7 @@
             max-width: 240px;
             max-height: 240px;
             flex-shrink: 0;
+            margin: 20px auto;
         }
         .fan-image {
             width: 100%;
@@ -79,12 +72,7 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        .mining-info {
-            text-align: center;
-            width: 100%;
-        }
-        
-        /* Yeni Navigasyon Stilleri */
+        /* Navigasyon Stilleri */
         .nav-bar {
             height: 90px;
             flex-shrink: 0;
@@ -138,17 +126,17 @@
             border-radius: 10px;
             box-shadow: 0 0 10px #5b5df2;
         }
-
         .tab-content {
             display: none;
             width: 100%;
             height: 100%;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         .tab-content.active {
             display: flex;
+            opacity: 1;
         }
         .claim-btn {
             background: linear-gradient(135deg, #5b5df2, #4042b8);
@@ -176,6 +164,17 @@
             max-width: 320px;
             border: 1px solid rgba(255,255,255,0.08);
         }
+        .input-dragon {
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -190,7 +189,7 @@
                     </div>
                     <div>
                         <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">TON</p>
-                        <p class="text-white font-extrabold text-sm leading-none balance-text"><span id="total-ton-balance">0.0000</span></p>
+                        <p class="text-white font-extrabold text-sm leading-none"><span id="total-ton-balance">0.0000</span></p>
                     </div>
                 </div>
                 <button class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0">
@@ -205,7 +204,7 @@
                     </div>
                     <div>
                         <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">$DRAGON</p>
-                        <p class="text-white font-extrabold text-sm leading-none balance-text"><span id="dragon-balance">0</span></p>
+                        <p class="text-white font-extrabold text-sm leading-none"><span id="dragon-balance">0</span></p>
                     </div>
                 </div>
                 <button class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0">
@@ -216,13 +215,14 @@
 
         <!-- Ana Madencilik Alanı -->
         <main class="main-content">
-            <section id="tab-home" class="tab-content active">
+            <!-- ANA SAYFA TAB -->
+            <section id="tab-home" class="tab-content active items-center justify-center">
                 <div class="flex-1 flex flex-col items-center justify-center w-full">
                     <div class="fan-container mb-6">
                         <img src="fan.jpg" alt="Fan" class="fan-image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/911/911369.png'">
                     </div>
 
-                    <div class="mining-info mb-6">
+                    <div class="mining-info mb-6 text-center">
                         <h2 class="text-3xl font-black text-white mb-2 tracking-tighter">
                             <span id="mining-display">0.0000000000</span> <span class="text-blue-500">TON</span>
                         </h2>
@@ -234,99 +234,106 @@
                     </div>
                 </div>
 
-                <div class="w-full flex gap-3 mb-4">
-                    <button id="claim-btn" class="flex-1 claim-btn text-white font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-widest">
-                        Aktar
-                    </button>
-                    <button id="boost-trigger" class="flex-1 boost-btn text-white font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-widest">
-                        Hızlandır
-                    </button>
+                <div class="w-full flex gap-3 mb-6">
+                    <button id="claim-btn" class="flex-1 claim-btn text-white font-extrabold py-3.5 rounded-2xl active:scale-95 transition-all text-xs uppercase">Aktar</button>
+                    <button id="boost-trigger" class="flex-1 boost-btn text-white font-extrabold py-3.5 rounded-2xl active:scale-95 transition-all text-xs uppercase">Hızlandır</button>
                 </div>
             </section>
 
-            <!-- Diğer Sekmeler -->
-            <section id="tab-wallet" class="tab-content items-center justify-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">Cüzdan Paneli</section>
-            <section id="tab-friends" class="tab-content items-center justify-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">Davet Paneli</section>
-            <section id="tab-missions" class="tab-content items-center justify-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">Görev Paneli</section>
-            <section id="tab-more" class="tab-content items-center justify-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">Ayarlar Paneli</section>
+            <!-- DAVET TAB -->
+            <section id="tab-friends" class="tab-content py-6 space-y-6">
+                <div class="text-center">
+                    <h3 class="text-xl font-extrabold mb-1 tracking-tight">Arkadaşlarını Davet Et</h3>
+                    <p class="text-gray-500 text-[11px] uppercase font-bold tracking-widest">Başarılı davet başı 0.03 TON</p>
+                </div>
+
+                <div class="balance-card space-y-4">
+                    <div>
+                        <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Senin Davet Kodun</p>
+                        <div class="flex gap-2">
+                            <div id="referral-code-display" class="flex-1 bg-black/40 p-3 rounded-xl border border-white/10 font-bold text-center tracking-widest text-blue-400">YÜKLENİYOR...</div>
+                            <button id="copy-code-btn" class="bg-indigo-600 px-4 rounded-xl active:scale-95 transition-all">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-white/5 pt-4">
+                        <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Sizi kim referans etti?</p>
+                        <div id="referral-input-container">
+                            <div class="flex gap-2">
+                                <input type="text" id="referral-input" placeholder="Kod" class="input-dragon text-sm uppercase">
+                                <button id="apply-referral-btn" class="bg-white text-black font-black px-4 rounded-xl text-xs active:scale-95 transition-all">OK</button>
+                            </div>
+                        </div>
+                        <div id="referral-used-container" class="hidden bg-green-500/10 p-3 rounded-xl border border-green-500/20 text-center">
+                            <p class="text-green-500 text-xs font-bold">Referans Uygulandı ✅</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="balance-card flex justify-between">
+                    <p class="text-[10px] text-gray-500 font-black uppercase">Toplam Referans</p>
+                    <span id="total-referrals-display" class="text-white font-black">0</span>
+                </div>
+            </section>
+            
+            <!-- Diğer Sekmeler Placeholder -->
+            <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
+            <section id="tab-missions" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Görevler</section>
+            <section id="tab-more" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Ayarlar</section>
         </main>
 
-        <!-- Alt Navigasyon (Emoji & Dock Style) -->
+        <!-- Navigasyon (Emoji Style) -->
         <nav class="nav-bar">
-            <button onclick="switchTab('wallet')" class="nav-btn" id="nav-wallet">
-                <span class="nav-emoji">💼</span>
-                <span class="nav-text">Cüzdan</span>
-            </button>
-            <button onclick="switchTab('friends')" class="nav-btn" id="nav-friends">
-                <span class="nav-emoji">👥</span>
-                <span class="nav-text">Davet</span>
-            </button>
-            <button onclick="switchTab('home')" class="nav-btn nav-active" id="nav-home">
-                <span class="nav-emoji">🏠</span>
-                <span class="nav-text">Ev</span>
-            </button>
-            <button onclick="switchTab('missions')" class="nav-btn" id="nav-missions">
-                <span class="nav-emoji">🎯</span>
-                <span class="nav-text">Görevler</span>
-            </button>
-            <button onclick="switchTab('more')" class="nav-btn" id="nav-more">
-                <span class="nav-emoji">⚙️</span>
-                <span class="nav-text">Diğer</span>
-            </button>
+            <button onclick="switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="nav-text">Cüzdan</span></button>
+            <button onclick="switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="nav-text">Davet</span></button>
+            <button onclick="switchTab('home')" class="nav-btn nav-active" id="nav-home"><span class="nav-emoji">🏠</span><span class="nav-text">Ev</span></button>
+            <button onclick="switchTab('missions')" class="nav-btn" id="nav-missions"><span class="nav-emoji">🎯</span><span class="nav-text">Görevler</span></button>
+            <button onclick="switchTab('more')" class="nav-btn" id="nav-more"><span class="nav-emoji">⚙️</span><span class="nav-text">Daha</span></button>
         </nav>
     </div>
 
-    <!-- Modallar -->
+    <!-- Hoş Geldin Modalı -->
     <div id="welcome-modal" class="modal-overlay">
         <div class="modal-content p-7 flex flex-col items-center text-center">
-            <div class="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
-                <img src="dragon.jpg" alt="Reward" class="w-full h-full object-cover rounded-full" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
-            </div>
-            <h3 class="text-xl font-black mb-1">HOŞ GELDİN!</h3>
-            <p class="text-gray-400 text-[11px] mb-6 px-2 leading-relaxed">Senin için hazırladığımız başlangıç paketini hemen topla!</p>
-            
+            <img src="dragon.jpg" class="w-16 h-16 rounded-full mb-4 border border-orange-500/20 shadow-lg">
+            <h3 class="text-xl font-black mb-1 uppercase">Hesap Oluşturuldu!</h3>
+            <p class="text-gray-400 text-[10px] mb-6 leading-relaxed">Yeni hesabın için başlangıç hediyelerini topla!</p>
             <div class="w-full space-y-2 mb-8">
-                <div class="flex items-center justify-between bg-white/5 p-3.5 rounded-2xl border border-white/5">
-                    <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">TON Ödülü</span>
-                    <span class="text-green-400 font-black text-sm">+0.05 TON</span>
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span class="text-[9px] font-black text-gray-500 uppercase">TON Ödülü</span>
+                    <span class="text-green-400 font-black">+0.05 TON</span>
                 </div>
-                <div class="flex items-center justify-between bg-white/5 p-3.5 rounded-2xl border border-white/5">
-                    <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">$DRAGON Ödülü</span>
-                    <span class="text-orange-400 font-black text-sm">+50</span>
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span class="text-[9px] font-black text-gray-500 uppercase">$DRAGON Ödülü</span>
+                    <span class="text-orange-400 font-black">+50</span>
                 </div>
             </div>
-
-            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-xs uppercase">
-                ÖDÜLLERİ AL
-            </button>
+            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-all text-xs uppercase">ÖDÜLLERİ AL</button>
         </div>
     </div>
 
+    <!-- Boost Modalı -->
     <div id="boost-modal" class="modal-overlay">
         <div class="modal-content p-7 flex flex-col items-center">
-            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3 border border-indigo-500/20">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <h3 class="text-lg font-extrabold mb-1 tracking-tight">HIZINI ARTIR!</h3>
-            <p class="text-gray-500 text-[10px] text-center mb-6 px-4">Video izleyerek kalıcı <span class="text-white">+0.01 GH/s</span> kazan.</p>
-            
+            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3 border border-indigo-500/20">⚡</div>
+            <h3 class="text-lg font-extrabold mb-1">Hızını Artır!</h3>
+            <p class="text-gray-500 text-[10px] text-center mb-6">Video izleyerek kalıcı <span class="text-white">+0.01 GH/s</span> kazan.</p>
             <div id="ad-simulation" class="hidden w-full mb-6">
                 <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                     <div id="ad-progress" class="h-full bg-indigo-500 w-0 transition-all duration-[3000ms] ease-linear"></div>
                 </div>
             </div>
-
-            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-xl text-xs uppercase">
-                [izle]
-            </button>
-            <button id="close-boost-btn" class="mt-4 text-gray-500 text-[9px] font-black uppercase tracking-[0.2em]">Kapat</button>
+            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-xl text-xs uppercase">[izle]</button>
+            <button id="close-boost-btn" class="mt-4 text-gray-500 text-[9px] font-black uppercase tracking-widest">Kapat</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
@@ -342,56 +349,32 @@
         const db = getFirestore(app);
         const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v2';
 
+        // Telegram User ID ayrıştırma
+        const tg = window.Telegram?.WebApp;
+        const tgUserId = tg?.initDataUnsafe?.user?.id || "guest_mode";
+
         let ghsSpeed = 11.0;
         let totalWalletBalance = 0;
         let lastClaimTime = Date.now();
-        let currentMiningBalance = 0;
         let dragonBalance = 0; 
+        let referralCount = 0;
+        let referredBy = null;
         let currentUser = null;
 
-        const miningDisplay = document.getElementById('mining-display');
-        const walletDisplay = document.getElementById('total-ton-balance');
-        const dragonDisplay = document.getElementById('dragon-balance');
-        const ghsDisplay = document.getElementById('ghs-speed-display');
-
-        const welcomeModal = document.getElementById('welcome-modal');
-        const boostModal = document.getElementById('boost-modal');
-        const watchAdBtn = document.getElementById('watch-ad-btn');
-        const adSimulation = document.getElementById('ad-simulation');
-        const adProgress = document.getElementById('ad-progress');
-
-        window.switchTab = (tabId) => {
-            // Tab gizle/göster
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            const selectedTab = document.getElementById('tab-' + tabId);
-            if(selectedTab) selectedTab.classList.add('active');
-
-            // Nav buton stilleri
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            const clickedBtn = document.getElementById('nav-' + tabId);
-            if(clickedBtn) clickedBtn.classList.add('nav-active');
-
-            // Haptic Feedback
-            if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.selectionChanged();
-        };
-
-        function tick() {
-            const now = Date.now();
-            const elapsed = (now - lastClaimTime) / 1000;
-            const perSecondReward = (ghsSpeed * 0.01) / 86400;
-            currentMiningBalance = Math.max(0, elapsed * perSecondReward);
-            
-            miningDisplay.textContent = currentMiningBalance.toFixed(10);
-            walletDisplay.textContent = totalWalletBalance.toFixed(8);
-            dragonDisplay.textContent = dragonBalance;
-            ghsDisplay.textContent = ghsSpeed.toFixed(2);
-        }
-
-        setInterval(tick, 100);
-
+        // Sync and Load Data per Telegram ID
         function startSync(user) {
             currentUser = user;
-            const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'miner', 'data');
+            // Referral code unique to the Telegram account
+            const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
+            document.getElementById('referral-code-display').textContent = myRefCode;
+
+            // Registry linking RefCode to this specific Telegram ID
+            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
+            setDoc(regRef, { ownerTgId: tgUserId, ownerUid: user.uid }, { merge: true });
+
+            // Account specific progress document
+            const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString());
+            
             onSnapshot(docRef, (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -399,62 +382,109 @@
                     lastClaimTime = data.lastClaimTime || Date.now();
                     dragonBalance = data.dragonBalance || 0;
                     ghsSpeed = data.ghsSpeed || 11.0;
+                    referralCount = data.referralCount || 0;
+                    referredBy = data.referredBy || null;
+
+                    document.getElementById('total-referrals-display').textContent = referralCount;
+                    if (referredBy) {
+                        document.getElementById('referral-input-container').classList.add('hidden');
+                        document.getElementById('referral-used-container').classList.remove('hidden');
+                    }
                 } else {
-                    welcomeModal.style.display = 'flex';
+                    document.getElementById('welcome-modal').style.display = 'flex';
                 }
-            }, (err) => console.error(err));
+            });
         }
 
-        async function saveToCloud() {
+        async function save() {
             if (!currentUser) return;
-            const docRef = doc(db, 'artifacts', contextAppId, 'users', currentUser.uid, 'miner', 'data');
+            const docRef = doc(db, 'artifacts', contextAppId, 'users', currentUser.uid, 'accounts', tgUserId.toString());
             await setDoc(docRef, {
                 walletBalance: totalWalletBalance,
                 lastClaimTime: lastClaimTime,
                 dragonBalance: dragonBalance,
                 ghsSpeed: ghsSpeed,
+                referralCount: referralCount,
+                referredBy: referredBy,
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
 
-        document.getElementById('collect-reward-btn').addEventListener('click', async () => {
-            totalWalletBalance = 0.05;
-            dragonBalance = 50;
-            lastClaimTime = Date.now();
-            ghsSpeed = 11.0;
-            await saveToCloud();
-            welcomeModal.style.display = 'none';
-            if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        });
+        // Logic Loop
+        setInterval(() => {
+            const now = Date.now();
+            const elapsed = (now - lastClaimTime) / 1000;
+            const currentMining = Math.max(0, elapsed * ((ghsSpeed * 0.01) / 86400));
+            document.getElementById('mining-display').textContent = currentMining.toFixed(10);
+            document.getElementById('total-ton-balance').textContent = totalWalletBalance.toFixed(8);
+            document.getElementById('dragon-balance').textContent = dragonBalance;
+            document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
+        }, 100);
 
-        document.getElementById('claim-btn').addEventListener('click', () => {
-            if (currentMiningBalance > 0) {
-                totalWalletBalance += currentMiningBalance;
-                currentMiningBalance = 0;
-                lastClaimTime = Date.now();
-                saveToCloud();
-                if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        // Events
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            document.getElementById('nav-' + tabId).classList.add('nav-active');
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        };
+
+        document.getElementById('collect-reward-btn').onclick = async () => {
+            totalWalletBalance = 0.05; dragonBalance = 50; lastClaimTime = Date.now();
+            await save();
+            document.getElementById('welcome-modal').style.display = 'none';
+        };
+
+        document.getElementById('claim-btn').onclick = () => {
+            const now = Date.now();
+            const elapsed = (now - lastClaimTime) / 1000;
+            const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
+            totalWalletBalance += gained;
+            lastClaimTime = now;
+            save();
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        };
+
+        document.getElementById('apply-referral-btn').onclick = async () => {
+            const code = document.getElementById('referral-input').value.trim().toUpperCase();
+            if (!code || code === tgUserId.toString().substring(0, 8).toUpperCase()) return;
+
+            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
+            const regSnap = await getDoc(regRef);
+
+            if (regSnap.exists()) {
+                const target = regSnap.data();
+                const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
+                const rSnap = await getDoc(referrerRef);
+                if (rSnap.exists()) {
+                    await updateDoc(referrerRef, {
+                        walletBalance: (rSnap.data().walletBalance || 0) + 0.03,
+                        referralCount: (rSnap.data().referralCount || 0) + 1
+                    });
+                }
+                referredBy = target.ownerTgId;
+                await save();
+                tg?.showAlert('Referans uygulandı!');
             }
-        });
+        };
 
-        document.getElementById('boost-trigger').onclick = () => boostModal.style.display = 'flex';
-        document.getElementById('close-boost-btn').onclick = () => boostModal.style.display = 'none';
-
-        watchAdBtn.addEventListener('click', async () => {
-            watchAdBtn.disabled = true;
-            watchAdBtn.style.opacity = '0.5';
-            adSimulation.classList.remove('hidden');
-            setTimeout(() => adProgress.style.width = '100%', 10);
+        document.getElementById('boost-trigger').onclick = () => document.getElementById('boost-modal').style.display = 'flex';
+        document.getElementById('close-boost-btn').onclick = () => document.getElementById('boost-modal').style.display = 'none';
+        document.getElementById('watch-ad-btn').onclick = () => {
+            const btn = document.getElementById('watch-ad-btn');
+            btn.disabled = true;
+            document.getElementById('ad-simulation').classList.remove('hidden');
+            document.getElementById('ad-progress').style.width = '100%';
             setTimeout(async () => {
-                ghsSpeed += 0.01;
-                await saveToCloud();
-                adSimulation.classList.add('hidden');
-                adProgress.style.width = '0';
-                watchAdBtn.disabled = false;
-                watchAdBtn.style.opacity = '1';
-                if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                ghsSpeed += 0.01; await save();
+                document.getElementById('ad-simulation').classList.add('hidden');
+                document.getElementById('ad-progress').style.width = '0';
+                btn.disabled = false;
+                document.getElementById('boost-modal').style.display = 'none';
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }, 3000);
-        });
+        };
 
         signInAnonymously(auth).then(res => startSync(res.user));
     </script>
