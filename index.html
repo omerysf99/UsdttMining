@@ -408,11 +408,9 @@
             const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
             document.getElementById('referral-code-display').textContent = myRefCode;
 
-            // Kayıt defterini güncelle
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
             setDoc(regRef, { ownerTgId: tgUserId, ownerUid: user.uid, ownerName: tgName }, { merge: true });
 
-            // Kullanıcı hesabı dokümanı
             const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString());
             
             onSnapshot(docRef, (snap) => {
@@ -438,7 +436,6 @@
                 }
             });
 
-            // Referans listesini dinle
             const refListRef = collection(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString(), 'referrals');
             onSnapshot(refListRef, (snap) => {
                 const listEl = document.getElementById('friends-list-render');
@@ -478,7 +475,6 @@
             }, { merge: true });
         }
 
-        // Timer Loop
         setInterval(() => {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
@@ -489,7 +485,6 @@
             document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
         }, 100);
 
-        // UI Events
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
@@ -533,7 +528,6 @@
             if (regSnap.exists()) {
                 const target = regSnap.data();
                 
-                // Referans verene ödül ver
                 const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
                 const rSnap = await getDoc(referrerRef);
                 if (rSnap.exists()) {
@@ -544,7 +538,6 @@
                         referralEarnings: (rData.referralEarnings || 0) + 0.03
                     });
                     
-                    // Referans listesine ekle
                     const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
                     await addDoc(refListCol, {
                         tgId: tgUserId,
@@ -555,7 +548,7 @@
 
                 referredBy = target.ownerTgId;
                 await save();
-                tg?.showAlert('Referans başarıyla uygulandı! +0.03 TON ödülü davet edene gönderildi.');
+                // Bildirim kaldırıldı.
             } else {
                 tg?.showAlert('Geçersiz referans kodu!');
             }
