@@ -72,7 +72,6 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        /* Navigasyon Stilleri */
         .nav-bar {
             height: 90px;
             flex-shrink: 0;
@@ -163,6 +162,9 @@
             width: 100%;
             max-width: 320px;
             border: 1px solid rgba(255,255,255,0.08);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
         }
         .input-dragon {
             background: #111;
@@ -174,6 +176,21 @@
             text-align: center;
             outline: none;
             width: 100%;
+        }
+        .friends-list-container {
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px;
+        }
+        .friend-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
@@ -241,50 +258,59 @@
             </section>
 
             <!-- DAVET TAB -->
-            <section id="tab-friends" class="tab-content py-6 space-y-6">
+            <section id="tab-friends" class="tab-content py-6 space-y-4">
                 <div class="text-center">
-                    <h3 class="text-xl font-extrabold mb-1 tracking-tight">Arkadaşlarını Davet Et</h3>
-                    <p class="text-gray-500 text-[11px] uppercase font-bold tracking-widest">Başarılı davet başı 0.03 TON</p>
+                    <h3 class="text-xl font-extrabold mb-1 tracking-tight">Referans Sistemi</h3>
+                    <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Arkadaşlarını davet et, birlikte kazan!</p>
                 </div>
 
-                <div class="balance-card space-y-4">
-                    <div>
-                        <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Senin Davet Kodun</p>
+                <!-- Davet Kodu Görüntüleme -->
+                <div class="balance-card">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Senin Davet Kodun</p>
+                    <div class="flex gap-2">
+                        <div id="referral-code-display" class="flex-1 bg-black/40 p-3 rounded-xl border border-white/10 font-bold text-center tracking-widest text-blue-400 uppercase">YÜKLENİYOR...</div>
+                        <button id="copy-code-btn" class="bg-indigo-600 px-4 rounded-xl active:scale-95 transition-all">
+                            📋
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Referans Giriş Alanı -->
+                <div class="balance-card" id="referral-entry-card">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Sizi kim referans etti?</p>
+                    <div id="referral-input-container">
                         <div class="flex gap-2">
-                            <div id="referral-code-display" class="flex-1 bg-black/40 p-3 rounded-xl border border-white/10 font-bold text-center tracking-widest text-blue-400">YÜKLENİYOR...</div>
-                            <button id="copy-code-btn" class="bg-indigo-600 px-4 rounded-xl active:scale-95 transition-all">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                            <input type="text" id="referral-input" placeholder="KOD" class="input-dragon text-sm uppercase">
+                            <button id="apply-referral-btn" class="bg-white text-black font-black px-4 rounded-xl text-xs active:scale-95 transition-all tracking-tighter">ONAYLA</button>
                         </div>
                     </div>
-
-                    <div class="border-t border-white/5 pt-4">
-                        <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Sizi kim referans etti?</p>
-                        <div id="referral-input-container">
-                            <div class="flex gap-2">
-                                <input type="text" id="referral-input" placeholder="Kod" class="input-dragon text-sm uppercase">
-                                <button id="apply-referral-btn" class="bg-white text-black font-black px-4 rounded-xl text-xs active:scale-95 transition-all">OK</button>
-                            </div>
-                        </div>
-                        <div id="referral-used-container" class="hidden bg-green-500/10 p-3 rounded-xl border border-green-500/20 text-center">
-                            <p class="text-green-500 text-xs font-bold">Referans Uygulandı ✅</p>
-                        </div>
+                    <div id="referral-used-container" class="hidden text-center py-2">
+                        <p class="text-green-500 text-xs font-bold bg-green-500/10 p-2 rounded-xl border border-green-500/20">Referans Uygulandı ✅</p>
                     </div>
                 </div>
                 
-                <div class="balance-card flex justify-between">
-                    <p class="text-[10px] text-gray-500 font-black uppercase">Toplam Referans</p>
-                    <span id="total-referrals-display" class="text-white font-black">0</span>
+                <!-- İstatistikler ve Liste Butonu -->
+                <div class="balance-card space-y-3">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-500 font-bold uppercase">Toplam Davet</span>
+                        <span id="total-referrals-display" class="text-white font-black">0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-500 font-bold uppercase">Referans Kazancı</span>
+                        <span class="text-green-400 font-black"><span id="referral-earnings-display">0.00</span> TON</span>
+                    </div>
+                    <button id="open-friends-list-btn" class="w-full bg-zinc-800 text-white font-bold py-3 rounded-xl text-xs uppercase mt-2 active:scale-95 transition-all">
+                        📋 Arkadaş Listesini Aç
+                    </button>
                 </div>
             </section>
             
-            <!-- Diğer Sekmeler Placeholder -->
             <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
             <section id="tab-missions" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Görevler</section>
             <section id="tab-more" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Ayarlar</section>
         </main>
 
-        <!-- Navigasyon (Emoji Style) -->
+        <!-- Navigasyon -->
         <nav class="nav-bar">
             <button onclick="switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="nav-text">Cüzdan</span></button>
             <button onclick="switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="nav-text">Davet</span></button>
@@ -294,23 +320,37 @@
         </nav>
     </div>
 
+    <!-- Arkadaş Listesi Modalı -->
+    <div id="friends-list-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <h3 class="font-black uppercase text-sm tracking-widest">Davetli Listesi</h3>
+                <button id="close-friends-list" class="text-gray-500 font-bold">X</button>
+            </div>
+            <div class="friends-list-container" id="friends-list-render">
+                <!-- Buraya JS ile liste gelecek -->
+                <p class="text-center text-gray-600 text-xs py-10">Henüz kimseyi davet etmedin.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Hoş Geldin Modalı -->
     <div id="welcome-modal" class="modal-overlay">
         <div class="modal-content p-7 flex flex-col items-center text-center">
             <img src="dragon.jpg" class="w-16 h-16 rounded-full mb-4 border border-orange-500/20 shadow-lg">
-            <h3 class="text-xl font-black mb-1 uppercase">Hesap Oluşturuldu!</h3>
-            <p class="text-gray-400 text-[10px] mb-6 leading-relaxed">Yeni hesabın için başlangıç hediyelerini topla!</p>
-            <div class="w-full space-y-2 mb-8">
+            <h3 class="text-xl font-black mb-1 uppercase">Yeni Hesap!</h3>
+            <p class="text-gray-400 text-[10px] mb-6 px-4">Madencilik serüvenin için hediyelerini hazırladık!</p>
+            <div class="w-full space-y-2 mb-8 px-2">
                 <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
-                    <span class="text-[9px] font-black text-gray-500 uppercase">TON Ödülü</span>
-                    <span class="text-green-400 font-black">+0.05 TON</span>
+                    <span class="text-[9px] font-black text-gray-500 uppercase">TON</span>
+                    <span class="text-green-400 font-black">+0.05</span>
                 </div>
                 <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
-                    <span class="text-[9px] font-black text-gray-500 uppercase">$DRAGON Ödülü</span>
+                    <span class="text-[9px] font-black text-gray-500 uppercase">$DRAGON</span>
                     <span class="text-orange-400 font-black">+50</span>
                 </div>
             </div>
-            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-all text-xs uppercase">ÖDÜLLERİ AL</button>
+            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-all text-xs uppercase">HEDİYELERİ AL</button>
         </div>
     </div>
 
@@ -333,7 +373,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
@@ -347,32 +387,32 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v2';
+        const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v3';
 
-        // Telegram User ID ayrıştırma
         const tg = window.Telegram?.WebApp;
-        const tgUserId = tg?.initDataUnsafe?.user?.id || "guest_mode";
+        const tgUser = tg?.initDataUnsafe?.user;
+        const tgUserId = tgUser?.id || "guest_mode";
+        const tgName = tgUser ? `${tgUser.first_name} ${tgUser.last_name || ""}` : "Misafir";
 
         let ghsSpeed = 11.0;
         let totalWalletBalance = 0;
         let lastClaimTime = Date.now();
         let dragonBalance = 0; 
         let referralCount = 0;
+        let referralEarnings = 0;
         let referredBy = null;
         let currentUser = null;
 
-        // Sync and Load Data per Telegram ID
         function startSync(user) {
             currentUser = user;
-            // Referral code unique to the Telegram account
             const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
             document.getElementById('referral-code-display').textContent = myRefCode;
 
-            // Registry linking RefCode to this specific Telegram ID
+            // Kayıt defterini güncelle
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
-            setDoc(regRef, { ownerTgId: tgUserId, ownerUid: user.uid }, { merge: true });
+            setDoc(regRef, { ownerTgId: tgUserId, ownerUid: user.uid, ownerName: tgName }, { merge: true });
 
-            // Account specific progress document
+            // Kullanıcı hesabı dokümanı
             const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString());
             
             onSnapshot(docRef, (snap) => {
@@ -383,9 +423,12 @@
                     dragonBalance = data.dragonBalance || 0;
                     ghsSpeed = data.ghsSpeed || 11.0;
                     referralCount = data.referralCount || 0;
+                    referralEarnings = data.referralEarnings || 0;
                     referredBy = data.referredBy || null;
 
                     document.getElementById('total-referrals-display').textContent = referralCount;
+                    document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
+                    
                     if (referredBy) {
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
@@ -393,6 +436,30 @@
                 } else {
                     document.getElementById('welcome-modal').style.display = 'flex';
                 }
+            });
+
+            // Referans listesini dinle
+            const refListRef = collection(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString(), 'referrals');
+            onSnapshot(refListRef, (snap) => {
+                const listEl = document.getElementById('friends-list-render');
+                if (snap.empty) {
+                    listEl.innerHTML = '<p class="text-center text-gray-600 text-xs py-10 uppercase font-bold">Henüz davetin yok</p>';
+                    return;
+                }
+                listEl.innerHTML = '';
+                snap.forEach(d => {
+                    const item = d.data();
+                    const div = document.createElement('div');
+                    div.className = 'friend-item';
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-white text-xs font-black">${item.name}</p>
+                            <p class="text-gray-500 text-[9px] uppercase font-bold tracking-widest">ID: ${item.tgId}</p>
+                        </div>
+                        <span class="text-green-500 text-[10px] font-black">+0.03 TON</span>
+                    `;
+                    listEl.appendChild(div);
+                });
             });
         }
 
@@ -405,12 +472,13 @@
                 dragonBalance: dragonBalance,
                 ghsSpeed: ghsSpeed,
                 referralCount: referralCount,
+                referralEarnings: referralEarnings,
                 referredBy: referredBy,
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
 
-        // Logic Loop
+        // Timer Loop
         setInterval(() => {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
@@ -421,7 +489,7 @@
             document.getElementById('ghs-speed-display').textContent = ghsSpeed.toFixed(2);
         }, 100);
 
-        // Events
+        // UI Events
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
@@ -446,28 +514,55 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
+        document.getElementById('copy-code-btn').onclick = () => {
+            const code = document.getElementById('referral-code-display').textContent;
+            const temp = document.createElement('textarea');
+            temp.value = code; document.body.appendChild(temp); temp.select();
+            document.execCommand('copy'); document.body.removeChild(temp);
+            tg?.showAlert('Kod Kopyalandı!');
+        };
+
         document.getElementById('apply-referral-btn').onclick = async () => {
             const code = document.getElementById('referral-input').value.trim().toUpperCase();
-            if (!code || code === tgUserId.toString().substring(0, 8).toUpperCase()) return;
+            const myCode = tgUserId.toString().substring(0, 8).toUpperCase();
+            if (!code || code === myCode || referredBy) return;
 
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
             const regSnap = await getDoc(regRef);
 
             if (regSnap.exists()) {
                 const target = regSnap.data();
+                
+                // Referans verene ödül ver
                 const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
                 const rSnap = await getDoc(referrerRef);
                 if (rSnap.exists()) {
+                    const rData = rSnap.data();
                     await updateDoc(referrerRef, {
-                        walletBalance: (rSnap.data().walletBalance || 0) + 0.03,
-                        referralCount: (rSnap.data().referralCount || 0) + 1
+                        walletBalance: (rData.walletBalance || 0) + 0.03,
+                        referralCount: (rData.referralCount || 0) + 1,
+                        referralEarnings: (rData.referralEarnings || 0) + 0.03
+                    });
+                    
+                    // Referans listesine ekle
+                    const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
+                    await addDoc(refListCol, {
+                        tgId: tgUserId,
+                        name: tgName,
+                        date: serverTimestamp()
                     });
                 }
+
                 referredBy = target.ownerTgId;
                 await save();
-                tg?.showAlert('Referans uygulandı!');
+                tg?.showAlert('Referans başarıyla uygulandı! +0.03 TON ödülü davet edene gönderildi.');
+            } else {
+                tg?.showAlert('Geçersiz referans kodu!');
             }
         };
+
+        document.getElementById('open-friends-list-btn').onclick = () => document.getElementById('friends-list-modal').style.display = 'flex';
+        document.getElementById('close-friends-list').onclick = () => document.getElementById('friends-list-modal').style.display = 'none';
 
         document.getElementById('boost-trigger').onclick = () => document.getElementById('boost-modal').style.display = 'flex';
         document.getElementById('close-boost-btn').onclick = () => document.getElementById('boost-modal').style.display = 'none';
