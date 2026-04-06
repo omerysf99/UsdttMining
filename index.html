@@ -205,6 +205,32 @@
             justify-content: space-between;
             align-items: center;
         }
+        .invite-btn {
+            background: #7169e6;
+            color: white;
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: transform 0.1s;
+        }
+        .invite-btn:active {
+            transform: scale(0.98);
+        }
+        .square-btn {
+            background: #7169e6;
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -285,62 +311,63 @@
                 </div>
             </section>
 
-            <!-- DAVET TAB -->
+            <!-- DAVET TAB (GÜNCELLENDİ) -->
             <section id="tab-friends" class="tab-content py-6 space-y-4">
-                <div class="text-center">
-                    <h3 class="text-xl font-extrabold mb-1 tracking-tight">Referans Sistemi</h3>
-                    <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Arkadaşlarını davet et, birlikte kazan!</p>
+                <h3 class="text-xl font-extrabold tracking-tight mb-2 uppercase">Referans Kodu</h3>
+
+                <!-- KOD GÖRÜNTÜLEME -->
+                <div class="bg-[#111] p-5 rounded-[24px] border border-white/5 relative">
+                    <div id="referral-code-display" class="text-lg font-black tracking-[0.3em] text-center text-gray-400 py-2 uppercase">YÜKLENİYOR...</div>
                 </div>
 
-                <div class="balance-card">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Senin Davet Kodun</p>
-                    <div class="flex gap-2">
-                        <div id="referral-code-display" class="flex-1 bg-black/40 p-3 rounded-xl border border-white/10 font-bold text-center tracking-widest text-blue-400 uppercase">YÜKLENİYOR...</div>
-                        <button id="copy-code-btn" class="bg-indigo-600 px-4 rounded-xl active:scale-95 transition-all">📋</button>
-                    </div>
+                <!-- DAVET VE KOPYALAMA BUTONLARI -->
+                <div class="flex gap-3">
+                    <button id="invite-friend-btn" class="invite-btn text-sm">
+                        <span class="text-xl">🚀</span> Invite a friend
+                    </button>
+                    <button id="copy-code-btn" class="square-btn active:scale-90 transition-all">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
                 </div>
 
-                <div class="balance-card" id="referral-entry-card">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2">Sizi kim referans etti?</p>
+                <!-- REFERANS GİRİŞ -->
+                <div class="bg-[#111] p-6 rounded-[24px] border border-white/5 mt-2">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4">Sizi kim referans etti?</p>
                     <div id="referral-input-container">
                         <div class="flex gap-2">
-                            <input type="text" id="referral-input" placeholder="KOD" class="input-dragon text-sm uppercase">
-                            <button id="apply-referral-btn" class="bg-white text-black font-black px-4 rounded-xl text-xs active:scale-95 transition-all tracking-tighter">ONAYLA</button>
+                            <input type="text" id="referral-input" placeholder="KODU BURAYA YAZ" class="input-dragon text-sm uppercase">
+                            <button id="apply-referral-btn" class="bg-white text-black font-black px-5 rounded-xl text-xs active:scale-95 transition-all">OK</button>
                         </div>
                     </div>
                     <div id="referral-used-container" class="hidden text-center py-2">
                         <p class="text-green-500 text-xs font-bold bg-green-500/10 p-2 rounded-xl border border-green-500/20">Referans Uygulandı ✅</p>
                     </div>
                 </div>
-                
-                <div class="balance-card space-y-3">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-gray-500 font-bold uppercase">Toplam Davet</span>
-                        <span id="total-referrals-display" class="text-white font-black">0</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-gray-500 font-bold uppercase">Referans Kazancı</span>
-                        <span class="text-green-400 font-black"><span id="referral-earnings-display">0.00</span> TON</span>
-                    </div>
-                    <button id="open-friends-list-btn" class="w-full bg-zinc-800 text-white font-bold py-3 rounded-xl text-xs uppercase mt-2 active:scale-95 transition-all">📋 Arkadaş Listesini Aç</button>
+
+                <!-- LİSTE AÇMA BUTONU -->
+                <button id="open-friends-list-btn" class="invite-btn bg-[#7169e6] mt-2 text-sm">
+                    <span class="text-xl">📋</span> Open Friends List
+                </button>
+
+                <div class="balance-card flex justify-between items-center py-4 px-6 mt-2">
+                    <span class="text-gray-500 font-bold uppercase text-[10px]">Referans Kazancı</span>
+                    <span class="text-green-400 font-black text-sm"><span id="referral-earnings-display">0.00</span> TON</span>
                 </div>
             </section>
             
             <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
             <section id="tab-missions" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Görevler</section>
             
-            <!-- AYARLAR TAB (Sıfırlama Butonu Eklendi) -->
+            <!-- AYARLAR TAB -->
             <section id="tab-more" class="tab-content py-6 space-y-4">
                 <div class="text-center">
                     <h3 class="text-xl font-extrabold mb-1 tracking-tight uppercase">Ayarlar</h3>
-                    <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Hesap Yönetimi</p>
                 </div>
                 <div class="balance-card">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 text-center">Tehlikeli Bölge</p>
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 text-center">Hesap</p>
                     <button id="reset-data-btn" class="w-full bg-red-600/10 text-red-500 border border-red-500/20 font-black py-4 rounded-2xl text-xs uppercase active:scale-95 transition-all">
                         ⚠️ Verileri Sıfırla
                     </button>
-                    <p class="text-[9px] text-gray-600 mt-4 text-center italic uppercase leading-tight">Bu işlem tüm TON ve $DRAGON bakiyeni, hızını ve referanslarını KALICI olarak siler.</p>
                 </div>
             </section>
         </main>
@@ -360,10 +387,10 @@
         <div class="modal-content">
             <div class="p-6 border-b border-white/5 flex justify-between items-center">
                 <h3 class="font-black uppercase text-sm tracking-widest">Davetli Listesi</h3>
-                <button id="close-friends-list" class="text-gray-500 font-bold">X</button>
+                <button id="close-friends-list" class="text-gray-500 font-bold text-xl">×</button>
             </div>
             <div class="friends-list-container" id="friends-list-render">
-                <p class="text-center text-gray-600 text-xs py-10">Henüz kimseyi davet etmedin.</p>
+                <p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz kimseyi davet etmedin.</p>
             </div>
         </div>
     </div>
@@ -373,8 +400,8 @@
         <div class="modal-content p-7 flex flex-col items-center text-center">
             <img src="dragon.jpg" class="w-16 h-16 rounded-full mb-4 border border-orange-500/20 shadow-lg">
             <h3 class="text-xl font-black mb-1 uppercase">Yeni Hesap!</h3>
-            <p class="text-gray-400 text-[10px] mb-6 px-4">Madencilik serüvenin için hediyelerini hazırladık!</p>
-            <div class="w-full space-y-2 mb-8 px-2">
+            <p class="text-gray-400 text-[10px] mb-6 px-4">Hediyelerini hazırladık!</p>
+            <div class="w-full space-y-2 mb-8">
                 <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
                     <span class="text-[9px] font-black text-gray-500 uppercase">TON</span>
                     <span class="text-green-400 font-black">+0.05</span>
@@ -391,9 +418,9 @@
     <!-- Boost Modalı -->
     <div id="boost-modal" class="modal-overlay">
         <div class="modal-content p-7 flex flex-col items-center">
-            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3 border border-indigo-500/20">⚡</div>
+            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3 border border-indigo-500/20 text-2xl">⚡</div>
             <h3 class="text-lg font-extrabold mb-1">Hızını Artır!</h3>
-            <p class="text-gray-500 text-[10px] text-center mb-6">Video izleyerek kalıcı <span class="text-white">+0.01 GH/s</span> kazan.</p>
+            <p class="text-gray-500 text-[10px] text-center mb-6 px-4">Video izleyerek kalıcı <span class="text-white">+0.01 GH/s</span> kazan.</p>
             <div id="ad-simulation" class="hidden w-full mb-6">
                 <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                     <div id="ad-progress" class="h-full bg-indigo-500 w-0 transition-all duration-[3000ms] ease-linear"></div>
@@ -421,7 +448,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // APP SIFIRLAMA: Versiyonu v4 yaparak herkesin verisini 0'dan başlattık.
         const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v4';
 
         const tg = window.Telegram?.WebApp;
@@ -429,6 +455,7 @@
         if (isTelegram) {
             document.getElementById('telegram-only-overlay').style.display = 'none';
             document.getElementById('main-app-container').style.display = 'flex';
+            tg.expand();
         }
 
         const tgUser = tg?.initDataUnsafe?.user;
@@ -443,14 +470,15 @@
         let referralEarnings = 0;
         let referredBy = null;
         let currentUser = null;
+        let myReferralCode = "";
 
         function startSync(user) {
             if (!isTelegram) return;
             currentUser = user;
-            const myRefCode = tgUserId.toString().substring(0, 8).toUpperCase();
-            document.getElementById('referral-code-display').textContent = myRefCode;
+            myReferralCode = tgUserId.toString().substring(0, 8).toUpperCase();
+            document.getElementById('referral-code-display').textContent = myReferralCode;
 
-            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
+            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myReferralCode);
             setDoc(regRef, { ownerTgId: tgUserId, ownerUid: user.uid, ownerName: tgName }, { merge: true });
 
             const docRef = doc(db, 'artifacts', contextAppId, 'users', user.uid, 'accounts', tgUserId.toString());
@@ -466,7 +494,6 @@
                     referralEarnings = data.referralEarnings || 0;
                     referredBy = data.referredBy || null;
 
-                    document.getElementById('total-referrals-display').textContent = referralCount;
                     document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
                     
                     if (referredBy) {
@@ -485,7 +512,7 @@
             onSnapshot(refListRef, (snap) => {
                 const listEl = document.getElementById('friends-list-render');
                 if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-center text-gray-600 text-xs py-10 uppercase font-bold">Henüz davetin yok</p>';
+                    listEl.innerHTML = '<p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz davetin yok</p>';
                     return;
                 }
                 listEl.innerHTML = '';
@@ -493,7 +520,7 @@
                     const item = d.data();
                     const div = document.createElement('div');
                     div.className = 'friend-item';
-                    div.innerHTML = `<div><p class="text-white text-xs font-black">${item.name}</p><p class="text-gray-500 text-[9px] uppercase font-bold tracking-widest">ID: ${item.tgId}</p></div><span class="text-green-500 text-[10px] font-black">+0.03 TON</span>`;
+                    div.innerHTML = `<div><p class="text-white text-xs font-black">${item.name}</p><p class="text-gray-500 text-[9px] uppercase tracking-widest">ID: ${item.tgId}</p></div><span class="text-green-500 text-[10px] font-black">+0.03 TON</span>`;
                     listEl.appendChild(div);
                 });
             });
@@ -549,25 +576,19 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
-        document.getElementById('reset-data-btn').onclick = () => {
-            const confirmAction = () => {
-                const docRef = doc(db, 'artifacts', contextAppId, 'users', currentUser.uid, 'accounts', tgUserId.toString());
-                deleteDoc(docRef).then(() => {
-                    window.location.reload();
-                });
-            };
-
-            if (tg?.showConfirm) {
-                tg.showConfirm("TÜM VERİLERİNİ SİLECEKSİN. EMİN MİSİN?", (ok) => {
-                    if (ok) confirmAction();
-                });
-            } else if (confirm("Tüm verilerini sıfırlamak istediğinden emin misin?")) {
-                confirmAction();
+        // SHARE LOGIC
+        document.getElementById('invite-friend-btn').onclick = () => {
+            const message = `http://t.me/DragTon_bot/Xc1 bedava ton kazanıyorum işte referans kodum: "${myReferralCode}"`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('bedava ton kazanıyorum işte referans kodum: ' + myReferralCode)}`;
+            if (tg) {
+                tg.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
             }
         };
 
         document.getElementById('copy-code-btn').onclick = () => {
-            const code = document.getElementById('referral-code-display').textContent;
+            const code = myReferralCode;
             const temp = document.createElement('textarea');
             temp.value = code; document.body.appendChild(temp); temp.select();
             document.execCommand('copy'); document.body.removeChild(temp);
@@ -576,8 +597,7 @@
 
         document.getElementById('apply-referral-btn').onclick = async () => {
             const code = document.getElementById('referral-input').value.trim().toUpperCase();
-            const myCode = tgUserId.toString().substring(0, 8).toUpperCase();
-            if (!code || code === myCode || referredBy) return;
+            if (!code || code === myReferralCode || referredBy) return;
 
             const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
             const regSnap = await getDoc(regRef);
