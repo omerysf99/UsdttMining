@@ -231,6 +231,48 @@
             justify-content: center;
             flex-shrink: 0;
         }
+        /* Mission Styles */
+        .mission-card {
+            background: #111;
+            border-radius: 24px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .mission-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(91, 93, 242, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .mission-info-text {
+            flex-grow: 1;
+        }
+        .mission-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .mission-btn-active {
+            background: #5b5df2;
+            color: white;
+        }
+        .mission-btn-completed {
+            background: rgba(255,255,255,0.05);
+            color: #555;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -311,26 +353,20 @@
                 </div>
             </section>
 
-            <!-- DAVET TAB (GÜNCELLENDİ) -->
+            <!-- DAVET TAB -->
             <section id="tab-friends" class="tab-content py-6 space-y-4">
                 <h3 class="text-xl font-extrabold tracking-tight mb-2 uppercase">Referans Kodu</h3>
-
-                <!-- KOD GÖRÜNTÜLEME -->
                 <div class="bg-[#111] p-5 rounded-[24px] border border-white/5 relative">
                     <div id="referral-code-display" class="text-lg font-black tracking-[0.3em] text-center text-gray-400 py-2 uppercase">YÜKLENİYOR...</div>
                 </div>
-
-                <!-- DAVET VE KOPYALAMA BUTONLARI -->
                 <div class="flex gap-3">
                     <button id="invite-friend-btn" class="invite-btn text-sm">
                         <span class="text-xl">🚀</span> Invite a friend
                     </button>
                     <button id="copy-code-btn" class="square-btn active:scale-90 transition-all">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        📋
                     </button>
                 </div>
-
-                <!-- REFERANS GİRİŞ -->
                 <div class="bg-[#111] p-6 rounded-[24px] border border-white/5 mt-2">
                     <p class="text-[10px] text-gray-500 font-black uppercase mb-4">Sizi kim referans etti?</p>
                     <div id="referral-input-container">
@@ -343,12 +379,9 @@
                         <p class="text-green-500 text-xs font-bold bg-green-500/10 p-2 rounded-xl border border-green-500/20">Referans Uygulandı ✅</p>
                     </div>
                 </div>
-
-                <!-- LİSTE AÇMA BUTONU -->
                 <button id="open-friends-list-btn" class="invite-btn bg-[#7169e6] mt-2 text-sm">
                     <span class="text-xl">📋</span> Open Friends List
                 </button>
-
                 <div class="balance-card flex justify-between items-center py-4 px-6 mt-2">
                     <span class="text-gray-500 font-bold uppercase text-[10px]">Referans Kazancı</span>
                     <span class="text-green-400 font-black text-sm"><span id="referral-earnings-display">0.00</span> TON</span>
@@ -356,7 +389,25 @@
             </section>
             
             <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
-            <section id="tab-missions" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Görevler</section>
+            
+            <!-- GÖREVLER TAB (AKTİF EDİLDİ) -->
+            <section id="tab-missions" class="tab-content py-6 space-y-4">
+                <h3 class="text-xl font-extrabold tracking-tight mb-4 uppercase">Aktif Görevler</h3>
+                
+                <!-- Kanal Görevi -->
+                <div class="mission-card" id="mission-channel-card">
+                    <div class="mission-icon">📢</div>
+                    <div class="mission-info-text">
+                        <p class="text-white text-xs font-black uppercase">Kanala Katıl</p>
+                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.001 TON | +1 $DRAGON</p>
+                    </div>
+                    <div id="mission-status-container">
+                        <button id="mission-action-btn" class="mission-btn mission-btn-active">KATIL</button>
+                    </div>
+                </div>
+
+                <p class="text-[9px] text-gray-600 text-center uppercase font-bold tracking-widest mt-10">Daha fazla görev yakında...</p>
+            </section>
             
             <!-- AYARLAR TAB -->
             <section id="tab-more" class="tab-content py-6 space-y-4">
@@ -471,6 +522,9 @@
         let referredBy = null;
         let currentUser = null;
         let myReferralCode = "";
+        
+        // Mission States
+        let mission_channel_completed = false;
 
         function startSync(user) {
             if (!isTelegram) return;
@@ -493,16 +547,16 @@
                     referralCount = data.referralCount || 0;
                     referralEarnings = data.referralEarnings || 0;
                     referredBy = data.referredBy || null;
+                    mission_channel_completed = data.mission_channel_completed || false;
 
                     document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
                     
                     if (referredBy) {
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
-                    } else {
-                        document.getElementById('referral-input-container').classList.remove('hidden');
-                        document.getElementById('referral-used-container').classList.add('hidden');
                     }
+                    
+                    updateMissionUI();
                 } else {
                     document.getElementById('welcome-modal').style.display = 'flex';
                 }
@@ -537,8 +591,17 @@
                 referralCount: referralCount,
                 referralEarnings: referralEarnings,
                 referredBy: referredBy,
+                mission_channel_completed: mission_channel_completed,
                 updatedAt: serverTimestamp()
             }, { merge: true });
+        }
+
+        function updateMissionUI() {
+            const btn = document.getElementById('mission-action-btn');
+            if (mission_channel_completed) {
+                btn.textContent = "TAMAMLANDI ✅";
+                btn.className = "mission-btn mission-btn-completed";
+            }
         }
 
         setInterval(() => {
@@ -576,15 +639,48 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
-        // SHARE LOGIC
+        // CHANNEL MISSION LOGIC
+        document.getElementById('mission-action-btn').onclick = function() {
+            if (mission_channel_completed) return;
+            
+            const btn = this;
+            const channelLink = "https://t.me/+8WTu-FmvmCxhNzE1";
+            
+            // Linki aç
+            if (tg) tg.openTelegramLink(channelLink);
+            else window.open(channelLink, '_blank');
+            
+            // Sayaç başlat
+            let timeLeft = 10;
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            
+            const timer = setInterval(() => {
+                btn.textContent = timeLeft + "s";
+                timeLeft--;
+                
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btn.textContent = "CLAIM";
+                    btn.onclick = async () => {
+                        mission_channel_completed = true;
+                        totalWalletBalance += 0.001;
+                        dragonBalance += 1;
+                        await save();
+                        updateMissionUI();
+                        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    };
+                }
+            }, 1000);
+        };
+
         document.getElementById('invite-friend-btn').onclick = () => {
             const message = `http://t.me/DragTon_bot/Xc1 bedava ton kazanıyorum işte referans kodum: "${myReferralCode}"`;
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('bedava ton kazanıyorum işte referans kodum: ' + myReferralCode)}`;
-            if (tg) {
-                tg.openTelegramLink(shareUrl);
-            } else {
-                window.open(shareUrl, '_blank');
-            }
+            if (tg) tg.openTelegramLink(shareUrl);
+            else window.open(shareUrl, '_blank');
         };
 
         document.getElementById('copy-code-btn').onclick = () => {
@@ -639,6 +735,15 @@
                 document.getElementById('boost-modal').style.display = 'none';
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }, 3000);
+        };
+
+        document.getElementById('reset-data-btn').onclick = () => {
+            const confirmAction = () => {
+                const docRef = doc(db, 'artifacts', contextAppId, 'users', currentUser.uid, 'accounts', tgUserId.toString());
+                deleteDoc(docRef).then(() => { window.location.reload(); });
+            };
+            if (tg?.showConfirm) tg.showConfirm("TÜM VERİLERİNİ SİLECEKSİN. EMİN MİSİN?", (ok) => { if (ok) confirmAction(); });
+            else if (confirm("Tüm verilerini sıfırlamak istediğinden emin misin?")) confirmAction();
         };
 
         if (isTelegram) {
