@@ -193,13 +193,14 @@
             font-size: 10px;
             color: #6d5dfc;
             opacity: 0.7;
+            z-index: 200;
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="saveStatus">Initializing...</div>
+        <div id="saveStatus">Başlatılıyor...</div>
         <div class="content">
             <!-- Üst Bakiye Kartları -->
             <div class="balance-card">
@@ -273,9 +274,9 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global environment variables
+        // Firebase Yapılandırması
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "", // API key provided at runtime
+            apiKey: "",
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
             projectId: "studio-9241589115-a403e",
             storageBucket: "studio-9241589115-a403e.firebasestorage.app",
@@ -284,23 +285,27 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-v1';
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Mining variables
+        // Değişkenler
         let currentBalance = 0.0;
         let walletBalance = 0.0;
-        let lastUpdateTime = Date.now();
-        const incrementPerSecond = 0.11 / 86400; // 11 GH/s = 0.11 TON per day
+        const incrementPerSecond = 0.11 / 86400; // Günde 0.11 TON
 
         const balanceElement = document.getElementById('tonBalance');
         const walletElement = document.getElementById('mainWalletBalance');
         const saveStatus = document.getElementById('saveStatus');
         const miningFan = document.getElementById('miningFan');
 
-        // Rule 3: Auth first, then guard queries
+        // Sayaç Döngüsü (Hemen başlar)
+        setInterval(() => {
+            currentBalance += (incrementPerSecond / 10);
+            balanceElement.textContent = currentBalance.toFixed(10);
+        }, 100);
+
+        // Auth Başlatma
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -312,9 +317,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) return;
             
-            saveStatus.textContent = "Loading progress...";
-            
-            // Rule 1: Correct 6-segment doc path (artifacts/appId/users/userId/mining/data)
+            saveStatus.textContent = "Veriler yükleniyor...";
             const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'mining', 'data');
             
             try {
@@ -324,15 +327,15 @@
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     walletBalance = parseFloat(data.walletBalance) || 0;
-                    currentBalance = parseFloat(data.currentBalance) || 0;
-                    lastUpdateTime = data.lastUpdateTime || now;
-
-                    // Calculate offline gain
+                    
+                    // Mevcut bakiyeyi ve offline kazancı hesapla
+                    const lastMiningBalance = parseFloat(data.currentBalance) || 0;
+                    const lastUpdateTime = data.lastUpdateTime || now;
                     const secondsPassed = (now - lastUpdateTime) / 1000;
                     const offlineGain = secondsPassed * incrementPerSecond;
-                    currentBalance += offlineGain;
+                    
+                    currentBalance = lastMiningBalance + offlineGain;
                 } else {
-                    // Create initial data
                     await setDoc(userDocRef, {
                         walletBalance: 0,
                         currentBalance: 0,
@@ -340,65 +343,50 @@
                     });
                 }
 
-                saveStatus.textContent = "Cloud Sync Active";
-                updateUI();
-                startLoops(userDocRef);
+                saveStatus.textContent = "Bulut Senkronize";
+                walletElement.textContent = walletBalance.toFixed(10) + " TON";
+                
+                // Kayıt Döngüsü (30 saniyede bir)
+                setInterval(async () => {
+                    await saveToCloud(userDocRef);
+                }, 30000);
 
             } catch (err) {
-                console.error("Storage Error:", err);
-                saveStatus.textContent = "Offline Mode";
-                startLoops(null); // Fallback to local only
+                console.error("Depolama Hatası:", err);
+                saveStatus.textContent = "Çevrimdışı Mod";
             }
         });
 
-        function updateUI() {
-            balanceElement.textContent = currentBalance.toFixed(10);
-            walletElement.textContent = walletBalance.toFixed(10) + " TON";
-        }
-
-        function startLoops(docRef) {
-            // UI loop (100ms)
-            setInterval(() => {
-                currentBalance += (incrementPerSecond / 10);
-                balanceElement.textContent = currentBalance.toFixed(10);
-            }, 100);
-
-            // Cloud Save loop (every 30s)
-            if (docRef) {
-                setInterval(async () => {
-                    await saveToCloud(docRef);
-                }, 30000);
-            }
-        }
-
         async function saveToCloud(docRef) {
-            if (!docRef) return;
+            if (!docRef || !auth.currentUser) return;
             try {
                 await updateDoc(docRef, {
                     walletBalance: walletBalance,
                     currentBalance: currentBalance,
                     lastUpdateTime: Date.now()
                 });
-                saveStatus.textContent = "Progress Saved";
-                setTimeout(() => { saveStatus.textContent = "Cloud Sync Active"; }, 2000);
+                saveStatus.textContent = "İlerleme Kaydedildi";
+                setTimeout(() => { saveStatus.textContent = "Bulut Senkronize"; }, 2000);
             } catch (e) {
-                saveStatus.textContent = "Sync Error";
+                saveStatus.textContent = "Senkronizasyon Hatası";
             }
         }
 
-        // Action Handlers
+        // Buton Dinleyicileri
         document.getElementById('claimBtn').addEventListener('click', async () => {
             if (currentBalance > 0) {
                 walletBalance += currentBalance;
                 currentBalance = 0;
-                updateUI();
+                
+                walletElement.textContent = walletBalance.toFixed(10) + " TON";
+                balanceElement.textContent = "0.0000000000";
                 
                 if (auth.currentUser) {
                     const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'mining', 'data');
                     await saveToCloud(userDocRef);
                 }
 
-                // Effect
+                // Efekt
                 const btn = document.getElementById('claimBtn');
                 btn.style.transform = "scale(0.9)";
                 setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
