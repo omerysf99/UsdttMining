@@ -3,303 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TON Madencilik Arayüzü</title>
+    <title>Telegram Bot Sayaç</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: white;
-            margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            margin: 0;
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
         }
-
-        .app-container {
-            width: 100%;
-            height: 100%;
-            max-width: calc(100vh * 9 / 16);
-            max-height: 100vh;
-            background-color: #0c0c0c;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-            padding-bottom: 100px;
-        }
-
-        .balance-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-
-        .coin-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            margin-right: 12px;
-            object-fit: cover;
-        }
-
-        .wallet-btn {
-            background: #6d5dfc;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mining-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .counter-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             text-align: center;
-            min-height: 300px;
+            width: 340px;
         }
-
-        .fan-container {
-            position: relative;
-            width: min(70vw, 260px);
-            height: min(70vw, 260px);
-            margin-bottom: 20px;
-        }
-
-        .fan-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            animation: rotateFan 3s linear infinite;
-        }
-
-        @keyframes rotateFan {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .main-balance {
-            font-size: clamp(1.8rem, 8vw, 2.5rem);
+        #counter-display {
+            font-size: 4rem;
             font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -1px;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            transition: transform 0.1s ease;
         }
-
-        .stats-badge {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #aaa;
-            margin-top: 10px;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-            flex-shrink: 0;
-        }
-
-        .btn {
-            padding: 14px;
-            border-radius: 16px;
+        .btn-increment {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            border-radius: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            width: 100%;
+            transition: all 0.2s ease;
             user-select: none;
         }
-
-        .btn:active { transform: scale(0.95); }
-        .btn-claim { background: #6d5dfc; color: white; }
-        .btn-boost { background: #8e80ff; color: white; }
-
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 15, 15, 0.98);
-            backdrop-filter: blur(15px);
+        .btn-increment:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .btn-increment:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        .btn-increment:active:not(:disabled) {
+            transform: translateY(0) scale(0.95);
+        }
+        #status-indicator {
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            color: #6b7280;
+        }
+        .telegram-info {
+            background: #f0f7ff;
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #1d4ed8;
             display: flex;
-            justify-content: space-around;
-            padding: 12px 0 24px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 100;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.7rem;
-            color: #888;
-            text-decoration: none;
-            width: 20%;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #8e80ff;
-        }
-
-        .nav-icon {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
-        }
-
-        .svg-icon { width: 20px; height: 20px; fill: currentColor; }
-
-        #saveStatus {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 10px;
-            color: #6d5dfc;
-            opacity: 0.7;
-            z-index: 200;
-        }
-
-        /* Friends Page Specific Styles */
-        .invite-box {
-            background: #1a1a1a;
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 10px;
-        }
-        .code-display {
-            background: #000;
-            padding: 12px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: #888;
-            font-size: 0.9rem;
-            border: 1px solid #333;
-        }
-        .referral-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 12px;
-            text-align: center;
-        }
-
-        /* Modal Styles */
-        #invite-modal {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            gap: 0.5rem;
         }
-        .modal-card {
-            background: #1a1a1a;
-            width: 100%;
-            border-radius: 24px;
-            padding: 24px;
-            border: 1px solid #333;
-            text-align: center;
+        .loading-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        #reset-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div id="saveStatus">Bağlanıyor...</div>
+    <div class="counter-card">
+        <div class="telegram-info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
+            <span id="tg-id-display">TG ID: Yükleniyor...</span>
+        </div>
         
-        <!-- Invite Modal -->
-        <div id="invite-modal">
-            <div class="modal-card">
-                <h3 class="text-xl font-bold mb-2">Hoş Geldiniz!</h3>
-                <p class="text-gray-400 text-sm mb-6">Sizi kim davet etti? Lütfen davet kodunu giriniz.</p>
-                <input type="text" id="referral-input" placeholder="Örn: Drg123x45678" class="w-full bg-black border border-gray-700 rounded-xl p-4 mb-4 text-white outline-none focus:border-[#6d5dfc]">
-                <div class="flex flex-col gap-2">
-                    <button class="btn btn-claim w-full" onclick="window.submitReferral()">Onayla</button>
-                    <button class="text-gray-500 text-xs mt-2" onclick="window.skipReferral()">Davet kodum yok</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div id="page-content" class="content">
-            <!-- İçerik JS ile buraya yüklenecek -->
-        </div>
-
-        <!-- Alt Navigasyon -->
-        <nav class="bottom-nav">
-            <div class="nav-item" onclick="changePage('wallet')">
-                <span class="nav-icon">👛</span>
-                <span>Wallet</span>
-            </div>
-            <div class="nav-item" id="nav-friends" onclick="changePage('friends')">
-                <span class="nav-icon">👥</span>
-                <span>Friends</span>
-            </div>
-            <div class="nav-item active" id="nav-home" onclick="changePage('home')">
-                <span class="nav-icon">🏠</span>
-                <span>Home</span>
-            </div>
-            <div class="nav-item" onclick="changePage('missions')">
-                <span class="nav-icon">🎯</span>
-                <span>Missions</span>
-            </div>
-            <div class="nav-item" onclick="changePage('more')">
-                <span class="nav-icon">⚙️</span>
-                <span>More</span>
-            </div>
-        </nav>
+        <h2 class="text-gray-500 text-xs font-bold tracking-widest mb-2 uppercase">Toplam Puan</h2>
+        <div id="counter-display" class="loading-pulse">0</div>
+        
+        <button id="increment-btn" class="btn-increment" disabled>
+            Yükleniyor...
+        </button>
+        
+        <button id="reset-trigger" class="mt-4 text-gray-400 hover:text-red-500 text-xs underline transition-colors">Verileri Sıfırla</button>
+        <div id="status-indicator">Başlatılıyor...</div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <div id="reset-modal">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-xs w-full mx-4">
+            <h3 class="text-lg font-bold mb-2">Emin misiniz?</h3>
+            <p class="text-gray-600 mb-4 text-sm">Tüm ilerlemeniz silinecek. Onaylıyor musunuz?</p>
+            <div class="flex gap-2">
+                <button id="confirm-reset" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex-1">Sıfırla</button>
+                <button id="cancel-reset" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold flex-1">Kapat</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Yapılandırması
-        const defaultFirebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
             authDomain: "studio-9241589115-a403e.firebaseapp.com",
             projectId: "studio-9241589115-a403e",
@@ -308,240 +134,105 @@
             appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
         };
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
-        if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
-            firebaseConfig.apiKey = defaultFirebaseConfig.apiKey;
-        }
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telegram-counter-bot';
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ton-miner-v1';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Değişkenler
-        let currentBalance = 0.0;
-        let walletBalance = 0.0;
-        let currentPage = 'home';
-        let hasAnsweredInvite = false;
-        const incrementPerSecond = 0.11 / 86400; 
+        let count = 0;
+        let currentUser = null;
+        let unsubCounter = null;
+        let unsubProfile = null;
 
-        // Rastgele Davet Kodu Üret
-        const generateRandomCode = () => {
-            const part1 = Math.floor(100 + Math.random() * 900);
-            const part2 = Math.floor(10000 + Math.random() * 90000);
-            return `Drg${part1}x${part2}`;
-        };
-        const userInviteCode = generateRandomCode();
+        const display = document.getElementById('counter-display');
+        const tgDisplay = document.getElementById('tg-id-display');
+        const btn = document.getElementById('increment-btn');
+        const resetTrigger = document.getElementById('reset-trigger');
+        const status = document.getElementById('status-indicator');
+        const resetModal = document.getElementById('reset-modal');
 
-        // Madencilik Döngüsü
-        let lastTick = Date.now();
-        setInterval(() => {
-            const now = Date.now();
-            const deltaSeconds = (now - lastTick) / 1000;
-            lastTick = now;
-            
-            currentBalance += deltaSeconds * incrementPerSecond;
-            const balanceEl = document.getElementById('tonBalance');
-            if (balanceEl) balanceEl.textContent = currentBalance.toFixed(10);
-        }, 100);
-
-        // Sayfa Değiştirme
-        window.changePage = (page) => {
-            currentPage = page;
-            render();
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if (page === 'home') document.getElementById('nav-home').classList.add('active');
-            if (page === 'friends') document.getElementById('nav-friends').classList.add('active');
-        };
-
-        // Modal İşlemleri
-        window.submitReferral = async () => {
-            const val = document.getElementById('referral-input').value;
-            if (val.trim() === "") return alert("Lütfen bir kod girin veya atlayın.");
-            await completeInvite(val);
-        };
-
-        window.skipReferral = async () => {
-            await completeInvite("none");
-        };
-
-        const completeInvite = async (code) => {
-            if (!auth.currentUser) return;
-            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', auth.currentUser.uid);
+        // Firebase'e Kaydetme Fonksiyonu
+        async function updateCloud(newCount) {
+            if (!currentUser) return;
             try {
-                await updateDoc(userDocRef, {
-                    hasAnsweredInvite: true,
-                    invitedBy: code
-                });
-                document.getElementById('invite-modal').style.display = 'none';
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'counter');
+                await setDoc(docRef, { value: newCount, updatedAt: serverTimestamp() }, { merge: true });
             } catch (e) {
-                console.error(e);
+                status.textContent = "Kaydetme hatası!";
             }
-        };
+        }
 
-        const render = () => {
-            const container = document.getElementById('page-content');
-            if (currentPage === 'home') {
-                container.innerHTML = `
-                    <div class="balance-card">
-                        <div class="flex items-center">
-                            <img src="ton.jpg" alt="TON" class="coin-icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                            <div>
-                                <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
-                                <div class="font-bold text-sm" id="mainWalletBalance">${walletBalance.toFixed(10)} TON</div>
-                            </div>
-                        </div>
-                        <div class="wallet-btn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg></div>
-                    </div>
-                    <div class="balance-card">
-                        <div class="flex items-center">
-                            <img src="dragon.jpg" alt="TONIX" class="coin-icon" onerror="this.src='https://via.placeholder.com/32/333/fff?text=T'">
-                            <div>
-                                <div class="text-[10px] uppercase tracking-wider text-gray-500">Bakiye</div>
-                                <div class="font-bold text-sm">0 TONIX</div>
-                            </div>
-                        </div>
-                        <div class="wallet-btn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18V19C21 20.1 20.1 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.89 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.89 6 10 6.89 10 8V16C10 17.11 10.89 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"/></svg></div>
-                    </div>
-                    <div class="mining-section">
-                        <div class="fan-container">
-                            <img src="fan.jpg" alt="Fan" class="fan-img" id="miningFan" onerror="this.src='https://img.freepik.com/premium-photo/3d-render-electric-fan-ventilator-blue-color-isolated-black-background_1020697-2384.jpg'">
-                        </div>
-                        <div class="main-balance" id="tonBalance">${currentBalance.toFixed(10)}</div>
-                        <div class="text-xl font-extrabold text-white mb-2">TON</div>
-                        <div class="stats-badge">
-                            <span style="font-size: 14px; opacity: 0.6;">ℹ️</span>
-                            <span class="font-bold text-white">11 GH/s</span>
-                            <span style="color: #ff9d00;">⚡</span>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <div class="btn btn-claim" onclick="window.handleClaim(event)">
-                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg> Claim
-                        </div>
-                        <div class="btn btn-boost" onclick="window.handleBoost()">
-                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14H11V21L20 10H13Z"/></svg> Boost
-                        </div>
-                    </div>
-                `;
-            } else if (currentPage === 'friends') {
-                container.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4">Invite Friends</h2>
-                    <div class="invite-box">
-                        <p class="text-sm text-gray-400 mb-3 font-semibold">Your Invite Link</p>
-                        <div class="code-display mb-6">
-                            <span>${userInviteCode}</span>
-                            <button onclick="window.copyToClipboard('${userInviteCode}')">
-                                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
-                            </button>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="btn btn-claim flex-1" onclick="window.handleInvite()">
-                                <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M13 8c0-2.21-1.79-4-4-4S5 5.79 5 8s1.79 4 4 4 4-1.79 4-4zm2 2v2h2v-2h2V8h-2V6h-2v2h-2v2h2zM1 18v2h16v-2c0-2.66-5.33-4-8-4s-8 1.34-8 4z"/></svg>
-                                Invite a friend
-                            </button>
-                        </div>
-                    </div>
-                    <button class="btn btn-claim w-full mt-4 !bg-blue-600" onclick="window.alert('Arkadaşlar listesi şu an boş.')">
-                         Open Friends List
-                    </button>
-                    <div class="referral-card mt-8">
-                         <p class="text-sm text-gray-500 mb-1">Referrals</p>
-                         <h3 class="text-3xl font-extrabold">0</h3>
-                         <p class="text-xs text-gray-600 mt-2">Kaç referansım var?</p>
-                    </div>
-                `;
-            }
-        };
+        // Veri Senkronizasyonu
+        function startSyncing(user) {
+            currentUser = user;
+            
+            // 1. Sayaç Verisini Dinle
+            const counterRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'counter');
+            unsubCounter = onSnapshot(counterRef, (snap) => {
+                if (snap.exists()) {
+                    count = snap.data().value || 0;
+                    display.textContent = count;
+                    display.classList.remove('loading-pulse');
+                    btn.disabled = false;
+                    btn.textContent = "Artır +1";
+                    status.textContent = "Veriler güncel.";
+                } else {
+                    updateCloud(0);
+                }
+            });
 
-        // Firebase Logic
+            // 2. Telegram Profil Bilgisini Dinle (RULE 1 uyumlu yol)
+            const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info');
+            unsubProfile = onSnapshot(profileRef, (snap) => {
+                if (snap.exists() && snap.data().telegramId) {
+                    tgDisplay.textContent = `ID: ${snap.data().telegramId}`;
+                } else {
+                    tgDisplay.textContent = "TG ID: Bağlı Değil";
+                }
+            });
+        }
+
+        // Auth Başlatma
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== "") {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (err) {
-                try { await signInAnonymously(auth); } catch (e) { saveStatus.textContent = "Bağlantı Hatası"; }
+            } catch (e) {
+                status.textContent = "Giriş yapılamadı.";
             }
         };
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) return;
-            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-            try {
-                const userDoc = await getDoc(userDocRef);
-                const now = Date.now();
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    walletBalance = parseFloat(data.walletBalance) || 0;
-                    const savedMiningBalance = parseFloat(data.currentBalance) || 0;
-                    const savedUpdateTime = data.lastUpdateTime || now;
-                    const secondsPassed = (now - savedUpdateTime) / 1000;
-                    const offlineGain = secondsPassed * incrementPerSecond;
-                    currentBalance = savedMiningBalance + offlineGain;
-                    
-                    // Modal gösterme kontrolü
-                    if (!data.hasAnsweredInvite) {
-                        document.getElementById('invite-modal').style.display = 'flex';
-                    }
-                } else {
-                    await setDoc(userDocRef, { walletBalance: 0, currentBalance: 0, lastUpdateTime: now, hasAnsweredInvite: false });
-                    document.getElementById('invite-modal').style.display = 'flex';
-                }
-                saveStatus.textContent = "Bulut Aktif";
-                render();
-                setInterval(async () => { await saveToCloud(userDocRef); }, 30000);
-            } catch (err) { saveStatus.textContent = "Yerel Mod"; render(); }
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                startSyncing(user);
+            } else {
+                if (unsubCounter) unsubCounter();
+                if (unsubProfile) unsubProfile();
+                status.textContent = "Oturum açılmalı.";
+            }
         });
 
-        async function saveToCloud(docRef) {
-            if (!docRef || !auth.currentUser) return;
-            try {
-                await updateDoc(docRef, { walletBalance: walletBalance, currentBalance: currentBalance, lastUpdateTime: Date.now() });
-                saveStatus.textContent = "Kaydedildi";
-                setTimeout(() => { saveStatus.textContent = "Bulut Aktif"; }, 2000);
-            } catch (e) { saveStatus.textContent = "Eşitleme Hatası"; }
-        }
+        // Buton Olayları
+        btn.addEventListener('click', () => {
+            count++;
+            display.textContent = count; // Hızlı geri bildirim
+            updateCloud(count);
+            display.style.transform = 'scale(1.1)';
+            setTimeout(() => display.style.transform = 'scale(1)', 100);
+        });
 
-        window.handleClaim = async (e) => {
-            if (currentBalance > 0) {
-                walletBalance += currentBalance;
-                currentBalance = 0;
-                render();
-                if (auth.currentUser) {
-                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', auth.currentUser.uid);
-                    await saveToCloud(userDocRef);
-                }
-            }
-        };
-
-        window.handleBoost = () => {
-            const fan = document.getElementById('miningFan');
-            if (fan) fan.style.animationDuration = '0.4s';
-            setTimeout(() => { if (fan) fan.style.animationDuration = '3s'; }, 2500);
-        };
-
-        window.copyToClipboard = (text) => {
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert("Davet kodunuz kopyalandı!");
-        };
-
-        window.handleInvite = () => {
-            const shareUrl = "http://t.me/DragTon_bot/Xc1";
-            const shareText = `Dragon Ton Slash Oyununa Katıl Davet Kodum Bu ${userInviteCode}`;
-            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-            window.open(telegramUrl, '_blank');
-        };
+        resetTrigger.addEventListener('click', () => resetModal.style.display = 'flex');
+        document.getElementById('cancel-reset').addEventListener('click', () => resetModal.style.display = 'none');
+        document.getElementById('confirm-reset').addEventListener('click', () => {
+            updateCloud(0);
+            resetModal.style.display = 'none';
+        });
 
         initAuth();
-        render();
     </script>
 </body>
 </html>
