@@ -298,6 +298,42 @@
             border-radius: 50%;
             box-shadow: 0 0 8px #22c55e;
         }
+        /* Withdraw Modal specific styles */
+        .withdraw-input-group {
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 12px 16px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .withdraw-input-group input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+        }
+        .asset-tag {
+            background: rgba(255,255,255,0.05);
+            padding: 6px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .max-btn {
+            color: #7169e6;
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -330,11 +366,9 @@
                         <p class="text-white font-extrabold text-sm leading-none"><span id="total-ton-balance">0.0000</span></p>
                     </div>
                 </div>
-                <!-- Mining Status Badge -->
-                <div class="status-badge">
-                    <div class="status-dot"></div>
-                    7/24 AKTİF
-                </div>
+                <button onclick="openWithdraw('TON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </button>
             </div>
 
             <div class="balance-card flex items-center justify-between">
@@ -347,7 +381,7 @@
                         <p class="text-white font-extrabold text-sm leading-none"><span id="dragon-balance">0</span></p>
                     </div>
                 </div>
-                <button class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0">
+                <button onclick="openWithdraw('DRAGON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
                 </button>
             </div>
@@ -475,6 +509,63 @@
         </nav>
     </div>
 
+    <!-- Withdraw Modal (Paylaşılan image_b59527.png tasarımına göre) -->
+    <div id="withdraw-modal" class="modal-overlay">
+        <div class="modal-content p-6">
+            <!-- Mini bakiye başlığı -->
+            <div class="flex gap-2 mb-6">
+                <div class="bg-[#111] rounded-xl py-2 px-4 flex items-center gap-2 border border-white/5 flex-1">
+                    <img src="ton.jpg" class="w-4 h-4 rounded-full">
+                    <span class="text-[10px] font-bold" id="wd-ton-bal">0.00 TON</span>
+                </div>
+                <div class="bg-[#111] rounded-xl py-2 px-4 flex items-center gap-2 border border-white/5 flex-1">
+                    <img src="dragon.jpg" class="w-4 h-4 rounded-full">
+                    <span class="text-[10px] font-bold" id="wd-dragon-bal">0 $DRAGON</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h3 class="text-lg font-black tracking-tight" id="wd-title">Enter your personal TON address</h3>
+                <p class="text-gray-500 text-[11px] px-4 mt-2">This amount will be sent to the TON compatible wallet address</p>
+            </div>
+
+            <p class="text-center text-gray-400 text-[10px] font-black uppercase mb-4 tracking-wider">Minimum send amount is 1,5 <span id="wd-min-asset">TON</span></p>
+
+            <div class="space-y-3">
+                <!-- Asset Selector View -->
+                <div class="withdraw-input-group">
+                    <div class="asset-tag" id="wd-tag">
+                        <img src="ton.jpg" class="w-4 h-4 rounded-full" id="wd-tag-img">
+                        <span id="wd-tag-text">TON</span>
+                    </div>
+                    <div class="flex-grow"></div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+
+                <!-- Address Input -->
+                <div class="withdraw-input-group">
+                    <input type="text" id="wd-address" placeholder="Your TON address">
+                </div>
+
+                <!-- Amount Input -->
+                <div class="withdraw-input-group">
+                    <input type="number" id="wd-amount" placeholder="Amount">
+                    <button class="max-btn" id="wd-max-btn">MAX</button>
+                </div>
+            </div>
+
+            <div class="text-center mt-6 space-y-1">
+                <p class="text-gray-500 text-[10px] font-bold">Network fee: 0,3 <span id="wd-fee-asset">TON</span></p>
+                <p class="text-white text-xs font-black">Receive amount: <span id="wd-receive">0</span> <span id="wd-receive-asset">TON</span></p>
+            </div>
+
+            <div class="mt-8 space-y-3">
+                <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-4 rounded-2xl opacity-50 pointer-events-none uppercase text-xs tracking-widest">Send</button>
+                <button onclick="closeWithdraw()" class="w-full bg-[#222] text-gray-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Not yet</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Arkadaş Listesi Modalı -->
     <div id="friends-list-modal" class="modal-overlay">
         <div class="modal-content">
@@ -541,7 +632,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // VERİ SIFIRLAMA: Versiyon v6'ya yükseltildi.
         const contextAppId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-miner-pro-v6';
 
         const tg = window.Telegram?.WebApp;
@@ -569,8 +659,7 @@
         let mission_channel_completed = false;
         let mission_ad_last_time = 0;
 
-        // Debounce flag for referral
-        let isProcessingReferral = false;
+        let currentWdAsset = 'TON';
 
         function startSync(user) {
             if (!isTelegram) return;
@@ -597,13 +686,12 @@
                     mission_ad_last_time = data.mission_ad_last_time || 0;
 
                     document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
+                    document.getElementById('wd-ton-bal').textContent = totalWalletBalance.toFixed(4) + " TON";
+                    document.getElementById('wd-dragon-bal').textContent = dragonBalance + " $DRAGON";
                     
                     if (referredBy) {
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
-                    } else {
-                        document.getElementById('referral-input-container').classList.remove('hidden');
-                        document.getElementById('referral-used-container').classList.add('hidden');
                     }
                     updateMissionUI();
                 } else {
@@ -645,6 +733,71 @@
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
+
+        // --- Withdraw Logic ---
+        window.openWithdraw = (asset) => {
+            currentWdAsset = asset;
+            document.getElementById('withdraw-modal').style.display = 'flex';
+            
+            // UI Update based on asset
+            document.getElementById('wd-title').textContent = `Enter your personal ${asset} address`;
+            document.getElementById('wd-min-asset').textContent = asset;
+            document.getElementById('wd-fee-asset').textContent = asset;
+            document.getElementById('wd-receive-asset').textContent = asset;
+            document.getElementById('wd-tag-text').textContent = asset;
+            document.getElementById('wd-tag-img').src = asset === 'TON' ? 'ton.jpg' : 'dragon.jpg';
+            document.getElementById('wd-address').placeholder = `Your ${asset} address`;
+            
+            // Reset fields
+            document.getElementById('wd-amount').value = '';
+            document.getElementById('wd-address').value = '';
+            updateWdReceive();
+        };
+
+        window.closeWithdraw = () => {
+            document.getElementById('withdraw-modal').style.display = 'none';
+        };
+
+        const updateWdReceive = () => {
+            const amount = parseFloat(document.getElementById('wd-amount').value) || 0;
+            const fee = 0.3;
+            const receive = Math.max(0, amount - fee);
+            document.getElementById('wd-receive').textContent = amount > fee ? receive.toFixed(4) : "0";
+            
+            const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
+            const sendBtn = document.getElementById('wd-send-btn');
+            
+            if (amount >= 1.5 && amount <= balance) {
+                sendBtn.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                sendBtn.classList.add('opacity-50', 'pointer-events-none');
+            }
+        };
+
+        document.getElementById('wd-amount').oninput = updateWdReceive;
+        document.getElementById('wd-max-btn').onclick = () => {
+            const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
+            document.getElementById('wd-amount').value = balance.toFixed(4);
+            updateWdReceive();
+        };
+
+        document.getElementById('wd-send-btn').onclick = async () => {
+            const amount = parseFloat(document.getElementById('wd-amount').value);
+            const address = document.getElementById('wd-address').value.trim();
+            
+            if (!address) {
+                if (tg?.showAlert) tg.showAlert("Lütfen bir adres girin!");
+                return;
+            }
+
+            // Simüle çekim
+            if (currentWdAsset === 'TON') totalWalletBalance -= amount;
+            else dragonBalance -= amount;
+            
+            await save();
+            closeWithdraw();
+            if (tg?.showAlert) tg.showAlert("Çekim talebi alındı! İnceleme sonrası gönderilecektir.");
+        };
 
         function updateMissionUI() {
             const channelBtn = document.getElementById('mission-action-btn');
@@ -779,62 +932,34 @@
         };
 
         document.getElementById('apply-referral-btn').onclick = async () => {
-            // Check if already processing or already has a referrer
-            if (isProcessingReferral || referredBy) return;
-
+            if (referredBy) return;
             const codeInput = document.getElementById('referral-input');
             const btn = document.getElementById('apply-referral-btn');
             const code = codeInput.value.trim().toUpperCase();
-
             if (!code || code === myReferralCode) return;
-
-            // Start processing
-            isProcessingReferral = true;
             btn.disabled = true;
-            btn.textContent = "...";
-            btn.style.opacity = "0.5";
-
             try {
                 const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
                 const regSnap = await getDoc(regRef);
-
                 if (regSnap.exists()) {
                     const target = regSnap.data();
-                    
-                    // Double check referredBy to prevent concurrent race conditions
-                    if (!referredBy) {
-                        const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
-                        const rSnap = await getDoc(referrerRef);
-                        
-                        if (rSnap.exists()) {
-                            const rData = rSnap.data();
-                            await updateDoc(referrerRef, {
-                                walletBalance: (rData.walletBalance || 0) + 0.03,
-                                referralCount: (rData.referralCount || 0) + 1,
-                                referralEarnings: (rData.referralEarnings || 0) + 0.03
-                            });
-                            const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
-                            await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
-                            
-                            referredBy = target.ownerTgId;
-                            await save();
-                        }
+                    const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
+                    const rSnap = await getDoc(referrerRef);
+                    if (rSnap.exists()) {
+                        const rData = rSnap.data();
+                        await updateDoc(referrerRef, {
+                            walletBalance: (rData.walletBalance || 0) + 0.03,
+                            referralCount: (rData.referralCount || 0) + 1,
+                            referralEarnings: (rData.referralEarnings || 0) + 0.03
+                        });
+                        const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
+                        await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
+                        referredBy = target.ownerTgId;
+                        await save();
                     }
-                } else {
-                    if (tg?.showAlert) tg.showAlert('Geçersiz referans kodu!');
-                }
-            } catch (error) {
-                console.error("Referral process error:", error);
-            } finally {
-                // Reset processing flag so user can try again if it failed for validity reasons
-                isProcessingReferral = false;
-                // If it was successful, referredBy will be set and onSnapshot will hide the container anyway
-                if (!referredBy) {
-                    btn.disabled = false;
-                    btn.textContent = "OK";
-                    btn.style.opacity = "1";
-                }
-            }
+                } else if (tg?.showAlert) tg.showAlert('Geçersiz referans kodu!');
+            } catch (error) { console.error(error); }
+            btn.disabled = false;
         };
 
         document.getElementById('open-friends-list-btn').onclick = () => document.getElementById('friends-list-modal').style.display = 'flex';
