@@ -569,6 +569,9 @@
         let mission_channel_completed = false;
         let mission_ad_last_time = 0;
 
+        // Debounce flag for referral
+        let isProcessingReferral = false;
+
         function startSync(user) {
             if (!isTelegram) return;
             currentUser = user;
@@ -776,26 +779,61 @@
         };
 
         document.getElementById('apply-referral-btn').onclick = async () => {
-            const code = document.getElementById('referral-input').value.trim().toUpperCase();
-            if (!code || code === myReferralCode || referredBy) return;
-            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
-            const regSnap = await getDoc(regRef);
-            if (regSnap.exists()) {
-                const target = regSnap.data();
-                const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
-                const rSnap = await getDoc(referrerRef);
-                if (rSnap.exists()) {
-                    const rData = rSnap.data();
-                    await updateDoc(referrerRef, {
-                        walletBalance: (rData.walletBalance || 0) + 0.03,
-                        referralCount: (rData.referralCount || 0) + 1,
-                        referralEarnings: (rData.referralEarnings || 0) + 0.03
-                    });
-                    const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
-                    await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
+            // Check if already processing or already has a referrer
+            if (isProcessingReferral || referredBy) return;
+
+            const codeInput = document.getElementById('referral-input');
+            const btn = document.getElementById('apply-referral-btn');
+            const code = codeInput.value.trim().toUpperCase();
+
+            if (!code || code === myReferralCode) return;
+
+            // Start processing
+            isProcessingReferral = true;
+            btn.disabled = true;
+            btn.textContent = "...";
+            btn.style.opacity = "0.5";
+
+            try {
+                const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
+                const regSnap = await getDoc(regRef);
+
+                if (regSnap.exists()) {
+                    const target = regSnap.data();
+                    
+                    // Double check referredBy to prevent concurrent race conditions
+                    if (!referredBy) {
+                        const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
+                        const rSnap = await getDoc(referrerRef);
+                        
+                        if (rSnap.exists()) {
+                            const rData = rSnap.data();
+                            await updateDoc(referrerRef, {
+                                walletBalance: (rData.walletBalance || 0) + 0.03,
+                                referralCount: (rData.referralCount || 0) + 1,
+                                referralEarnings: (rData.referralEarnings || 0) + 0.03
+                            });
+                            const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
+                            await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
+                            
+                            referredBy = target.ownerTgId;
+                            await save();
+                        }
+                    }
+                } else {
+                    if (tg?.showAlert) tg.showAlert('Geçersiz referans kodu!');
                 }
-                referredBy = target.ownerTgId;
-                await save();
+            } catch (error) {
+                console.error("Referral process error:", error);
+            } finally {
+                // Reset processing flag so user can try again if it failed for validity reasons
+                isProcessingReferral = false;
+                // If it was successful, referredBy will be set and onSnapshot will hide the container anyway
+                if (!referredBy) {
+                    btn.disabled = false;
+                    btn.textContent = "OK";
+                    btn.style.opacity = "1";
+                }
             }
         };
 
