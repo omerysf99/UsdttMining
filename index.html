@@ -14,6 +14,8 @@
         :root {
             --tg-viewport-height: 100vh;
             --tg-viewport-stable-height: 100vh;
+            --primary-color: #5b5df2;
+            --accent-color: #7169e6;
         }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -55,10 +57,14 @@
         }
         .balance-card {
             background: #111111;
-            border-radius: 18px;
-            padding: 12px 16px;
+            border-radius: 20px;
+            padding: 14px 18px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        .balance-card:active {
+            transform: scale(0.98);
         }
         .main-content {
             flex-grow: 1;
@@ -69,20 +75,20 @@
         }
         .fan-container {
             position: relative;
-            width: 60vw;
-            height: 60vw;
-            max-width: 240px;
-            max-height: 240px;
+            width: 62vw;
+            height: 62vw;
+            max-width: 250px;
+            max-height: 250px;
             flex-shrink: 0;
-            margin: 20px auto;
+            margin: 15px auto;
         }
         .fan-image {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            animation: spin 3s linear infinite;
-            box-shadow: 0 0 30px rgba(91, 93, 242, 0.15);
+            animation: spin 2.5s linear infinite;
+            box-shadow: 0 0 50px rgba(91, 93, 242, 0.2);
         }
         @keyframes spin {
             from { transform: rotate(0deg); }
@@ -95,8 +101,8 @@
             align-items: center;
             justify-content: space-around;
             padding: 0 10px 15px 10px;
-            background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.8));
-            backdrop-filter: blur(10px);
+            background: linear-gradient(to top, rgba(0,0,0,1), rgba(10,10,10,0.9));
+            backdrop-filter: blur(15px);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             z-index: 50;
         }
@@ -109,37 +115,31 @@
             width: 60px;
             height: 60px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            color: #666;
+            color: #444;
         }
         .nav-emoji {
-            font-size: 24px;
-            margin-bottom: 2px;
+            font-size: 22px;
+            margin-bottom: 3px;
             filter: grayscale(1);
             transition: all 0.3s ease;
         }
-        .nav-text {
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
         .nav-active {
             color: #ffffff;
-            transform: translateY(-5px);
+            transform: translateY(-8px);
         }
         .nav-active .nav-emoji {
-            filter: grayscale(0) drop-shadow(0 0 8px rgba(255,255,255,0.3));
-            font-size: 28px;
+            filter: grayscale(0) drop-shadow(0 0 12px rgba(91, 93, 242, 0.5));
+            font-size: 26px;
         }
         .nav-active::after {
             content: '';
             position: absolute;
             bottom: -5px;
-            width: 12px;
-            height: 4px;
-            background: #5b5df2;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #5b5df2;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--primary-color);
         }
         .tab-content {
             display: none;
@@ -147,7 +147,7 @@
             height: 100%;
             flex-direction: column;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
         .tab-content.active {
             display: flex;
@@ -155,134 +155,48 @@
         }
         .claim-btn {
             background: linear-gradient(135deg, #5b5df2, #4042b8);
-            box-shadow: 0 6px 15px rgba(91, 93, 242, 0.25);
+            box-shadow: 0 8px 20px rgba(91, 93, 242, 0.3);
         }
         .boost-btn {
             background: linear-gradient(135deg, #7169e6, #5a52c7);
-            box-shadow: 0 6px 15px rgba(113, 105, 230, 0.25);
+            box-shadow: 0 8px 20px rgba(113, 105, 230, 0.3);
         }
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.94);
+            backdrop-filter: blur(12px);
             z-index: 100;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 20px;
         }
         .modal-content {
-            background: #161616;
-            border-radius: 28px;
+            background: #0a0a0a;
+            border-radius: 30px;
             width: 100%;
-            max-width: 320px;
+            max-width: 330px;
             border: 1px solid rgba(255,255,255,0.08);
-            max-height: 90vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        .input-dragon {
-            background: #111;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 12px;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            outline: none;
-            width: 100%;
-        }
-        .friends-list-container {
-            overflow-y: auto;
-            flex: 1;
-            padding: 10px;
-        }
-        .friend-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 10px 15px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        /* Mission Styles */
-        .mission-card {
-            background: #111;
-            border-radius: 24px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .mission-icon {
-            width: 45px;
-            height: 45px;
-            background: rgba(91, 93, 242, 0.1);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .mission-info-text {
-            flex-grow: 1;
-        }
-        .mission-btn {
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 10px;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            min-width: 80px;
-            text-align: center;
-        }
-        .mission-btn-active {
-            background: #5b5df2;
-            color: white;
-        }
-        .mission-btn-completed {
-            background: rgba(255,255,255,0.05);
-            color: #555;
-            pointer-events: none;
-        }
-        /* Offline Mining Status Badge */
-        .status-badge {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 9px;
-            font-weight: 800;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #22c55e;
-        }
-        /* Withdraw Modal specific styles */
         .withdraw-input-group {
             background: #111;
             border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 12px 16px;
+            border-radius: 18px;
+            padding: 14px 18px;
             width: 100%;
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: border-color 0.3s;
+        }
+        .withdraw-input-group:focus-within {
+            border-color: var(--primary-color);
         }
         .withdraw-input-group input {
             background: transparent;
@@ -293,26 +207,46 @@
             font-weight: 600;
             width: 100%;
         }
-        .asset-tag {
-            background: rgba(255,255,255,0.05);
-            padding: 6px 12px;
-            border-radius: 10px;
+        /* Notification Toast */
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 24px;
+            border-radius: 20px;
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 800;
+            gap: 10px;
         }
-        .max-btn {
-            color: #7169e6;
-            font-weight: 800;
-            font-size: 11px;
-            text-transform: uppercase;
-            padding: 4px 8px;
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Stats Table */
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .stat-row:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
 <body>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <span id="toast-emoji">✅</span>
+        <span id="toast-text" class="text-xs font-bold uppercase tracking-widest">Başarıyla Aktarıldı</span>
+    </div>
 
     <!-- Sadece Telegram Mesajı -->
     <div id="telegram-only-overlay">
@@ -324,9 +258,6 @@
             Güvenlik gereği bu uygulama sadece <br>
             <span class="text-blue-400 font-bold">Telegram Mobile</span> üzerinden açılabilir.
         </p>
-        <div class="bg-zinc-900 p-4 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest text-gray-500">
-            Lütfen Telegram botunu kullanın
-        </div>
     </div>
 
     <div class="app-container" id="main-app-container">
@@ -334,31 +265,31 @@
         <header class="header-section">
             <div class="balance-card flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#0088cc] flex items-center justify-center shrink-0">
+                    <div class="w-11 h-11 rounded-full bg-[#0088cc] flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20">
                         <img src="ton.jpg" alt="TON" class="w-full h-full object-cover rounded-full" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
-                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">TON</p>
-                        <p class="text-white font-extrabold text-sm leading-none"><span id="total-ton-balance">0.0000</span></p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">TON Cüzdan</p>
+                        <p class="text-white font-extrabold text-base leading-none"><span id="total-ton-balance">0.0000</span></p>
                     </div>
                 </div>
-                <button onclick="openWithdraw('TON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <button onclick="openWithdraw('TON')" class="w-10 h-10 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform hover:bg-[#2a2a2a]">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
                 </button>
             </div>
 
             <div class="balance-card flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-orange-950 flex items-center justify-center shrink-0 border border-orange-500/20">
+                    <div class="w-11 h-11 rounded-full bg-orange-950 flex items-center justify-center shrink-0 border border-orange-500/20 shadow-lg">
                         <img src="dragon.jpg" alt="$DRAGON" class="w-full h-full object-cover rounded-full" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3233/3233303.png'">
                     </div>
                     <div>
-                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">$DRAGON</p>
-                        <p class="text-white font-extrabold text-sm leading-none"><span id="dragon-balance">0</span></p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">$DRAGON Bakiye</p>
+                        <p class="text-white font-extrabold text-base leading-none"><span id="dragon-balance">0</span></p>
                     </div>
                 </div>
-                <button onclick="openWithdraw('DRAGON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <button onclick="openWithdraw('DRAGON')" class="w-10 h-10 bg-[#222] rounded-xl flex items-center justify-center shrink-0 active:scale-90 transition-transform hover:bg-[#2a2a2a]">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
                 </button>
             </div>
         </header>
@@ -367,28 +298,71 @@
         <main class="main-content">
             <!-- ANA SAYFA TAB -->
             <section id="tab-home" class="tab-content active items-center justify-center">
+                <div class="status-badge mb-2">
+                    <div class="status-dot"></div>
+                    <span class="ml-2">MADENCİLİK AKTİF (7/24)</span>
+                </div>
+
                 <div class="flex-1 flex flex-col items-center justify-center w-full">
                     <div class="fan-container mb-6">
                         <img src="fan.jpg" alt="Fan" class="fan-image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/911/911369.png'">
                     </div>
 
-                    <div class="mining-info mb-6 text-center">
-                        <h2 class="text-3xl font-black text-white mb-2 tracking-tighter">
-                            <span id="mining-display">0.0000000000</span> <span class="text-blue-500">TON</span>
+                    <div class="mining-info mb-4 text-center">
+                        <h2 class="text-4xl font-black text-white mb-2 tracking-tighter">
+                            <span id="mining-display">0.0000000000</span> <span class="text-blue-500 text-2xl">TON</span>
                         </h2>
-                        <div class="flex items-center justify-center gap-2 text-[11px] text-gray-400 font-bold bg-[#111] py-1.5 px-4 rounded-full mx-auto w-fit border border-white/5">
-                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        <div class="flex items-center justify-center gap-3 text-[12px] text-gray-400 font-bold bg-[#111] py-2 px-6 rounded-full mx-auto w-fit border border-white/5 shadow-lg">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
                             <span id="ghs-speed-display">11.00</span> GH/s
                             <span class="text-orange-500">⚡</span>
                         </div>
                     </div>
                     
-                    <p class="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] mb-4">Kazım Çevrimdışı Devam Ediyor</p>
+                    <p class="text-[9px] text-gray-600 font-bold uppercase tracking-[0.3em] mb-4">Otomatik Bulut Kazımı</p>
                 </div>
 
-                <div class="w-full flex gap-3 mb-6">
-                    <button id="claim-btn" class="flex-1 claim-btn text-white font-extrabold py-3.5 rounded-2xl active:scale-95 transition-all text-xs uppercase">Aktar</button>
-                    <button id="boost-trigger" class="flex-1 boost-btn text-white font-extrabold py-3.5 rounded-2xl active:scale-95 transition-all text-xs uppercase">Hızlandır</button>
+                <div class="w-full flex gap-4 mb-6">
+                    <button id="claim-btn" class="flex-1 claim-btn text-white font-extrabold py-4 rounded-2xl active:scale-95 transition-all text-xs uppercase tracking-widest">Aktar</button>
+                    <button id="boost-trigger" class="flex-1 boost-btn text-white font-extrabold py-4 rounded-2xl active:scale-95 transition-all text-xs uppercase tracking-widest">Hızlandır</button>
+                </div>
+            </section>
+
+            <!-- CÜZDAN SEKMESİ (GELİŞTİRİLDİ) -->
+            <section id="tab-wallet" class="tab-content py-6 space-y-4">
+                <h3 class="text-xl font-extrabold tracking-tight mb-2 uppercase">Hesap Özeti</h3>
+                
+                <div class="bg-[#111] p-6 rounded-[28px] border border-white/5 space-y-4">
+                    <div class="stat-row">
+                        <span class="text-gray-500 text-[10px] font-black uppercase">Toplam Kazılan</span>
+                        <span class="text-white font-bold" id="stats-total-mined">0.0000 TON</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="text-gray-500 text-[10px] font-black uppercase">Mevcut Güç</span>
+                        <span class="text-orange-400 font-bold" id="stats-speed">11.00 GH/s</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="text-gray-500 text-[10px] font-black uppercase">Günlük Getiri</span>
+                        <span class="text-green-400 font-bold" id="stats-daily">0.11 TON</span>
+                    </div>
+                </div>
+
+                <h4 class="text-xs font-black text-gray-500 uppercase mt-6 ml-2 tracking-widest">Varlık Dağılımı</h4>
+                <div class="flex gap-2">
+                    <div class="flex-1 bg-[#111] p-4 rounded-2xl border border-white/5 text-center">
+                        <img src="ton.jpg" class="w-6 h-6 rounded-full mx-auto mb-2">
+                        <p class="text-[10px] font-black uppercase text-gray-400">TON</p>
+                        <p class="text-sm font-black" id="wallet-ton">0.00</p>
+                    </div>
+                    <div class="flex-1 bg-[#111] p-4 rounded-2xl border border-white/5 text-center">
+                        <img src="dragon.jpg" class="w-6 h-6 rounded-full mx-auto mb-2">
+                        <p class="text-[10px] font-black uppercase text-gray-400">$DRAGON</p>
+                        <p class="text-sm font-black" id="wallet-dragon">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#111] p-5 rounded-[24px] border border-white/5 mt-4">
+                    <p class="text-center text-gray-600 text-[10px] font-black uppercase py-4">İşlem geçmişi bulunmuyor</p>
                 </div>
             </section>
 
@@ -399,10 +373,10 @@
                     <div id="referral-code-display" class="text-lg font-black tracking-[0.3em] text-center text-gray-400 py-2 uppercase">YÜKLENİYOR...</div>
                 </div>
                 <div class="flex gap-3">
-                    <button id="invite-friend-btn" class="invite-btn text-sm" style="background:#7169e6; color:white; font-weight:800; padding:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%">
-                        <span class="text-xl">🚀</span> Invite a friend
+                    <button id="invite-friend-btn" class="invite-btn text-sm" style="background:var(--accent-color); color:white; font-weight:800; padding:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%">
+                        <span class="text-xl">🚀</span> Arkadaşını Davet Et
                     </button>
-                    <button id="copy-code-btn" style="background:#7169e6; width:60px; height:60px; border-radius:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0" class="active:scale-90 transition-all">
+                    <button id="copy-code-btn" style="background:var(--accent-color); width:60px; height:60px; border-radius:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0" class="active:scale-90 transition-all">
                         📋
                     </button>
                 </div>
@@ -418,8 +392,8 @@
                         <p class="text-green-500 text-xs font-bold bg-green-500/10 p-2 rounded-xl border border-green-500/20">Referans Uygulandı ✅</p>
                     </div>
                 </div>
-                <button id="open-friends-list-btn" class="invite-btn bg-[#7169e6] mt-2 text-sm" style="background:#7169e6; color:white; font-weight:800; padding:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%">
-                    <span class="text-xl">📋</span> Open Friends List
+                <button id="open-friends-list-btn" class="invite-btn mt-2 text-sm" style="background:#222; color:white; font-weight:800; padding:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%">
+                    <span class="text-xl">👥</span> Davetli Listesini Aç
                 </button>
                 <div class="balance-card flex justify-between items-center py-4 px-6 mt-2">
                     <span class="text-gray-500 font-bold uppercase text-[10px]">Referans Kazancı</span>
@@ -427,12 +401,9 @@
                 </div>
             </section>
             
-            <section id="tab-wallet" class="tab-content items-center justify-center text-gray-500 font-bold text-[10px] uppercase">Cüzdan</section>
-            
             <!-- GÖREVLER TAB -->
             <section id="tab-missions" class="tab-content py-6 space-y-4">
                 <h3 class="text-xl font-extrabold tracking-tight mb-4 uppercase">Aktif Görevler</h3>
-                
                 <div class="mission-card" id="mission-channel-card">
                     <div class="mission-icon">📢</div>
                     <div class="mission-info-text">
@@ -443,20 +414,18 @@
                         <button id="mission-action-btn" class="mission-btn mission-btn-active">KATIL</button>
                     </div>
                 </div>
-
                 <div class="mission-card" id="mission-ad-card">
                     <div class="mission-icon">📺</div>
                     <div class="mission-info-text">
                         <p class="text-white text-xs font-black uppercase">Reklam İzle</p>
                         <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.0003 TON | +3 $DRAGON</p>
-                        <p class="text-[8px] text-gray-500 uppercase mt-0.5 italic">Her 5 dakikada bir</p>
+                        <p class="text-[8px] text-gray-500 uppercase mt-0.5 italic">5 dk bekleme süresi</p>
                     </div>
                     <div>
                         <button id="mission-ad-btn" class="mission-btn mission-btn-active">İZLE</button>
                     </div>
                 </div>
-
-                <p class="text-[9px] text-gray-600 text-center uppercase font-bold tracking-widest mt-10">Daha fazla görev yakında...</p>
+                <p class="text-[9px] text-gray-600 text-center uppercase font-bold tracking-widest mt-10">Yakında daha fazla görev gelecek...</p>
             </section>
             
             <!-- AYARLAR TAB -->
@@ -465,7 +434,7 @@
                     <h3 class="text-xl font-extrabold mb-1 tracking-tight uppercase">Ayarlar</h3>
                 </div>
                 <div class="balance-card">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 text-center">Hesap</p>
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 text-center">Hesap İşlemleri</p>
                     <button id="reset-data-btn" class="w-full bg-red-600/10 text-red-500 border border-red-500/20 font-black py-4 rounded-2xl text-xs uppercase active:scale-95 transition-all">
                         ⚠️ Verileri Sıfırla
                     </button>
@@ -475,18 +444,17 @@
 
         <!-- Alt Navigasyon -->
         <nav class="nav-bar">
-            <button onclick="switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="nav-text">Cüzdan</span></button>
-            <button onclick="switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="nav-text">Davet</span></button>
-            <button onclick="switchTab('home')" class="nav-btn nav-active" id="nav-home"><span class="nav-emoji">🏠</span><span class="nav-text">Ev</span></button>
-            <button onclick="switchTab('missions')" class="nav-btn" id="nav-missions"><span class="nav-emoji">🎯</span><span class="nav-text">Görevler</span></button>
-            <button onclick="switchTab('more')" class="nav-btn" id="nav-more"><span class="nav-emoji">⚙️</span><span class="nav-text">Daha</span></button>
+            <button onclick="switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="text-[8px] font-black uppercase">Cüzdan</span></button>
+            <button onclick="switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="text-[8px] font-black uppercase">Davet</span></button>
+            <button onclick="switchTab('home')" class="nav-btn nav-active" id="nav-home"><span class="nav-emoji">🏠</span><span class="text-[8px] font-black uppercase">Ev</span></button>
+            <button onclick="switchTab('missions')" class="nav-btn" id="nav-missions"><span class="nav-emoji">🎯</span><span class="text-[8px] font-black uppercase">Görevler</span></button>
+            <button onclick="switchTab('more')" class="nav-btn" id="nav-more"><span class="nav-emoji">⚙️</span><span class="text-[8px] font-black uppercase">Daha</span></button>
         </nav>
     </div>
 
-    <!-- Withdraw Modal (Görsel Tasarımıyla Güncellendi) -->
+    <!-- Withdraw Modal (GÜNCEL: 10 TON Limit, 0.01 TON Fee) -->
     <div id="withdraw-modal" class="modal-overlay">
         <div class="modal-content p-6">
-            <!-- Üst Bakiye Bilgileri -->
             <div class="flex gap-2 mb-8">
                 <div class="bg-[#111] rounded-2xl py-3 px-4 flex items-center gap-3 border border-white/5 flex-1 shadow-inner">
                     <img src="ton.jpg" class="w-5 h-5 rounded-full shadow-lg">
@@ -499,15 +467,14 @@
             </div>
 
             <div class="text-center mb-8">
-                <h3 class="text-xl font-black tracking-tight text-white uppercase" id="wd-title">Enter your personal TON address</h3>
-                <p class="text-gray-500 text-[11px] px-6 mt-3 leading-relaxed">This amount will be sent to the TON compatible wallet address</p>
+                <h3 class="text-xl font-black tracking-tight text-white uppercase" id="wd-title">Çekim Talebi</h3>
+                <p class="text-gray-500 text-[11px] px-6 mt-3 leading-relaxed uppercase font-bold tracking-tighter">Varlıklarınızı TON uyumlu cüzdan adresinize gönderin</p>
             </div>
 
-            <p class="text-center text-gray-400 text-[10px] font-black uppercase mb-5 tracking-widest">Minimum send amount is 1,5 <span id="wd-min-asset">TON</span></p>
+            <p class="text-center text-gray-400 text-[10px] font-black uppercase mb-5 tracking-widest bg-white/5 py-2 rounded-lg">Minimum Çekim: 10 <span id="wd-min-asset">TON</span></p>
 
-            <div class="space-y-3">
-                <!-- Varlık Seçici (Statik Görsel Temsili) -->
-                <div class="withdraw-input-group border-white/10">
+            <div class="space-y-4">
+                <div class="withdraw-input-group">
                     <div class="asset-tag" id="wd-tag">
                         <img src="ton.jpg" class="w-5 h-5 rounded-full" id="wd-tag-img">
                         <span id="wd-tag-text" class="text-white font-black">TON</span>
@@ -516,26 +483,24 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
 
-                <!-- Adres Girişi -->
-                <div class="withdraw-input-group border-white/10">
-                    <input type="text" id="wd-address" placeholder="Your TON address" class="placeholder:text-gray-700">
+                <div class="withdraw-input-group">
+                    <input type="text" id="wd-address" placeholder="TON Cüzdan Adresiniz" class="placeholder:text-gray-700 uppercase text-xs">
                 </div>
 
-                <!-- Miktar Girişi + MAX -->
-                <div class="withdraw-input-group border-white/10">
-                    <input type="number" id="wd-amount" placeholder="Amount" step="any" class="placeholder:text-gray-700">
+                <div class="withdraw-input-group">
+                    <input type="number" id="wd-amount" placeholder="Miktar" step="any" class="placeholder:text-gray-700">
                     <button class="max-btn active:opacity-60 transition-opacity" id="wd-max-btn">MAX</button>
                 </div>
             </div>
 
             <div class="text-center mt-8 space-y-2">
-                <p class="text-gray-500 text-[10px] font-black uppercase tracking-tighter">Network fee: 0,3 <span id="wd-fee-asset">TON</span></p>
-                <p class="text-white text-sm font-black uppercase tracking-tight">Receive amount: <span id="wd-receive" class="text-blue-400">0</span> <span id="wd-receive-asset">TON</span></p>
+                <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">İşlem Ücreti: 0,01 <span id="wd-fee-asset">TON</span></p>
+                <p class="text-white text-sm font-black uppercase tracking-tight">Net Geçecek Tutar: <span id="wd-receive" class="text-blue-400">0</span> <span id="wd-receive-asset">TON</span></p>
             </div>
 
             <div class="mt-8 space-y-3">
-                <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-4 rounded-2xl opacity-50 pointer-events-none uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20">Send</button>
-                <button onclick="closeWithdraw()" class="w-full bg-[#222] text-gray-500 font-black py-4 rounded-2xl uppercase text-xs tracking-[0.2em] active:bg-[#333]">Not yet</button>
+                <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-4 rounded-2xl opacity-50 pointer-events-none uppercase text-xs tracking-[0.2em]">Gönder</button>
+                <button onclick="closeWithdraw()" class="w-full bg-[#222] text-gray-500 font-black py-4 rounded-2xl uppercase text-xs tracking-[0.2em]">Vazgeç</button>
             </div>
         </div>
     </div>
@@ -548,7 +513,7 @@
                 <button onclick="document.getElementById('friends-list-modal').style.display='none'" class="text-gray-500 font-bold text-2xl">×</button>
             </div>
             <div class="friends-list-container bg-black" id="friends-list-render">
-                <p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz kimseyi davet etmedin.</p>
+                <p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz davet bulunmuyor.</p>
             </div>
         </div>
     </div>
@@ -557,19 +522,19 @@
     <div id="welcome-modal" class="modal-overlay">
         <div class="modal-content p-7 flex flex-col items-center text-center">
             <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-orange-500/20 shadow-2xl">
-            <h3 class="text-2xl font-black mb-1 uppercase tracking-tighter text-white">Yeni Hesap!</h3>
-            <p class="text-gray-500 text-[11px] mb-8 px-4 leading-relaxed uppercase font-bold">Madencilik paketini hemen al!</p>
+            <h3 class="text-2xl font-black mb-1 uppercase tracking-tighter text-white">Hoş Geldin Ejderha!</h3>
+            <p class="text-gray-500 text-[11px] mb-8 px-4 leading-relaxed uppercase font-bold">Kayıt hediyeni hemen al ve kazmaya başla!</p>
             <div class="w-full space-y-3 mb-10 px-2">
-                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">TON</span>
+                <div class="flex items-center justify-between bg-[#111] p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">HEDİYE TON</span>
                     <span class="text-green-400 font-black text-base">+0.05</span>
                 </div>
-                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">$DRAGON</span>
+                <div class="flex items-center justify-between bg-[#111] p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">HEDİYE $DRAGON</span>
                     <span class="text-orange-400 font-black text-base">+50</span>
                 </div>
             </div>
-            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-5 rounded-2xl active:scale-95 transition-all text-xs uppercase tracking-widest">HEDİYELERİ AL</button>
+            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-5 rounded-2xl active:scale-95 transition-all text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20">HEDİYELERİ AL</button>
         </div>
     </div>
 
@@ -614,6 +579,7 @@
             document.getElementById('telegram-only-overlay').style.display = 'none';
             document.getElementById('main-app-container').style.display = 'flex';
             tg.expand();
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
         const tgUser = tg?.initDataUnsafe?.user;
@@ -629,10 +595,23 @@
         let referredBy = null;
         let currentUser = null;
         let myReferralCode = "";
+        let totalMinedStats = 0;
         
         let mission_channel_completed = false;
         let mission_ad_last_time = 0;
         let currentWdAsset = 'TON';
+
+        // Consts
+        const WITHDRAW_FEE = 0.01;
+        const MIN_WITHDRAW = 10.0;
+
+        function showToast(text, emoji = '✅') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = text;
+            document.getElementById('toast-emoji').textContent = emoji;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
 
         function startSync(user) {
             if (!isTelegram) return;
@@ -656,11 +635,19 @@
                     referredBy = data.referredBy || null;
                     mission_channel_completed = data.mission_channel_completed || false;
                     mission_ad_last_time = data.mission_ad_last_time || 0;
+                    totalMinedStats = data.totalMinedStats || 0;
 
                     document.getElementById('referral-earnings-display').textContent = referralEarnings.toFixed(2);
                     document.getElementById('wd-ton-bal').textContent = totalWalletBalance.toFixed(4) + " TON";
                     document.getElementById('wd-dragon-bal').textContent = dragonBalance + " $DRAGON";
                     
+                    // Stats UI
+                    document.getElementById('stats-total-mined').textContent = totalMinedStats.toFixed(4) + " TON";
+                    document.getElementById('stats-speed').textContent = ghsSpeed.toFixed(2) + " GH/s";
+                    document.getElementById('stats-daily').textContent = ((ghsSpeed * 0.01)).toFixed(2) + " TON";
+                    document.getElementById('wallet-ton').textContent = totalWalletBalance.toFixed(4);
+                    document.getElementById('wallet-dragon').textContent = dragonBalance;
+
                     if (referredBy) {
                         document.getElementById('referral-input-container').classList.add('hidden');
                         document.getElementById('referral-used-container').classList.remove('hidden');
@@ -675,7 +662,7 @@
             onSnapshot(refListRef, (snap) => {
                 const listEl = document.getElementById('friends-list-render');
                 if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz davetin yok</p>';
+                    listEl.innerHTML = '<p class="text-center text-gray-600 text-xs py-10 uppercase">Henüz davet bulunmuyor.</p>';
                     return;
                 }
                 listEl.innerHTML = '';
@@ -702,6 +689,7 @@
                 referredBy: referredBy,
                 mission_channel_completed: mission_channel_completed,
                 mission_ad_last_time: mission_ad_last_time,
+                totalMinedStats: totalMinedStats,
                 updatedAt: serverTimestamp()
             }, { merge: true });
         }
@@ -710,13 +698,13 @@
         window.openWithdraw = (asset) => {
             currentWdAsset = asset;
             document.getElementById('withdraw-modal').style.display = 'flex';
-            document.getElementById('wd-title').textContent = `Enter your personal ${asset} address`;
+            document.getElementById('wd-title').textContent = `${asset} Çekim Talebi`;
             document.getElementById('wd-min-asset').textContent = asset;
             document.getElementById('wd-fee-asset').textContent = asset;
             document.getElementById('wd-receive-asset').textContent = asset;
             document.getElementById('wd-tag-text').textContent = asset;
             document.getElementById('wd-tag-img').src = asset === 'TON' ? 'ton.jpg' : 'dragon.jpg';
-            document.getElementById('wd-address').placeholder = `Your ${asset} address`;
+            document.getElementById('wd-address').placeholder = `${asset} Cüzdan Adresiniz`;
             document.getElementById('wd-amount').value = '';
             document.getElementById('wd-address').value = '';
             updateWdReceive();
@@ -728,12 +716,13 @@
 
         const updateWdReceive = () => {
             const amount = parseFloat(document.getElementById('wd-amount').value) || 0;
-            const fee = 0.3;
+            const fee = WITHDRAW_FEE;
             const receive = Math.max(0, amount - fee);
             document.getElementById('wd-receive').textContent = amount > fee ? receive.toFixed(4) : "0";
             const balance = currentWdAsset === 'TON' ? totalWalletBalance : dragonBalance;
             const sendBtn = document.getElementById('wd-send-btn');
-            if (amount >= 1.5 && amount <= balance) {
+            
+            if (amount >= MIN_WITHDRAW && amount <= balance) {
                 sendBtn.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 sendBtn.classList.add('opacity-50', 'pointer-events-none');
@@ -751,20 +740,20 @@
             const amount = parseFloat(document.getElementById('wd-amount').value);
             const address = document.getElementById('wd-address').value.trim();
             if (!address) {
-                if (tg?.showAlert) tg.showAlert("Lütfen geçerli bir adres girin!");
+                showToast("Lütfen cüzdan adresi girin", "⚠️");
                 return;
             }
             if (currentWdAsset === 'TON') totalWalletBalance -= amount;
             else dragonBalance -= amount;
             await save();
             closeWithdraw();
-            if (tg?.showAlert) tg.showAlert("Çekim talebiniz başarıyla oluşturuldu! Kontrollerden sonra gönderilecektir.");
+            showToast("Çekim talebi oluşturuldu", "🚀");
         };
 
         function updateMissionUI() {
             const channelBtn = document.getElementById('mission-action-btn');
             if (mission_channel_completed) {
-                channelBtn.textContent = "TAMAMLANDI ✅";
+                channelBtn.textContent = "ALINDI ✅";
                 channelBtn.className = "mission-btn mission-btn-completed";
                 channelBtn.disabled = true;
             }
@@ -800,26 +789,35 @@
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
+            const target = document.getElementById('tab-' + tabId);
+            if(target) target.classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById('nav-' + tabId).classList.add('nav-active');
+            const navBtn = document.getElementById('nav-' + tabId);
+            if(navBtn) navBtn.classList.add('nav-active');
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         };
 
         document.getElementById('collect-reward-btn').onclick = async () => {
             totalWalletBalance = 0.05; dragonBalance = 50; lastClaimTime = Date.now();
+            totalMinedStats = 0.05;
             await save();
             document.getElementById('welcome-modal').style.display = 'none';
+            showToast("Hediyeler Cüzdana Eklendi!");
         };
 
         document.getElementById('claim-btn').onclick = () => {
             const now = Date.now();
             const elapsed = (now - lastClaimTime) / 1000;
             const gained = elapsed * ((ghsSpeed * 0.01) / 86400);
-            totalWalletBalance += gained;
-            lastClaimTime = now;
-            save();
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            
+            if(gained > 0) {
+                totalWalletBalance += gained;
+                totalMinedStats += gained;
+                lastClaimTime = now;
+                save();
+                showToast(`+${gained.toFixed(6)} TON AKTARILDI`);
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
         };
 
         document.getElementById('mission-action-btn').onclick = function() {
@@ -836,21 +834,20 @@
                 if (timeLeft < 0) {
                     clearInterval(timer);
                     btn.disabled = false;
-                    btn.textContent = "CLAIM";
+                    btn.textContent = "AL";
                     btn.onclick = async () => {
                         mission_channel_completed = true;
                         totalWalletBalance += 0.001;
                         dragonBalance += 1;
                         await save();
                         updateMissionUI();
-                        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                        showToast("Görev Ödülü Alındı");
                     };
                 }
             }, 1000);
         };
 
         document.getElementById('mission-ad-btn').onclick = function() {
-            const btn = this;
             if (Date.now() - mission_ad_last_time < 5 * 60 * 1000) return;
             if (typeof show_10839932 === 'function') {
                 show_10839932().then(() => {
@@ -859,47 +856,57 @@
                     dragonBalance += 3;
                     save();
                     updateMissionUI();
-                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    showToast("+3 $DRAGON & +0.0003 TON");
                 });
+            } else {
+                // Fallback for non-sdk environments
+                mission_ad_last_time = Date.now();
+                totalWalletBalance += 0.0003;
+                dragonBalance += 3;
+                save();
+                updateMissionUI();
+                showToast("Reklam Ödülü Alındı (Simüle)");
             }
         };
 
         document.getElementById('invite-friend-btn').onclick = () => {
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('bedava ton kazanıyorum işte referans kodum: ' + myReferralCode)}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + myReferralCode)}`;
             if (tg) tg.openTelegramLink(shareUrl);
         };
 
         document.getElementById('copy-code-btn').onclick = () => {
-            const code = myReferralCode;
             const temp = document.createElement('textarea');
-            temp.value = code; document.body.appendChild(temp); temp.select();
+            temp.value = myReferralCode; document.body.appendChild(temp); temp.select();
             document.execCommand('copy'); document.body.removeChild(temp);
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            showToast("Kod Kopyalandı", "📋");
         };
 
         document.getElementById('apply-referral-btn').onclick = async () => {
             if (referredBy) return;
             const code = document.getElementById('referral-input').value.trim().toUpperCase();
             if (!code || code === myReferralCode) return;
-            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
-            const regSnap = await getDoc(regRef);
-            if (regSnap.exists()) {
-                const target = regSnap.data();
-                const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
-                const rSnap = await getDoc(referrerRef);
-                if (rSnap.exists()) {
-                    const rData = rSnap.data();
-                    await updateDoc(referrerRef, {
-                        walletBalance: (rData.walletBalance || 0) + 0.03,
-                        referralCount: (rData.referralCount || 0) + 1,
-                        referralEarnings: (rData.referralEarnings || 0) + 0.03
-                    });
-                    const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
-                    await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
-                    referredBy = target.ownerTgId;
-                    await save();
-                }
-            } else if (tg?.showAlert) tg.showAlert('Geçersiz referans kodu!');
+            try {
+                const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', code);
+                const regSnap = await getDoc(regRef);
+                if (regSnap.exists()) {
+                    const target = regSnap.data();
+                    const referrerRef = doc(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString());
+                    const rSnap = await getDoc(referrerRef);
+                    if (rSnap.exists()) {
+                        const rData = rSnap.data();
+                        await updateDoc(referrerRef, {
+                            walletBalance: (rData.walletBalance || 0) + 0.03,
+                            referralCount: (rData.referralCount || 0) + 1,
+                            referralEarnings: (rData.referralEarnings || 0) + 0.03
+                        });
+                        const refListCol = collection(db, 'artifacts', contextAppId, 'users', target.ownerUid, 'accounts', target.ownerTgId.toString(), 'referrals');
+                        await addDoc(refListCol, { tgId: tgUserId, name: tgName, date: serverTimestamp() });
+                        referredBy = target.ownerTgId;
+                        await save();
+                        showToast("Referans Başarılı!");
+                    }
+                } else { showToast("Geçersiz Kod!", "❌"); }
+            } catch (error) { console.error(error); }
         };
 
         document.getElementById('boost-trigger').onclick = () => document.getElementById('boost-modal').style.display = 'flex';
@@ -914,6 +921,7 @@
                 document.getElementById('ad-progress').style.width = '0';
                 btn.disabled = false;
                 document.getElementById('boost-modal').style.display = 'none';
+                showToast("Hız Artırıldı: +0.01 GH/s", "⚡");
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }, 3000);
         };
