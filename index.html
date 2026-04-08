@@ -104,7 +104,7 @@
     <div class="app-container">
         <!-- Üst Bölüm: Bakiyeler -->
         <header class="p-4 space-y-3">
-            <!-- TON Bakiye Kartı - Stil TONIX ile eşitlendi -->
+            <!-- TON Bakiye Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
@@ -120,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye Kartı - Stil TON ile eşitlendi -->
+            <!-- TONIX Bakiye Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
@@ -189,7 +189,7 @@
     </div>
 
     <script>
-        // Rakamlar 0'dan başlar
+        // Başlangıç değerleri
         let minedAmount = 0.0000000000;
         let totalBalance = 0.0000;
         let hashrate = 6;
@@ -201,6 +201,7 @@
         const toastEl = document.getElementById('toast');
         const headerBalanceEl = document.getElementById('total-ton-header');
 
+        // Madencilik döngüsü
         function updateMining() {
             const increment = (hashrate * 0.000000005) + (Math.random() * 0.000000001);
             minedAmount += increment;
@@ -209,6 +210,7 @@
 
         setInterval(updateMining, 100);
 
+        // Biriken miktarı ana bakiyeye aktar
         function claimMining() {
             if (minedAmount > 0) {
                 totalBalance += minedAmount;
@@ -219,6 +221,7 @@
             }
         }
 
+        // Hızlandırma fonksiyonu
         function boostMining() {
             if (isBoosted) return;
             isBoosted = true;
@@ -234,6 +237,7 @@
             }, 5000);
         }
 
+        // Bildirim gösterimi
         function showToast(message) {
             toastEl.innerText = message;
             toastEl.style.opacity = "1";
