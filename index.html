@@ -260,24 +260,24 @@
             const loader = new THREE.TextureLoader();
             const fanTexture = loader.load('fan.jpg');
 
-            const geometry = new THREE.CylinderGeometry(2, 2, 0.1, 64);
+            // "Yan yatırma" isteği üzerine CircleGeometry kullanarak düz bir disk yapısı kuruyoruz
+            // Bu yapı varsayılan olarak dik durur ve yan yatık görünmez.
+            const geometry = new THREE.CircleGeometry(2, 64);
             
-            const materials = [
-                new THREE.MeshPhongMaterial({ color: 0x1e293b }), 
-                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 }), 
-                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 })  
-            ];
+            const material = new THREE.MeshBasicMaterial({ 
+                map: fanTexture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
 
-            fanMesh = new THREE.Mesh(geometry, materials);
-            fanMesh.rotation.x = Math.PI / 2; 
+            fanMesh = new THREE.Mesh(geometry, material);
+            // Rotasyonu sıfırlıyoruz (Dik durması için)
+            fanMesh.rotation.x = 0; 
             scene.add(fanMesh);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+            // Aydınlatma - BasicMaterial kullandığımız için ışığa ihtiyacı yok ama ortam ışığı kalsın
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
             scene.add(ambientLight);
-            
-            const pointLight = new THREE.PointLight(0xffffff, 1.2, 20);
-            pointLight.position.set(0, 0, 5);
-            scene.add(pointLight);
 
             camera.position.z = 5;
         }
@@ -308,8 +308,9 @@
             state.dailyTaps -= 1;
             state.balance += TAP_VALUE;
 
-            fanMesh.scale.set(1.03, 1.03, 1.03);
-            setTimeout(() => fanMesh.scale.set(1, 1, 1), 60);
+            // Görsel geri bildirim için sadece çok hafif bir büyüme (ileri-geri hareketi yok)
+            fanMesh.scale.set(1.02, 1.02, 1.02);
+            setTimeout(() => fanMesh.scale.set(1, 1, 1), 50);
 
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
