@@ -338,7 +338,8 @@
                 texture.center.set(0.5, 0.5);
             });
 
-            const fanGeo = new THREE.CircleGeometry(2.3, 64);
+            // Boyut küçültüldü: 2.3 -> 1.5
+            const fanGeo = new THREE.CircleGeometry(1.5, 64);
             const fanMat = new THREE.MeshBasicMaterial({ map: fanTexture, transparent: true, side: THREE.DoubleSide });
             fanMesh = new THREE.Mesh(fanGeo, fanMat);
             scene.add(fanMesh);
