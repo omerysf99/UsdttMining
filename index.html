@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Miner 3D</title>
+    <title>Crypto Miner 3D - Fan Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -57,6 +57,11 @@
             transition: height 0.3s ease;
             background: linear-gradient(to top, #0ea5e9, #38bdf8);
             box-shadow: 0 0 15px #0ea5e9;
+        }
+
+        .limit-fill {
+            background: linear-gradient(to top, #f97316, #fbbf24);
+            box-shadow: 0 0 15px #f97316;
         }
 
         .canvas-container {
@@ -123,7 +128,7 @@
     <div class="text-center mt-6">
         <h1 id="balance" class="text-4xl font-bold orbitron glow-text tracking-widest">0.000000</h1>
         <span class="text-sky-400 font-bold ml-1">USDT</span>
-        <p class="text-[11px] text-slate-500 mt-2 uppercase tracking-widest">Otomatik madenciliği artırmak için bir modül satın alın</p>
+        <p class="text-[11px] text-slate-500 mt-2 uppercase tracking-widest">Günlük tıklama limitine dikkat edin</p>
     </div>
 
     <!-- 3D Alan ve Enerji -->
@@ -141,12 +146,12 @@
             <!-- Three.js buraya render edilecek -->
         </div>
 
-        <!-- Sağ Isı/Enerji Barı (Görsel) -->
+        <!-- Sağ Günlük Limit Barı (Turuncu) -->
         <div class="flex flex-col items-center gap-2">
             <div class="energy-bar-container">
-                <div class="energy-fill" style="height: 40%; background: linear-gradient(to top, #f97316, #fbbf24); box-shadow: 0 0 15px #f97316;"></div>
+                <div id="limit-fill-right" class="energy-fill limit-fill" style="height: 100%;"></div>
             </div>
-            <span class="text-[10px] text-orange-400 font-bold uppercase">TEMP</span>
+            <span class="text-[10px] text-orange-400 font-bold uppercase" id="limit-text">2500/2500</span>
         </div>
     </div>
 
@@ -175,26 +180,37 @@
     </div>
 
     <script>
-        // Oyun Ayarları ve Durumu
+        const getTodayString = () => new Date().toDateString();
+
         let state = {
             balance: parseFloat(localStorage.getItem('miner_balance')) || 0.0,
             energy: parseInt(localStorage.getItem('miner_energy')) || 100,
+            dailyTaps: parseInt(localStorage.getItem('miner_daily_taps')) || 2500,
+            lastDate: localStorage.getItem('miner_last_date') || getTodayString(),
             lastUpdate: parseInt(localStorage.getItem('miner_last_update')) || Date.now()
         };
 
         const MAX_ENERGY = 100;
+        const MAX_DAILY_TAPS = 2500;
         const TAP_VALUE = 0.000250;
         const DAILY_PASSIVE = 0.05;
         const PASSIVE_PER_MS = DAILY_PASSIVE / (24 * 60 * 60 * 1000);
-        const REGEN_TIME = 2000; // 2 saniyede 1 enerji
+        const REGEN_TIME = 2000;
 
         const balanceEl = document.getElementById('balance');
         const energyFillLeft = document.getElementById('energy-fill-left');
         const energyText = document.getElementById('energy-text');
+        const limitFillRight = document.getElementById('limit-fill-right');
+        const limitText = document.getElementById('limit-text');
         const canvasContainer = document.getElementById('canvas-container');
 
+        if (state.lastDate !== getTodayString()) {
+            state.dailyTaps = MAX_DAILY_TAPS;
+            state.lastDate = getTodayString();
+        }
+
         // Three.js Kurulumu
-        let scene, camera, renderer, core;
+        let scene, camera, renderer, fanGroup, fanMesh;
 
         function init3D() {
             scene = new THREE.Scene();
@@ -204,85 +220,98 @@
             renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
             canvasContainer.appendChild(renderer.domElement);
 
-            // Çekirdek yapısı (fan.jpg texture olarak kullanılacak)
-            // Not: fan.jpg yerelde olmadığı için bir placeholder renk kullanıyoruz, 
-            // kullanıcı kendi GitHub linkini buraya ekleyebilir.
+            // fan.jpg Texture Yükleme
             const loader = new THREE.TextureLoader();
-            const texture = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/uv_grid_opengl.jpg'); // Fallback
+            // Not: GitHub linkinizi buraya ekleyebilirsiniz: 'https://raw.githubusercontent.com/.../fan.jpg'
+            const fanTexture = loader.load('fan.jpg', 
+                undefined, 
+                undefined, 
+                (err) => {
+                    console.warn("fan.jpg yüklenemedi, varsayılan doku kullanılıyor.");
+                }
+            );
 
-            const geometry = new THREE.IcosahedronGeometry(1.5, 0);
-            const material = new THREE.MeshPhongMaterial({
-                color: 0x0ea5e9,
-                wireframe: true,
-                emissive: 0x0369a1,
-                emissiveIntensity: 0.5
-            });
+            // Fan Geometrisi (Silindir şeklinde bir disk)
+            const geometry = new THREE.CylinderGeometry(1.8, 1.8, 0.3, 32);
             
-            const innerGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-            const innerMaterial = new THREE.MeshPhongMaterial({
-                color: 0x38bdf8,
-                emissive: 0x38bdf8,
-                emissiveIntensity: 1
-            });
+            // Yanlar için farklı, üst/alt için farklı materyal
+            const materials = [
+                new THREE.MeshPhongMaterial({ color: 0x1e293b }), // Yan yüzey
+                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 100 }), // Üst yüzey (Görsel burada)
+                new THREE.MeshPhongMaterial({ map: fanTexture })  // Alt yüzey
+            ];
 
-            core = new THREE.Group();
-            const outerMesh = new THREE.Mesh(geometry, material);
-            const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
+            fanGroup = new THREE.Group();
+            fanMesh = new THREE.Mesh(geometry, materials);
+            fanMesh.rotation.x = Math.PI / 2.5; // Hafif eğik duruş
             
-            // Etrafındaki halkalar
-            const ringGeo = new THREE.TorusGeometry(2, 0.05, 16, 100);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.3 });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.PI / 2;
+            // Parlayan bir çekirdek ışığı
+            const coreLight = new THREE.PointLight(0x38bdf8, 5, 10);
+            fanGroup.add(coreLight);
 
-            core.add(outerMesh);
-            core.add(innerMesh);
-            core.add(ring);
-            scene.add(core);
+            // Dış Halkalar
+            const ringGeo = new THREE.TorusGeometry(2.2, 0.03, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
+            const ring1 = new THREE.Mesh(ringGeo, ringMat);
+            
+            const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.02, 16, 100), ringMat);
+            ring2.rotation.y = Math.PI / 4;
 
-            const light = new THREE.PointLight(0x38bdf8, 2, 100);
-            light.position.set(5, 5, 5);
-            scene.add(light);
-            scene.add(new THREE.AmbientLight(0x404040));
+            fanGroup.add(fanMesh);
+            fanGroup.add(ring1);
+            fanGroup.add(ring2);
+            scene.add(fanGroup);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const spotLight = new THREE.SpotLight(0x38bdf8, 2);
+            spotLight.position.set(0, 5, 5);
+            scene.add(spotLight);
 
             camera.position.z = 5;
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (core) {
-                core.rotation.y += 0.01;
-                core.rotation.x += 0.005;
+            if (fanGroup) {
+                // Fanın kendi etrafında hızlıca dönmesi
+                fanMesh.rotation.y += 0.05; 
+                // Tüm grubun yavaş salınımı
+                fanGroup.rotation.y += 0.005;
+                fanGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
             }
             renderer.render(scene, camera);
         }
 
-        // Oyun Mantığı
         function updateUI() {
             balanceEl.innerText = state.balance.toFixed(6);
             energyFillLeft.style.height = `${(state.energy / MAX_ENERGY) * 100}%`;
             energyText.innerText = `${state.energy}/${MAX_ENERGY}`;
+            limitFillRight.style.height = `${(state.dailyTaps / MAX_DAILY_TAPS) * 100}%`;
+            limitText.innerText = `${state.dailyTaps}/${MAX_DAILY_TAPS}`;
             
             localStorage.setItem('miner_balance', state.balance);
             localStorage.setItem('miner_energy', state.energy);
+            localStorage.setItem('miner_daily_taps', state.dailyTaps);
+            localStorage.setItem('miner_last_date', state.lastDate);
             localStorage.setItem('miner_last_update', Date.now());
         }
 
         function handleTap(e) {
-            if (state.energy <= 0) return;
+            if (state.energy <= 0 || state.dailyTaps <= 0) return;
 
-            // Enerji düşür, bakiye ekle
             state.energy -= 1;
+            state.dailyTaps -= 1;
             state.balance += TAP_VALUE;
 
-            // 3D Animasyon tepkisi
-            core.scale.set(1.2, 1.2, 1.2);
-            setTimeout(() => core.scale.set(1, 1, 1), 100);
+            // Tıklama anında fanın büyüme efekti
+            fanGroup.scale.set(1.1, 1.1, 1.1);
+            setTimeout(() => fanGroup.scale.set(1, 1, 1), 50);
 
-            // Görsel efekt
-            const x = e.clientX || e.touches[0].clientX;
-            const y = e.clientY || e.touches[0].clientY;
-            createTapEffect(x, y);
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            if(x && y) createTapEffect(x, y);
 
             updateUI();
         }
@@ -297,7 +326,6 @@
             setTimeout(() => el.remove(), 1000);
         }
 
-        // Pasif Gelir Hesaplama
         function calculatePassive() {
             const now = Date.now();
             const diff = now - state.lastUpdate;
@@ -315,7 +343,6 @@
             document.getElementById('passive-notice').classList.add('hidden');
         }
 
-        // Enerji Yenilenmesi (2 sn'de 1)
         setInterval(() => {
             if (state.energy < MAX_ENERGY) {
                 state.energy += 1;
@@ -323,13 +350,11 @@
             }
         }, REGEN_TIME);
 
-        // Pasif Güncelleme (Oyundayken de küçük artışlar için)
         setInterval(() => {
             state.balance += (1000 * PASSIVE_PER_MS);
             updateUI();
         }, 1000);
 
-        // Başlatma
         window.onload = () => {
             init3D();
             animate();
@@ -341,7 +366,6 @@
                 handleTap(e);
             });
 
-            // Pencere yeniden boyutlandırma
             window.onresize = () => {
                 camera.aspect = canvasContainer.offsetWidth / canvasContainer.offsetHeight;
                 camera.updateProjectionMatrix();
