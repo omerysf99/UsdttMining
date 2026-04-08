@@ -162,7 +162,8 @@
                     </div>
                     <div>
                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Balance</p>
-                        <p class="font-bold text-sm tracking-wide" id="total-ton-header">0.0000 TON</p>
+                        <!-- Başlangıçta 0 görünecek şekilde ayarlandı -->
+                        <p class="font-bold text-sm tracking-wide" id="total-ton-header">0 TON</p>
                     </div>
                 </div>
                 <div class="bg-[#1a1a1a] p-2 rounded-xl text-gray-400 border border-white/5">
@@ -243,7 +244,7 @@
     <script>
         // Oyun Durumu
         let minedAmount = 0.0000000000;
-        let totalBalance = 0.0000;
+        let totalBalance = 0;
         let hashrate = 6;
         let isBoosted = false;
 
@@ -323,9 +324,22 @@
             }, 3000);
         }
 
+        /**
+         * Bakiyeyi formatlayan yardımcı fonksiyon
+         * - Gereksiz sıfırları siler (0.0100 -> 0.01)
+         * - Noktadan sonra max 8 basamak destekler
+         */
+        function formatTONBalance(num) {
+            if (num === 0) return "0";
+            // toFixed(8) ile hassasiyeti koru, regex ile sondaki sıfırları temizle
+            return num.toFixed(8).replace(/\.?0+$/, "");
+        }
+
         function updateTotalBalance(amount) {
             totalBalance += amount;
-            headerBalanceEl.innerText = totalBalance.toFixed(4) + " TON";
+            
+            // Yeni formatlama mantığı uygulandı
+            headerBalanceEl.innerText = formatTONBalance(totalBalance) + " TON";
             
             // Bakiye Kartı Efekti
             tonCard.classList.remove('pulse-active');
