@@ -55,38 +55,34 @@
             border: 1px solid #222;
         }
 
-        /* Navigasyon Stilleri - navi.jpg arka planı ile */
+        /* Navigasyon Stilleri - navi.jpg tamamen görseli sağlar */
         .nav-footer {
             background-image: url('navi.jpg');
-            background-size: cover;
+            background-size: 100% 100%;
             background-position: center;
-            background-color: #0f0f0f; /* Görsel yüklenmezse yedek */
+            background-repeat: no-repeat;
+            height: 70px; /* Görselin yüksekliğine göre ayarlanabilir */
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-item {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            padding: 8px 0;
-            transition: all 0.2s ease;
-            color: #ffffff;
-            opacity: 0.7;
+            justify-content: space-between;
+            align-items: stretch;
+            position: relative;
+        }
+
+        /* Tıklama Alanları - Görünmez butonlar */
+        .nav-item {
             flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
             z-index: 10;
+            transition: background 0.2s;
         }
 
+        /* Aktif olanı hafifçe belli etmek için (isteğe bağlı) */
         .nav-item.active {
-            opacity: 1;
-            background: rgba(0, 0, 0, 0.4); /* Aktif sekme vurgusu */
-            border-radius: 16px;
-            color: #8b5cf6;
-        }
-
-        .nav-item.active svg {
-            color: #8b5cf6;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Buton Efektleri */
@@ -180,38 +176,27 @@
             <p class="text-xs text-gray-400">Kazançlarınızı yönetin</p>
         </div>
 
-        <!-- Alt Navigasyon - GÖRSELE GÖRE GÜNCELLENDİ -->
-        <footer class="nav-footer p-2 flex justify-between items-center px-2 pb-6">
-            <!-- Cüzdan -->
-            <button onclick="switchTab('wallet', this)" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm-32,80a12,12,0,1,1,12-12A12,12,0,0,1,184,152Z"></path></svg>
-                <span class="text-[10px] font-medium">Wallet</span>
-            </button>
+        <div id="view-friends" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
+            <h2 class="text-xl font-bold mb-1">Arkadaşlar</h2>
+            <p class="text-xs text-gray-400">Arkadaşlarını davet et</p>
+        </div>
+
+        <!-- Alt Navigasyon - navi.jpg Arka Planı Üzerine Şeffaf Butonlar -->
+        <footer class="nav-footer pb-4">
+            <!-- Cüzdan Tıklama Alanı -->
+            <button onclick="switchTab('wallet', this)" class="nav-item"></button>
             
-            <!-- Arkadaşlar -->
-            <button onclick="switchTab('friends', this)" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Zm104,0A48,48,0,1,0,173.33,104,48.05,48.05,0,0,0,221.33,152Z"></path></svg>
-                <span class="text-[10px] font-medium">Friends</span>
-            </button>
+            <!-- Arkadaşlar Tıklama Alanı -->
+            <button onclick="switchTab('friends', this)" class="nav-item"></button>
             
-            <!-- Ana Sayfa (Aktif) -->
-            <button onclick="switchTab('home', this)" class="nav-item active">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 12c0-3 2.5-5.5 5.5-5.5S23 9 23 12s-2.5 5.5-5.5 5.5S12 15 12 12z"></path><path d="M12 12c-3 0-5.5-2.5-5.5-5.5S9 1 12 1s5.5 2.5 5.5 5.5S15 12 12 12z"></path><path d="M12 12c0 3-2.5 5.5-5.5 5.5S1 15 1 12s2.5-5.5 5.5-5.5S12 9 12 12z"></path><path d="M12 12c3 0 5.5 2.5 5.5 5.5S15 23 12 23s-5.5-2.5-5.5-5.5S9 12 12 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                <span class="text-[10px] font-bold">Home</span>
-            </button>
+            <!-- Ana Sayfa Tıklama Alanı (Aktif) -->
+            <button onclick="switchTab('home', this)" class="nav-item active"></button>
             
-            <!-- Görevler -->
-            <button onclick="switchTab('missions', this)" class="nav-item relative">
-                <div class="absolute top-2 right-4 w-2.5 h-2.5 bg-[#ff4d4d] rounded-full border-2 border-[#0f0f0f]"></div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm0-144a56,56,0,1,0,56,56A56.06,56.06,0,0,0,128,72Zm0,96a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"></path></svg>
-                <span class="text-[10px] font-medium">Missions</span>
-            </button>
+            <!-- Görevler Tıklama Alanı -->
+            <button onclick="switchTab('missions', this)" class="nav-item"></button>
             
-            <!-- Daha Fazla -->
-            <button onclick="switchTab('more', this)" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M32,80a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,80Zm184,88H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0-48H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path><circle cx="80" cy="80" r="16"></circle><circle cx="176" cy="128" r="16"></circle><circle cx="112" cy="176" r="16"></circle></svg>
-                <span class="text-[10px] font-medium">More</span>
-            </button>
+            <!-- Daha Fazla Tıklama Alanı -->
+            <button onclick="switchTab('more', this)" class="nav-item"></button>
         </footer>
 
         <!-- Bildirim -->
