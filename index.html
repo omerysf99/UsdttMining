@@ -40,28 +40,54 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
         }
 
+        /* Gelişmiş Bar Tasarımı */
+        .energy-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            filter: drop-shadow(0 0 8px rgba(0,0,0,0.5));
+        }
+
         .energy-bar-container {
-            width: 12px;
-            height: 200px;
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 6px;
+            width: 16px;
+            height: 220px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 4px;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        /* Çentikli Görünüm Maskesi */
+        .bar-segments {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(to bottom, transparent 70%, rgba(2, 6, 23, 0.8) 70%);
+            background-size: 100% 6px; /* Her segment boyutu */
+            z-index: 10;
+            pointer-events: none;
         }
 
         .energy-fill {
             position: absolute;
             bottom: 0;
             width: 100%;
-            transition: height 0.3s ease;
-            background: linear-gradient(to top, #0ea5e9, #38bdf8);
-            box-shadow: 0 0 15px #0ea5e9;
+            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(to top, #0284c7, #38bdf8, #bae6fd);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
         }
 
         .limit-fill {
-            background: linear-gradient(to top, #f97316, #fbbf24);
-            box-shadow: 0 0 15px #f97316;
+            background: linear-gradient(to top, #ea580c, #fbbf24, #fef3c7);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+        }
+
+        .bar-icon {
+            font-size: 14px;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 5px currentColor);
         }
 
         .canvas-container {
@@ -132,13 +158,19 @@
     </div>
 
     <!-- 3D Alan ve Enerji -->
-    <div class="flex-grow flex items-center justify-center relative px-6">
-        <!-- Sol Enerji Barı -->
-        <div class="flex flex-col items-center gap-2">
+    <div class="flex-grow flex items-center justify-center relative px-4">
+        
+        <!-- Geliştirilmiş Sol Enerji Barı -->
+        <div class="energy-bar-wrapper">
+            <i class="fas fa-bolt bar-icon text-sky-400"></i>
             <div class="energy-bar-container">
                 <div id="energy-fill-left" class="energy-fill" style="height: 100%;"></div>
+                <div class="bar-segments"></div>
             </div>
-            <span class="text-[10px] text-sky-400 font-bold" id="energy-text">100/100</span>
+            <div class="flex flex-col items-center">
+                <span class="text-[9px] text-slate-500 uppercase font-bold">Enerji</span>
+                <span class="text-[11px] text-sky-400 font-bold" id="energy-text">100/100</span>
+            </div>
         </div>
 
         <!-- 3D Nesne Alanı -->
@@ -146,12 +178,17 @@
             <!-- Three.js buraya render edilecek -->
         </div>
 
-        <!-- Sağ Günlük Limit Barı (Turuncu) -->
-        <div class="flex flex-col items-center gap-2">
-            <div class="energy-bar-container">
+        <!-- Geliştirilmiş Sağ Günlük Limit Barı -->
+        <div class="energy-bar-wrapper">
+            <i class="fas fa-crosshairs bar-icon text-orange-400"></i>
+            <div class="energy-bar-container" style="border-color: rgba(249, 115, 22, 0.2);">
                 <div id="limit-fill-right" class="energy-fill limit-fill" style="height: 100%;"></div>
+                <div class="bar-segments"></div>
             </div>
-            <span class="text-[10px] text-orange-400 font-bold uppercase" id="limit-text">2500/2500</span>
+            <div class="flex flex-col items-center">
+                <span class="text-[9px] text-slate-500 uppercase font-bold">Limit</span>
+                <span class="text-[11px] text-orange-400 font-bold" id="limit-text">2500/2500</span>
+            </div>
         </div>
     </div>
 
@@ -223,24 +260,18 @@
             const loader = new THREE.TextureLoader();
             const fanTexture = loader.load('fan.jpg');
 
-            // Görseli yuvarlak kesmek için CylinderGeometry kullanıyoruz (bir disk gibi)
-            // radiusTop: 2, radiusBottom: 2, height: 0.1, segments: 64
             const geometry = new THREE.CylinderGeometry(2, 2, 0.1, 64);
             
-            // Yan yüzeyler için koyu bir renk, üst ve alt için fanTexture
             const materials = [
-                new THREE.MeshPhongMaterial({ color: 0x1e293b }), // Yan yüzeyler (kenar kalınlığı)
-                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 }), // Üst kapak (Asıl görsel)
-                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 })  // Alt kapak
+                new THREE.MeshPhongMaterial({ color: 0x1e293b }), 
+                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 }), 
+                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 30 })  
             ];
 
             fanMesh = new THREE.Mesh(geometry, materials);
-            
-            // Diskin ön yüzünün kameraya bakması için rotasyonu ayarlıyoruz
             fanMesh.rotation.x = Math.PI / 2; 
             scene.add(fanMesh);
 
-            // Aydınlatma
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
             scene.add(ambientLight);
             
@@ -277,7 +308,6 @@
             state.dailyTaps -= 1;
             state.balance += TAP_VALUE;
 
-            // Görsel geri bildirim için sadece küçük bir ölçeklendirme (ileri-geri hareketi yok)
             fanMesh.scale.set(1.03, 1.03, 1.03);
             setTimeout(() => fanMesh.scale.set(1, 1, 1), 60);
 
