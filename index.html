@@ -221,33 +221,35 @@
             canvasContainer.appendChild(renderer.domElement);
 
             const loader = new THREE.TextureLoader();
-            const fanTexture = loader.load('fan.jpg', 
-                undefined, 
-                undefined, 
-                (err) => {
-                    console.warn("fan.jpg yüklenemedi.");
-                }
-            );
+            const fanTexture = loader.load('fan.jpg');
 
-            // Daha temiz ve belirgin bir 3D görünüm için disk yapısı
-            const geometry = new THREE.CylinderGeometry(2, 2, 0.4, 64);
+            // Dik duran kare panel yapısı (Gerçekçi 3D duruş için ince derinlik)
+            const geometry = new THREE.BoxGeometry(3.8, 3.8, 0.1);
             
-            const materials = [
-                new THREE.MeshPhongMaterial({ color: 0x0f172a }), // Yan yüzey
-                new THREE.MeshPhongMaterial({ map: fanTexture, shininess: 100 }), // Üst (Resim burada)
-                new THREE.MeshPhongMaterial({ map: fanTexture })  // Alt
-            ];
+            // Materyal - Parlama efektleri korunarak görsel giydirme
+            const material = new THREE.MeshPhongMaterial({ 
+                map: fanTexture, 
+                shininess: 100,
+                specular: 0x38bdf8,
+                emissive: 0x0ea5e9,
+                emissiveIntensity: 0.15
+            });
 
-            fanMesh = new THREE.Mesh(geometry, materials);
-            fanMesh.rotation.x = Math.PI / 2; // Tam karşıya bakacak şekilde (sabit)
+            fanMesh = new THREE.Mesh(geometry, material);
+            // Rotasyonu sıfırlayarak karşıya dik bakmasını sağlıyoruz
+            fanMesh.rotation.x = 0; 
             scene.add(fanMesh);
 
-            // Aydınlatma - Nesnenin 3D durmasını sağlar
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            // Aydınlatma - Parlama (Glow) etkisini sağlayan ışıklar
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
             
-            const spotLight = new THREE.SpotLight(0x38bdf8, 2);
-            spotLight.position.set(0, 5, 5);
+            const pointLight = new THREE.PointLight(0x38bdf8, 2.5, 20);
+            pointLight.position.set(2, 2, 5);
+            scene.add(pointLight);
+
+            const spotLight = new THREE.SpotLight(0x38bdf8, 1.5);
+            spotLight.position.set(-2, -2, 5);
             scene.add(spotLight);
 
             camera.position.z = 5;
@@ -255,7 +257,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            // Animasyon yok (sabit duruyor)
+            // Sabit duruş (Rotasyon yok)
             renderer.render(scene, camera);
         }
 
@@ -280,9 +282,13 @@
             state.dailyTaps -= 1;
             state.balance += TAP_VALUE;
 
-            // Sadece tıklama anında küçük bir ölçek efekti (geribildirim için)
+            // Tıklama anında görsel tepki (Öne doğru küçük bir sıçrama)
+            fanMesh.position.z = 0.5;
             fanMesh.scale.set(1.05, 1.05, 1.05);
-            setTimeout(() => fanMesh.scale.set(1, 1, 1), 50);
+            setTimeout(() => {
+                fanMesh.position.z = 0;
+                fanMesh.scale.set(1, 1, 1);
+            }, 60);
 
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
