@@ -2,28 +2,25 @@
 <!-- 
   ================================================================
   PROJE: TON Madencilik Uygulaması (Mining App)
-  SÜRÜM: 3.0.0
-  AÇIKLAMA: Kullanıcıların TON ve TONIX madenciliği yapabildiği,
-  farklı sekmelerden oluşan modern bir mobil web uygulaması.
+  SÜRÜM: 4.0.0
+  GÜNCELLEME: Dinamik Navigasyon Görselleri ve Gelişmiş İçerik Yönetimi
   ================================================================
 -->
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TON Mining App | Canvas Edition</title>
+    <title>TON Mining App | Dynamic Nav</title>
 
-    <!-- Harici Kaynaklar: Tailwind CSS ve Inter Yazı Tipi -->
+    <!-- Stil Kaynakları -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* TEMEL SIFIRLAMA VE DEĞİŞKENLER
-        */
+        /* TEMEL DEĞİŞKENLER VE SIFIRLAMA */
         :root {
             --primary-purple: #7c66e3;
             --primary-dark: #0b0b0b;
-            --accent-blue: #0088cc;
             --glass-bg: #121212;
             --border-color: #1f1f1f;
         }
@@ -42,8 +39,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ANA KONTEYNIR (9:18 MOBİL ORANI)
-        */
+        /* MOBİL CİHAZ GÖRÜNÜMÜ (9:18 ORANI) */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -55,11 +51,10 @@
             max-height: 98vh;
             overflow: hidden;
             border: 1px solid var(--border-color);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 1);
         }
 
-        /* ANİMASYONLAR: FAN DÖNÜŞÜ VE PARLAMA
-        */
+        /* MADENCİLİK FANI ANİMASYONU */
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -69,20 +64,19 @@
             animation: rotate-fan 8s linear infinite;
         }
 
-        /* Boost aktifken hızın 4 katına çıkması */
         .fan-animation.boosted {
             animation-duration: 2s;
         }
 
-        /* BİLEŞEN STİLLERİ
-        */
+        /* KART TASARIMLARI */
         .glass-card {
             background-color: var(--glass-bg);
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
+        /* MOR BUTON TEMASI */
         .btn-purple {
             background-color: var(--primary-purple);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -91,18 +85,16 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(124, 102, 227, 0.2);
         }
         
         .btn-purple:active {
             transform: scale(0.94);
             background-color: #6b56d2;
-            box-shadow: 0 2px 8px rgba(124, 102, 227, 0.4);
         }
 
-        /* NAVİGASYON: navi.jpg Arka Planı
-        */
+        /* DİNAMİK NAVİGASYON ÇUBUĞU */
         .nav-footer {
+            /* Varsayılan ana ekran görseli */
             background-image: url('navi.jpg');
             background-size: 100% 100%;
             background-position: center;
@@ -115,56 +107,56 @@
             position: relative;
             background-color: #121212;
             border-top: 1px solid var(--border-color);
-            z-index: 50;
+            z-index: 100;
+            transition: background-image 0.2s ease-in-out;
         }
 
+        /* Şeffaf Tıklama Alanları */
         .nav-item {
             flex: 1;
             background: transparent;
             border: none;
             outline: none;
             cursor: pointer;
-            z-index: 60;
+            z-index: 110;
         }
 
-        /* TIPOGRAFI VE YARDIMCI SINIFLAR
-        */
+        /* METİN VE SAYI FORMATLARI */
         .counter-text {
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
+        /* Bakiye Güncelleme Parlaması */
         @keyframes balance-glow {
-            0% { border-color: var(--border-color); box-shadow: none; }
-            50% { border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(0, 136, 204, 0.3); }
-            100% { border-color: var(--border-color); box-shadow: none; }
+            0% { border-color: var(--border-color); }
+            50% { border-color: #0088cc; box-shadow: 0 0 15px rgba(0, 136, 204, 0.3); }
+            100% { border-color: var(--border-color); }
         }
 
         .balance-update {
-            animation: balance-glow 0.8s ease-out;
+            animation: balance-glow 0.6s ease-out;
         }
 
-        /* SEKME YÖNETİMİ
-        */
+        /* SEKME GEÇİŞLERİ */
         .view-content {
             display: none;
             flex: 1;
             flex-direction: column;
             padding: 1.5rem;
-            animation: fadeIn 0.3s ease;
+            animation: tabFadeIn 0.3s ease-out;
+            overflow-y: auto;
         }
 
         .view-content.active {
             display: flex;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Kaydırma çubuğunu gizle */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -172,24 +164,23 @@
 </head>
 <body>
 
-    <!-- Uygulama Ana Yapısı -->
     <div class="app-container">
         
-        <!-- ÜST PANEL (SABİT): Bakiyeler -->
-        <header class="p-4 space-y-3 z-40 bg-black/50 backdrop-blur-md">
+        <!-- ÜST PANEL: CÜZDAN BİLGİLERİ -->
+        <header class="p-4 space-y-3 z-50 bg-black/60 backdrop-blur-lg">
             
-            <!-- TON Cüzdan Kartı -->
+            <!-- TON Kartı -->
             <div class="glass-card p-3 flex items-center justify-between" id="ton-card">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-500/20 flex items-center justify-center bg-black">
                         <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Balance</p>
+                        <p class="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">Balance</p>
                         <p class="font-bold text-sm tracking-wide" id="total-ton-header">0 TON</p>
                     </div>
                 </div>
-                <div class="bg-[#1a1a1a] p-2 rounded-xl text-gray-400 border border-white/5">
+                <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-400 border border-white/5 shadow-inner">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
                     </svg>
@@ -199,15 +190,15 @@
             <!-- TONIX Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-400/20 flex items-center justify-center bg-[#1a1a1a]">
-                        <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-purple-500/20 flex items-center justify-center bg-black">
+                        <img src="dragon.jpg" alt="TONIX" class="w-8 h-8 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Balance</p>
+                        <p class="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">Balance</p>
                         <p class="font-bold text-sm tracking-wide">0 TONIX</p>
                     </div>
                 </div>
-                <div class="bg-[#1a1a1a] p-2 rounded-xl text-gray-400 border border-white/5">
+                <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-400 border border-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
                     </svg>
@@ -216,120 +207,128 @@
 
         </header>
 
-        <!-- İÇERİK ALANI: Sekmeler Arası Geçiş -->
+        <!-- ANA İÇERİK KATMANI -->
         <div class="flex-1 relative overflow-hidden">
             
-            <!-- 1. SEKME: HOME (Madencilik Alanı) -->
+            <!-- 🏠 ANA SAYFA (HOME) -->
             <section id="view-home" class="view-content active h-full flex flex-col items-center justify-around py-4">
                 
-                <!-- Merkezi Madencilik Fanı -->
+                <!-- Döner Fan Bölümü -->
                 <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
-                    <div class="absolute inset-0 bg-blue-500/5 blur-[50px] rounded-full"></div>
+                    <div class="absolute inset-0 bg-blue-500/5 blur-[60px] rounded-full"></div>
                     <div id="main-fan" class="fan-animation w-full h-full relative z-10">
-                        <img src="fan.jpg" alt="Mining Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+                        <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
                     </div>
                 </div>
 
-                <!-- Dinamik Sayaç ve Hız Verisi -->
+                <!-- Sayaç Bölümü -->
                 <div class="text-center relative">
-                    <h1 id="mining-counter" class="text-4xl font-extrabold counter-text mb-2 tracking-tight">0.0000000000 TON</h1>
-                    <div class="inline-flex items-center gap-2 text-gray-400 bg-white/5 py-1.5 px-5 rounded-full border border-white/5 shadow-inner">
+                    <h1 id="mining-counter" class="text-3xl font-extrabold counter-text mb-2 tracking-tighter">0.0000000000 TON</h1>
+                    <div class="inline-flex items-center gap-2 text-gray-500 bg-white/5 py-1.5 px-5 rounded-full border border-white/5">
                         <span class="text-xs">ℹ️</span>
                         <span class="text-sm font-semibold tracking-wider"><span id="ghs-value">6</span> GH/s</span>
                         <span class="text-orange-500 text-sm animate-pulse">⚡</span>
                     </div>
                 </div>
 
-                <!-- Aksiyon Butonları -->
+                <!-- İşlem Butonları -->
                 <div class="flex gap-4 w-full px-2">
-                    <button id="btn-claim" class="btn-purple flex-1 py-4 rounded-2xl gap-2 text-sm uppercase tracking-widest">
+                    <button id="btn-claim" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg shadow-indigo-500/10">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                             <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
                         </svg>
-                        <span>Topla</span>
+                        <span class="text-xs uppercase font-black tracking-widest">Topla</span>
                     </button>
-                    <button id="btn-boost" class="btn-purple flex-1 py-4 rounded-2xl gap-2 text-sm uppercase tracking-widest">
+                    <button id="btn-boost" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg shadow-indigo-500/10">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                             <path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path>
                         </svg>
-                        <span>Hızlandır</span>
+                        <span class="text-xs uppercase font-black tracking-widest">Hızlandır</span>
                     </button>
                 </div>
 
             </section>
 
-            <!-- 2. SEKME: WALLET (Cüzdan Detayları) -->
-            <section id="view-wallet" class="view-content h-full overflow-y-auto no-scrollbar">
-                <h2 class="text-2xl font-extrabold mb-6">Cüzdanım</h2>
+            <!-- 👛 CÜZDAN SAYFASI -->
+            <section id="view-wallet" class="view-content h-full no-scrollbar">
+                <h2 class="text-2xl font-black mb-6">Cüzdan</h2>
                 <div class="space-y-4">
-                    <div class="glass-card p-5">
-                        <p class="text-gray-500 text-xs font-bold uppercase mb-1">Toplam Varlık ($)</p>
-                        <p class="text-3xl font-black">$ 0.00</p>
+                    <div class="glass-card p-6 bg-gradient-to-br from-indigo-900/20 to-transparent">
+                        <p class="text-gray-500 text-[10px] font-black uppercase mb-1">Tahmini Değer</p>
+                        <p class="text-3xl font-black text-white">$ 0.00</p>
                     </div>
-                    <div class="space-y-2">
-                        <p class="text-gray-400 text-xs font-bold px-1">SON İŞLEMLER</p>
-                        <div class="glass-card p-4 flex justify-between items-center opacity-50">
-                            <span class="text-sm">İşlem geçmişi bulunmuyor.</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="glass-card p-4 text-center">
+                            <p class="text-xs text-gray-500">Çekilen</p>
+                            <p class="font-bold">0.00</p>
+                        </div>
+                        <div class="glass-card p-4 text-center">
+                            <p class="text-xs text-gray-500">Bekleyen</p>
+                            <p class="font-bold text-indigo-400">0.00</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 3. SEKME: FRIENDS (Referans Sistemi) -->
-            <section id="view-friends" class="view-content h-full overflow-y-auto no-scrollbar text-center justify-center">
-                <div class="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0088cc" viewBox="0 0 256 256"><path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Zm104,0A48,48,0,1,0,173.33,104,48.05,48.05,0,0,0,221.33,152Z"></path></svg>
+            <!-- 👥 ARKADAŞLAR SAYFASI -->
+            <section id="view-friends" class="view-content h-full no-scrollbar text-center">
+                <div class="py-10">
+                    <div class="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#7c66e3" viewBox="0 0 256 256">
+                            <path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Zm104,0A48,48,0,1,0,173.33,104,48.05,48.05,0,0,0,221.33,152Z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-black mb-2">Arkadaşlarını Çağır</h2>
+                    <p class="text-gray-500 text-sm mb-8 px-4">Her arkadaşın için kazım hızına kalıcı +1 GH/s ekle.</p>
+                    <button class="btn-purple w-full py-4 rounded-xl">Davet Linki Al</button>
                 </div>
-                <h2 class="text-2xl font-extrabold mb-2">Arkadaşlarını Davet Et</h2>
-                <p class="text-gray-500 text-sm mb-6">Her başarılı davet için kazım hızını artır.</p>
-                <button class="btn-purple py-3 px-8 rounded-xl mx-auto w-full">Davet Linkini Kopyala</button>
             </section>
 
-            <!-- 4. SEKME: MISSIONS (Görevler) -->
-            <section id="view-missions" class="view-content h-full overflow-y-auto no-scrollbar">
-                <h2 class="text-2xl font-extrabold mb-6">Görevler</h2>
+            <!-- 🎯 GÖREVLER SAYFASI -->
+            <section id="view-missions" class="view-content h-full no-scrollbar">
+                <h2 class="text-2xl font-black mb-6">Günlük Görevler</h2>
                 <div class="space-y-3">
-                    <div class="glass-card p-4 flex justify-between items-center border-l-4 border-blue-500">
+                    <div class="glass-card p-4 flex justify-between items-center bg-blue-500/5 border-l-4 border-blue-500">
                         <div>
-                            <p class="font-bold text-sm">Telegram Grubuna Katıl</p>
-                            <p class="text-[10px] text-gray-500">+100 TONIX</p>
+                            <p class="font-bold text-sm">Telegram Duyuru</p>
+                            <p class="text-[10px] text-blue-400">+500 TONIX</p>
                         </div>
-                        <button class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold">Yap</button>
+                        <button class="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-black">KATIL</button>
                     </div>
-                    <div class="glass-card p-4 flex justify-between items-center border-l-4 border-purple-500">
+                    <div class="glass-card p-4 flex justify-between items-center bg-purple-500/5 border-l-4 border-purple-500">
                         <div>
-                            <p class="font-bold text-sm">X (Twitter) Takip Et</p>
-                            <p class="text-[10px] text-gray-500">+50 TONIX</p>
+                            <p class="font-bold text-sm">Reklam İzle (YENİ)</p>
+                            <p class="text-[10px] text-purple-400">+1.0 TON</p>
                         </div>
-                        <button class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg text-xs font-bold">Yap</button>
+                        <button class="bg-purple-500 text-white px-4 py-1.5 rounded-lg text-xs font-black">İZLE</button>
                     </div>
                 </div>
             </section>
 
-            <!-- 5. SEKME: MORE (Ayarlar / Hakkında) -->
-            <section id="view-more" class="view-content h-full">
-                <h2 class="text-2xl font-extrabold mb-6">Daha Fazla</h2>
-                <ul class="space-y-2">
-                    <li class="glass-card p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
-                        <span class="text-sm font-medium">Uygulama Ayarları</span>
-                        <span class="text-gray-600">→</span>
-                    </li>
-                    <li class="glass-card p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
-                        <span class="text-sm font-medium">Destek Ekibi</span>
-                        <span class="text-gray-600">→</span>
-                    </li>
-                    <li class="glass-card p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
-                        <span class="text-sm font-medium">Kullanım Şartları</span>
-                        <span class="text-gray-600">→</span>
-                    </li>
-                </ul>
+            <!-- ⚙️ DAHASI SAYFASI -->
+            <section id="view-more" class="view-content h-full no-scrollbar">
+                <h2 class="text-2xl font-black mb-6">Ayarlar</h2>
+                <div class="space-y-2">
+                    <div class="glass-card p-4 flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
+                        <span class="text-sm font-bold text-gray-300">Profil Düzenle</span>
+                        <span class="text-indigo-500">→</span>
+                    </div>
+                    <div class="glass-card p-4 flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
+                        <span class="text-sm font-bold text-gray-300">Dil Seçenekleri</span>
+                        <span class="text-indigo-500">→</span>
+                    </div>
+                    <div class="glass-card p-4 flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
+                        <span class="text-sm font-bold text-gray-300">İletişim & Destek</span>
+                        <span class="text-indigo-500">→</span>
+                    </div>
+                </div>
             </section>
 
         </div>
 
-        <!-- NAVİGASYON ÇUBUĞU (navi.jpg tabanlı) -->
-        <footer class="nav-footer">
-            <!-- Görünmez butunlarla görsel üzerindeki alanları işlevsel hale getiriyoruz -->
+        <!-- ALT NAVİGASYON (navi.jpg, naviwallet.jpg vb.) -->
+        <footer class="nav-footer" id="dynamic-footer">
+            <!-- Her buton görsel üzerindeki sekmeye denk gelecek şekilde şeffaftır -->
             <button onclick="switchTab('wallet')" class="nav-item"></button>
             <button onclick="switchTab('friends')" class="nav-item"></button>
             <button onclick="switchTab('home')" class="nav-item"></button>
@@ -337,42 +336,41 @@
             <button onclick="switchTab('more')" class="nav-item"></button>
         </footer>
 
-        <!-- BİLDİRİM KUTUSU (TOAST) -->
-        <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a] border border-white/10 px-6 py-2.5 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 shadow-2xl z-[100] pointer-events-none scale-90">
+        <!-- TOAST BİLDİRİMİ -->
+        <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1e1e1e]/90 border border-white/10 px-6 py-2.5 rounded-2xl text-[11px] font-black opacity-0 transition-all duration-300 shadow-2xl z-[200] pointer-events-none scale-90 backdrop-blur-md">
             Toplandı!
         </div>
 
     </div>
 
-    <!-- 
-       UYGULAMA MANTIĞI (JAVASCRIPT)
-    -->
+    <!-- UYGULAMA MOTORU (JAVASCRIPT) -->
     <script>
-        /**
-         * UYGULAMA DURUMU (STATE)
-         */
-        const state = {
+        // 1. UYGULAMA DURUMU (STATE)
+        const appState = {
             minedAmount: 0.0000000000,
-            totalBalance: 0.00000000,
+            totalBalance: 0,
             hashrate: 6,
             isBoosted: false,
             boostDuration: 5000, // 5 Saniye
-            miningInterval: 100  // 100ms
+            navImages: {
+                home: 'navi.jpg',
+                wallet: 'naviwallet.jpg',
+                friends: 'navifriends.jpg',
+                missions: 'navimissions.jpg',
+                more: 'navimore.jpg'
+            }
         };
 
-        /**
-         * DOM ELEMANLARI
-         */
-        const elements = {
+        // 2. DOM ELEMENTLERİ
+        const dom = {
             counter: document.getElementById('mining-counter'),
             ghs: document.getElementById('ghs-value'),
             fan: document.getElementById('main-fan'),
             toast: document.getElementById('toast'),
             headerBalance: document.getElementById('total-ton-header'),
+            footer: document.getElementById('dynamic-footer'),
             tonCard: document.getElementById('ton-card'),
-            btnClaim: document.getElementById('btn-claim'),
-            btnBoost: document.getElementById('btn-boost'),
-            views: {
+            sections: {
                 home: document.getElementById('view-home'),
                 wallet: document.getElementById('view-wallet'),
                 friends: document.getElementById('view-friends'),
@@ -381,122 +379,119 @@
             }
         };
 
-        /**
-         * YARDIMCI FONKSİYONLAR
-         */
-        const utils = {
-            // Gereksiz sıfırları silen TON formatlayıcı
-            formatBalance: (num) => {
-                if (num === 0) return "0";
-                return num.toFixed(8).replace(/\.?0+$/, "");
+        // 3. YARDIMCI FONKSİYONLAR
+        const uiUtils = {
+            // Bakiyeyi formatla (0.0100 -> 0.01)
+            formatTON: (val) => {
+                if (val === 0) return "0";
+                return val.toFixed(8).replace(/\.?0+$/, "");
             },
 
-            // Bildirim gösterimi
-            showToast: (message) => {
-                elements.toast.innerText = message;
-                elements.toast.style.opacity = "1";
-                elements.toast.style.transform = "translateX(-50%) translateY(-20px) scale(1)";
+            // Bildirim göster (Örn: "Aktarıldı 0.01 ton")
+            notify: (msg) => {
+                dom.toast.innerText = msg;
+                dom.toast.style.opacity = "1";
+                dom.toast.style.transform = "translateX(-50%) translateY(-20px) scale(1)";
                 
                 setTimeout(() => {
-                    elements.toast.style.opacity = "0";
-                    elements.toast.style.transform = "translateX(-50%) translateY(0px) scale(0.9)";
-                }, 2000);
+                    dom.toast.style.opacity = "0";
+                    dom.toast.style.transform = "translateX(-50%) translateY(0px) scale(0.9)";
+                }, 2500);
             }
         };
 
-        /**
-         * ANA DÖNGÜ VE İŞLEMLER
-         */
-        
-        // Madencilik algoritması
-        const runMining = () => {
-            // Hız faktörüne göre kazanç hesapla
-            const increment = (state.hashrate * 0.0000000045) + (Math.random() * 0.0000000005);
-            state.minedAmount += increment;
+        // 4. MADENCİLİK MOTORU
+        const miningEngine = () => {
+            // GH/s hızı baz alınarak her 100ms'de bir artış
+            const gain = (appState.hashrate * 0.0000000045) + (Math.random() * 0.0000000005);
+            appState.minedAmount += gain;
             
-            // Arayüzü güncelle
-            if (elements.counter) {
-                elements.counter.innerText = state.minedAmount.toFixed(10) + " TON";
+            if (dom.counter) {
+                dom.counter.innerText = appState.minedAmount.toFixed(10) + " TON";
             }
         };
 
-        // Sayaç döngüsünü başlat
-        setInterval(runMining, state.miningInterval);
+        // Döngüyü başlat
+        setInterval(miningEngine, 100);
 
-        // Toplama işlemi
-        const handleClaim = () => {
-            if (state.minedAmount > 0.0000000001) {
-                const capturedAmount = state.minedAmount;
+        // 5. İŞLEM YÖNETİCİLERİ
+        
+        // Toplama (Claim) İşlemi
+        const claimNow = () => {
+            if (appState.minedAmount > 0.0000000001) {
+                const collected = appState.minedAmount;
                 
-                // Bakiyeyi güncelle
-                state.totalBalance += capturedAmount;
-                elements.headerBalance.innerText = utils.formatBalance(state.totalBalance) + " TON";
+                // Bakiyeyi ekle
+                appState.totalBalance += collected;
+                dom.headerBalance.innerText = uiUtils.formatTON(appState.totalBalance) + " TON";
                 
-                // Geri bildirimi göster
-                utils.showToast(`Aktarıldı ${utils.formatBalance(capturedAmount)} ton`);
+                // Bildirimi göster (İstenen formatta)
+                uiUtils.notify("Aktarıldı " + uiUtils.formatTON(collected) + " ton");
 
                 // Sayacı sıfırla
-                state.minedAmount = 0;
-                elements.counter.innerText = "0.0000000000 TON";
+                appState.minedAmount = 0;
+                dom.counter.innerText = "0.0000000000 TON";
 
-                // Kart parlaması
-                elements.tonCard.classList.remove('balance-update');
-                void elements.tonCard.offsetWidth; // DOM tetikleme
-                elements.tonCard.classList.add('balance-update');
+                // Görsel geri bildirim (Parlat)
+                dom.tonCard.classList.remove('balance-update');
+                void dom.tonCard.offsetWidth; // DOM Refresh
+                dom.tonCard.classList.add('balance-update');
             } else {
-                utils.showToast("Toplanacak miktar bulunmuyor.");
+                uiUtils.notify("Şu an toplanacak TON yok.");
             }
         };
 
-        // Hızlandırma işlemi
-        const handleBoost = () => {
-            if (state.isBoosted) {
-                utils.showToast("Zaten hızlandırma aktif!");
+        // Hızlandırma (Boost) İşlemi
+        const startBoost = () => {
+            if (appState.isBoosted) {
+                uiUtils.notify("Hızlandırma zaten aktif!");
                 return;
             }
 
-            state.isBoosted = true;
-            state.hashrate *= 2;
-            elements.ghs.innerText = state.hashrate;
-            elements.fan.classList.add('boosted');
-            utils.showToast("Hızlandırma Aktif! 🚀");
+            appState.isBoosted = true;
+            appState.hashrate *= 2;
+            dom.ghs.innerText = appState.hashrate;
+            dom.fan.classList.add('boosted');
+            uiUtils.notify("Boost Aktif! Hız 2 Katına Çıktı 🚀");
             
-            // Belirlenen süre sonunda eski hıza dön
             setTimeout(() => {
-                state.isBoosted = false;
-                state.hashrate /= 2;
-                elements.ghs.innerText = state.hashrate;
-                elements.fan.classList.remove('boosted');
-                utils.showToast("Hızlandırma Sona Erdi.");
-            }, state.boostDuration);
+                appState.isBoosted = false;
+                appState.hashrate /= 2;
+                dom.ghs.innerText = appState.hashrate;
+                dom.fan.classList.remove('boosted');
+                uiUtils.notify("Hız normale döndü.");
+            }, appState.boostDuration);
         };
 
-        /**
-         * SEKME GEZİNTİSİ
-         */
-        window.switchTab = (tabName) => {
-            // Tüm görünümleri gizle
-            Object.values(elements.views).forEach(view => {
-                if (view) view.classList.remove('active');
+        // 6. SEKMELER ARASI GEÇİŞ VE DİNAMİK GÖRSEL
+        window.switchTab = (tabID) => {
+            // Tüm sayfaları gizle
+            Object.values(dom.sections).forEach(section => {
+                section.classList.remove('active');
             });
 
-            // Seçilen görünümü göster
-            const targetView = elements.views[tabName];
-            if (targetView) {
-                targetView.classList.add('active');
-                console.log(`Sekme değiştirildi: ${tabName}`);
+            // Hedef sayfayı göster
+            const target = dom.sections[tabID];
+            if (target) {
+                target.classList.add('active');
             }
+
+            // Navigasyon görselini değiştir
+            const imgPath = appState.navImages[tabID];
+            if (imgPath) {
+                dom.footer.style.backgroundImage = `url('${imgPath}')`;
+            }
+
+            console.log(`Sekme: ${tabID} | Görsel: ${imgPath}`);
         };
 
-        /**
-         * OLAY DİNLEYİCİLER (EVENT LISTENERS)
-         */
-        elements.btnClaim.addEventListener('click', handleClaim);
-        elements.btnBoost.addEventListener('click', handleBoost);
+        // 7. OLAY DİNLEYİCİLER (EVENT LISTENERS)
+        document.getElementById('btn-claim').addEventListener('click', claimNow);
+        document.getElementById('btn-boost').addEventListener('click', startBoost);
 
         // Uygulama yüklendiğinde log bas
         window.addEventListener('load', () => {
-            console.info("Mining App Başarıyla Başlatıldı. 💎");
+            console.log("TON Mining App 4.0 Hazır. GitHub görselleri aktif.");
         });
 
     </script>
@@ -504,8 +499,8 @@
 </html>
 <!-- 
   KOD YAPISI NOTLARI:
-  - Satır sayısı: 400+
-  - Tasarım: Dark Modern Glassmorphism
-  - Uyumluluk: 9:18 Aspect Ratio
-  - İşlev: Claim, Boost, Multi-Tab Navigation
+  - Satır sayısı: ~450
+  - Dinamik Navigasyon: navi.jpg, naviwallet.jpg, navifriends.jpg, navimissions.jpg, navimore.jpg
+  - Fonksiyonlar: Claim (Aktarıldı bildirimi), Boost (Hız artışı), Tab Switching
+  - Tasarım: High-end Mobile Web Uygulaması
 -->
