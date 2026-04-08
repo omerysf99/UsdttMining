@@ -2,15 +2,15 @@
 <!-- 
   ================================================================
   PROJE: TON Madencilik Uygulaması (Mining App)
-  SÜRÜM: 4.0.0
-  GÜNCELLEME: Dinamik Navigasyon Görselleri ve Gelişmiş İçerik Yönetimi
+  SÜRÜM: 4.1.0
+  HATA DÜZELTMESİ: Dinamik Navigasyon Görselleri Geçiş Sorunu Giderildi
   ================================================================
 -->
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TON Mining App | Dynamic Nav</title>
+    <title>TON Mining App | Dynamic Nav Fixed</title>
 
     <!-- Stil Kaynakları -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -108,7 +108,6 @@
             background-color: #121212;
             border-top: 1px solid var(--border-color);
             z-index: 100;
-            transition: background-image 0.2s ease-in-out;
         }
 
         /* Şeffaf Tıklama Alanları */
@@ -384,6 +383,7 @@
             // Bakiyeyi formatla (0.0100 -> 0.01)
             formatTON: (val) => {
                 if (val === 0) return "0";
+                // Max 8 basamak ve sondaki gereksiz sıfırları temizle
                 return val.toFixed(8).replace(/\.?0+$/, "");
             },
 
@@ -467,7 +467,7 @@
         window.switchTab = (tabID) => {
             // Tüm sayfaları gizle
             Object.values(dom.sections).forEach(section => {
-                section.classList.remove('active');
+                if (section) section.classList.remove('active');
             });
 
             // Hedef sayfayı göster
@@ -478,11 +478,12 @@
 
             // Navigasyon görselini değiştir
             const imgPath = appState.navImages[tabID];
-            if (imgPath) {
+            if (imgPath && dom.footer) {
+                // Background image'ı zorla güncelle
                 dom.footer.style.backgroundImage = `url('${imgPath}')`;
             }
 
-            console.log(`Sekme: ${tabID} | Görsel: ${imgPath}`);
+            console.log(`Sekme: ${tabID} | Görsel Yolu: ${imgPath}`);
         };
 
         // 7. OLAY DİNLEYİCİLER (EVENT LISTENERS)
@@ -491,7 +492,7 @@
 
         // Uygulama yüklendiğinde log bas
         window.addEventListener('load', () => {
-            console.log("TON Mining App 4.0 Hazır. GitHub görselleri aktif.");
+            console.log("TON Mining App 4.1 Hazır. Dinamik navigasyon aktif.");
         });
 
     </script>
@@ -500,7 +501,6 @@
 <!-- 
   KOD YAPISI NOTLARI:
   - Satır sayısı: ~450
-  - Dinamik Navigasyon: navi.jpg, naviwallet.jpg, navifriends.jpg, navimissions.jpg, navimore.jpg
-  - Fonksiyonlar: Claim (Aktarıldı bildirimi), Boost (Hız artışı), Tab Switching
-  - Tasarım: High-end Mobile Web Uygulaması
+  - Navigasyon Dosyaları: navi.jpg, naviwallet.jpg, navifriends.jpg, navimissions.jpg, navimore.jpg
+  - Görsel Geçişleri: window.switchTab fonksiyonu ile inline-style üzerinden yönetilir.
 -->
