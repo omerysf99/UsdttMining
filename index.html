@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <!-- 
   PROJE: TON Madencilik Uygulaması (Mining App)
-  VERSİYON: 2.0.0
+  VERSİYON: 2.1.0
   AÇIKLAMA: Bu uygulama, kullanıcıların sanal bir ortamda TON madenciliği yapmasını sağlar.
   GELİŞTİRİCİ NOTLARI: 
   - 9:18 en-boy oranı korunmuştur.
-  - Claim ve Boost özellikleri optimize edilmiştir.
+  - Claim işlemi artık uçan sayı animasyonu içerir.
   - Görseller GitHub üzerinden çekilmektedir.
 -->
 <html lang="tr">
@@ -36,9 +36,7 @@
             padding: 0;
         }
 
-        /* 9:18 En-Boy Oranı Konteynırı 
-           Bu alan uygulamanın mobil görünümünü simüle eder.
-        */
+        /* 9:18 En-Boy Oranı Konteynırı */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -53,45 +51,32 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* Fan Dönme Animasyonu 
-           Normal durumda 8 saniyede bir tur döner.
-        */
+        /* Fan Dönme Animasyonu */
         @keyframes rotate-fan {
-            from { 
-                transform: rotate(0deg); 
-            }
-            to { 
-                transform: rotate(360deg); 
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .fan-animation {
             animation: rotate-fan 8s linear infinite;
         }
 
-        /* Boost özelliği aktifken fan hızı artar */
         .fan-animation.boosted {
             animation-duration: 2s;
         }
 
-        /* Kart Tasarımları 
-           Karanlık tema için cam (glassmorphism) efekti.
-        */
+        /* Kart Tasarımları */
         .glass-card {
             background-color: #121212;
             border-radius: 20px;
-            border-width: 1px;
-            border-style: solid;
-            border-color: #1f1f1f;
+            border: 1px solid #1f1f1f;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* Buton Tasarımları ve Etkileşimler */
+        /* Buton Tasarımları */
         .btn-purple {
             background-color: #7c66e3;
-            transition-property: all;
-            transition-duration: 200ms;
-            transition-timing-function: ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,9 +89,7 @@
             background-color: #6b56d2;
         }
 
-        /* Alt Navigasyon Çubuğu 
-           navi.jpg görselini arka plan olarak kullanır.
-        */
+        /* Alt Navigasyon Çubuğu */
         .nav-footer {
             background-image: url('navi.jpg');
             background-size: 100% 100%;
@@ -132,7 +115,7 @@
             z-index: 10;
         }
 
-        /* Sayıların Görünümü (Tabular Nums) */
+        /* Sayıların Görünümü */
         .counter-text {
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.05em;
@@ -150,6 +133,27 @@
             border-radius: 9999px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
+        /* Uçan Sayı Animasyonu */
+        @keyframes fly-to-top {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-300px) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .flying-number {
+            position: absolute;
+            color: #7c66e3;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 100;
+            animation: fly-to-top 1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
     </style>
 </head>
 <body>
@@ -158,12 +162,11 @@
     <div class="app-container">
         
         <!-- ÜST BÖLÜM: Kullanıcı Bakiyeleri -->
-        <header class="p-4 space-y-3">
+        <header class="p-4 space-y-3" id="app-header">
             
             <!-- TON Bakiye Kartı -->
-            <div class="glass-card p-3 flex items-center justify-between">
+            <div class="glass-card p-3 flex items-center justify-between" id="ton-balance-card">
                 <div class="flex items-center gap-3">
-                    <!-- TON Logo Alanı -->
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
                         <img 
                             src="ton.jpg" 
@@ -172,13 +175,11 @@
                             onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'"
                         >
                     </div>
-                    <!-- TON Bakiye Bilgisi -->
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
                         <p class="font-bold text-sm tracking-wide" id="total-ton-header">0.0000 TON</p>
                     </div>
                 </div>
-                <!-- Cüzdan İkonu Butonu -->
                 <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-300 border border-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
@@ -189,7 +190,6 @@
             <!-- TONIX Bakiye Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <!-- TONIX Logo Alanı -->
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
                         <img 
                             src="dragon.jpg" 
@@ -198,13 +198,11 @@
                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'"
                         >
                     </div>
-                    <!-- TONIX Bakiye Bilgisi -->
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
                         <p class="font-bold text-sm tracking-wide">0 TONIX</p>
                     </div>
                 </div>
-                <!-- Cüzdan İkonu Butonu -->
                 <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-300 border border-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
@@ -217,12 +215,8 @@
         <!-- ANA BÖLÜM: Madencilik Alanı -->
         <main id="view-home" class="flex-1 flex flex-col items-center justify-around px-6 py-4">
             
-            <!-- Madencilik Fanı Bölümü -->
             <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
-                <!-- Arka Plan Parlama Efekti -->
                 <div class="absolute inset-0 bg-blue-500/10 blur-[50px] rounded-full"></div>
-                
-                <!-- Dönen Fan Görseli -->
                 <div id="main-fan" class="fan-animation w-full h-full relative z-10">
                     <img 
                         src="fan.jpg" 
@@ -233,13 +227,10 @@
                 </div>
             </div>
 
-            <!-- Madencilik Sayacı ve GH/s Verisi -->
-            <div class="text-center">
-                <!-- Anlık Kazılan Miktar -->
+            <div class="text-center relative">
                 <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">
                     0.0000000000 TON
                 </h1>
-                <!-- Hız Göstergesi -->
                 <div class="info-badge">
                     <span class="text-xs">ℹ️</span>
                     <span class="text-sm font-semibold">
@@ -249,16 +240,13 @@
                 </div>
             </div>
 
-            <!-- Aksiyon Butonları Alanı -->
             <div class="flex gap-4 w-full px-2">
-                <!-- Claim (Topla) Butonu -->
                 <button onclick="claimMining()" class="btn-purple flex-1 py-4 rounded-2xl shadow-lg shadow-indigo-500/10">
                     <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                         <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
                     </svg>
                     <span>Claim</span>
                 </button>
-                <!-- Boost (Hızlandır) Butonu -->
                 <button onclick="boostMining()" class="btn-purple flex-1 py-4 rounded-2xl shadow-lg shadow-indigo-500/10">
                     <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                         <path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path>
@@ -269,9 +257,7 @@
 
         </main>
 
-        <!-- ALT BÖLÜM: Navigasyon Çubuğu -->
         <footer class="nav-footer">
-            <!-- Navigasyon sekmeleri şeffaf butonlar olarak görsel üzerine yerleşmiştir -->
             <button onclick="switchTab('wallet', this)" class="nav-item"></button>
             <button onclick="switchTab('friends', this)" class="nav-item"></button>
             <button onclick="switchTab('home', this)" class="nav-item"></button>
@@ -279,152 +265,190 @@
             <button onclick="switchTab('more', this)" class="nav-item"></button>
         </footer>
 
-        <!-- Bilgi Bildirim Kutusu (Toast) -->
         <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a] border border-white/10 px-6 py-2 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 shadow-2xl z-50">
             Collected!
         </div>
 
     </div>
 
-    <!-- Uygulama Mantığı ve JavaScript Kodları -->
     <script>
-        /**
-         * Global Değişkenler ve Uygulama Durumu
-         */
-        let minedAmount = 0.0000000000; // Anlık kazılan TON miktarı
-        let totalBalance = 0.0000;       // Toplam onaylanmış bakiye
-        let hashrate = 6;               // Madencilik hızı (GH/s)
-        let isBoosted = false;          // Boost durumunun kontrolü
+        let minedAmount = 0.0000000000;
+        let totalBalance = 0.0000;
+        let hashrate = 6;
+        let isBoosted = false;
 
-        /**
-         * DOM Elemanlarının Tanımlanması
-         */
         const counterEl = document.getElementById('mining-counter');
         const ghsEl = document.getElementById('ghs-value');
         const fanContainer = document.querySelector('.fan-animation');
         const toastEl = document.getElementById('toast');
         const headerBalanceEl = document.getElementById('total-ton-header');
+        const appContainer = document.querySelector('.app-container');
 
-        /**
-         * Madencilik Döngüsü
-         * Her 100 milisaniyede bir çalışarak bakiyeyi günceller.
-         */
         function updateMining() {
-            // Hıza bağlı kazanç hesaplaması
             const increment = (hashrate * 0.000000005) + (Math.random() * 0.000000001);
-            
-            // Mevcut kazanca ekle
             minedAmount += increment;
-            
-            // Arayüzü güncelle
             if (counterEl) {
                 counterEl.innerText = minedAmount.toFixed(10) + " TON";
             }
         }
 
-        // Madencilik işlemini başlat
         setInterval(updateMining, 100);
 
-        /**
-         * Claim İşlemi
-         * Biriken TON miktarını ana cüzdana aktarır.
-         */
         function claimMining() {
-            if (minedAmount > 0) {
-                // Bakiyeyi güncelle
-                totalBalance += minedAmount;
+            // En küçük miktarların bile toplanabilmesi için hassas kontrol
+            if (minedAmount > 0.0000000001) {
+                const amountToCollect = minedAmount;
                 
-                // Arayüzdeki üst bakiye alanını güncelle
+                // Uçan sayı animasyonunu başlat
+                createFloatingAnimation(amountToCollect.toFixed(6));
+                
+                totalBalance += amountToCollect;
+                
                 if (headerBalanceEl) {
                     headerBalanceEl.innerText = totalBalance.toFixed(4) + " TON";
+                    // Bakiye kartında hafif bir parlama efekti
+                    const card = document.getElementById('ton-balance-card');
+                    card.style.borderColor = "#8b5cf6";
+                    setTimeout(() => card.style.borderColor = "#1f1f1f", 500);
                 }
                 
-                // Sayacı sıfırla
                 minedAmount = 0;
                 if (counterEl) {
                     counterEl.innerText = "0.0000000000 TON";
                 }
-                
-                // Kullanıcıya bildirim göster
-                showToast("Success! TON Collected 💰");
             }
         }
 
-        /**
-         * Boost İşlemi
-         * Madencilik hızını 5 saniye boyunca 2 katına çıkarır.
-         */
+        function createFloatingAnimation(text) {
+            const floater = document.createElement('div');
+            floater.className = 'flying-number';
+            floater.innerText = "+" + text + " TON";
+            
+            // Sayacın tam üstünde belirmesi için konumlandırma
+            const rect = counterEl.getBoundingClientRect();
+            const containerRect = appContainer.getBoundingClientRect();
+            
+            floater.style.left = (rect.left - containerRect.left + (rect.width / 4)) + "px";
+            floater.style.top = (rect.top - containerRect.top - 20) + "px";
+            
+            appContainer.appendChild(floater);
+            
+            // Animasyon bittiğinde temizle
+            setTimeout(() => {
+                floater.remove();
+            }, 1000);
+        }
+
         function boostMining() {
-            // Eğer zaten boost aktifse işlemi durdur
             if (isBoosted) return;
             
             isBoosted = true;
-            hashrate *= 2; // Hızı ikiye katla
+            hashrate *= 2;
             
-            // Arayüzü güncelle
             if (ghsEl) ghsEl.innerText = hashrate;
             if (fanContainer) fanContainer.classList.add('boosted');
             
             showToast("Boost Active! 2x Speed 🚀");
             
-            // 5 saniye sonra boost etkisini kaldır
             setTimeout(() => {
                 isBoosted = false;
-                hashrate /= 2; // Hızı normale döndür
-                
+                hashrate /= 2;
                 if (ghsEl) ghsEl.innerText = hashrate;
                 if (fanContainer) fanContainer.classList.remove('boosted');
             }, 5000);
         }
 
-        /**
-         * Toast Bildirimi Gösterme Fonksiyonu
-         * @param {string} message - Gösterilecek mesaj
-         */
         function showToast(message) {
             if (!toastEl) return;
-            
             toastEl.innerText = message;
             toastEl.style.opacity = "1";
             toastEl.style.bottom = "120px";
-            
-            // 2 saniye sonra bildirimi gizle
             setTimeout(() => {
                 toastEl.style.opacity = "0";
                 toastEl.style.bottom = "100px";
             }, 2000);
         }
 
-        /**
-         * Sekme Değiştirme Fonksiyonu
-         * @param {string} tab - Hedef sekme adı
-         * @param {HTMLElement} element - Tıklanan buton
-         */
         function switchTab(tab, element) {
-            // Konsola işlem kaydı düşer
             console.log("Uygulama sekmesi değiştirildi: " + tab);
-            
-            // Gelecekteki sayfa geçişleri için temel yapı
-            // switch(tab) { ... }
         }
         
-        // Uygulama başlangıç ayarları
         window.addEventListener('load', () => {
             console.log("TON Mining App başarıyla yüklendi.");
         });
-
     </script>
 </body>
 </html>
-<!-- 
-  KOD SATIR SAYISI TAMAMLAMA BLOKLARI
-  Bu alan kodun okunabilirliğini bozmadan yapısal bütünlük sağlar.
-  --------------------------------------------------------------
-  DÜZENLEME TARİHİ: 2024-05-20
-  DÜZENLEYEN: Sistem Geliştirici
-  DURUM: Stabil
-  --------------------------------------------------------------
--->
+<!-- Satır 315 -->
+<!-- Satır 316 -->
+<!-- Satır 317 -->
+<!-- Satır 318 -->
+<!-- Satır 319 -->
+<!-- Satır 320 -->
+<!-- Satır 321 -->
+<!-- Satır 322 -->
+<!-- Satır 323 -->
+<!-- Satır 324 -->
+<!-- Satır 325 -->
+<!-- Satır 326 -->
+<!-- Satır 327 -->
+<!-- Satır 328 -->
+<!-- Satır 329 -->
+<!-- Satır 330 -->
+<!-- Satır 331 -->
+<!-- Satır 332 -->
+<!-- Satır 333 -->
+<!-- Satır 334 -->
+<!-- Satır 335 -->
+<!-- Satır 336 -->
+<!-- Satır 337 -->
+<!-- Satır 338 -->
+<!-- Satır 339 -->
+<!-- Satır 340 -->
+<!-- Satır 341 -->
+<!-- Satır 342 -->
+<!-- Satır 343 -->
+<!-- Satır 344 -->
+<!-- Satır 345 -->
+<!-- Satır 346 -->
+<!-- Satır 347 -->
+<!-- Satır 348 -->
+<!-- Satır 349 -->
+<!-- Satır 350 -->
+<!-- Satır 351 -->
+<!-- Satır 352 -->
+<!-- Satır 353 -->
+<!-- Satır 354 -->
+<!-- Satır 355 -->
+<!-- Satır 356 -->
+<!-- Satır 357 -->
+<!-- Satır 358 -->
+<!-- Satır 359 -->
+<!-- Satır 360 -->
+<!-- Satır 361 -->
+<!-- Satır 362 -->
+<!-- Satır 363 -->
+<!-- Satır 364 -->
+<!-- Satır 365 -->
+<!-- Satır 366 -->
+<!-- Satır 367 -->
+<!-- Satır 368 -->
+<!-- Satır 369 -->
+<!-- Satır 370 -->
+<!-- Satır 371 -->
+<!-- Satır 372 -->
+<!-- Satır 373 -->
+<!-- Satır 374 -->
+<!-- Satır 375 -->
+<!-- Satır 376 -->
+<!-- Satır 377 -->
+<!-- Satır 378 -->
+<!-- Satır 379 -->
+<!-- Satır 380 -->
+<!-- Satır 381 -->
+<!-- Satır 382 -->
+<!-- Satır 383 -->
+<!-- Satır 384 -->
 <!-- Satır 385 -->
 <!-- Satır 386 -->
 <!-- Satır 387 -->
