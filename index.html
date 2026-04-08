@@ -61,12 +61,13 @@
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
-            height: 70px; /* Görselin yüksekliğine göre ayarlanabilir */
+            height: 65px; 
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: stretch;
             position: relative;
+            flex-shrink: 0;
         }
 
         /* Tıklama Alanları - Görünmez butonlar */
@@ -77,12 +78,11 @@
             outline: none;
             cursor: pointer;
             z-index: 10;
-            transition: background 0.2s;
         }
 
-        /* Aktif olanı hafifçe belli etmek için (isteğe bağlı) */
+        /* Aktif olanı hafifçe belli etmek için */
         .nav-item.active {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         /* Buton Efektleri */
@@ -96,8 +96,8 @@
         }
         
         @media (max-height: 650px) {
-            .main-fan-wrapper { width: 120px; height: 120px; }
-            .mining-title { font-size: 1.5rem; }
+            .main-fan-wrapper { width: 110px; height: 110px; }
+            .mining-title { font-size: 1.25rem; }
         }
     </style>
 </head>
@@ -106,101 +106,94 @@
     <div class="app-container">
         <!-- Üst Bölüm: Bakiyeler -->
         <header class="p-3 space-y-2">
-            <div class="glass-card rounded-xl p-2.5 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-full overflow-hidden border border-blue-500/30 flex items-center justify-center bg-blue-500/10 shadow-lg shadow-blue-500/10">
+            <div class="glass-card rounded-xl p-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-blue-500/30 flex items-center justify-center bg-blue-500/10 shadow-lg shadow-blue-500/10">
                         <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-medium">Bakiye</p>
-                        <p class="font-bold text-xs tracking-wide" id="total-ton">7.6823 TON</p>
+                        <p class="text-[9px] text-gray-500 font-medium leading-none mb-1">Bakiye</p>
+                        <p class="font-bold text-[11px] tracking-wide" id="total-ton">7.6823 TON</p>
                     </div>
                 </div>
-                <button class="bg-[#1e1e1e] p-2 rounded-xl text-indigo-400 btn-active border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                <button class="bg-[#1e1e1e] p-1.5 rounded-lg text-indigo-400 btn-active border border-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
                 </button>
             </div>
 
-            <div class="glass-card rounded-xl p-2.5 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-full overflow-hidden border border-blue-400/30 flex items-center justify-center bg-blue-400/10 shadow-lg shadow-blue-400/10">
+            <div class="glass-card rounded-xl p-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-blue-400/30 flex items-center justify-center bg-blue-400/10 shadow-lg shadow-blue-400/10">
                         <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-medium">Bakiye</p>
-                        <p class="font-bold text-xs tracking-wide">500 TONIX</p>
+                        <p class="text-[9px] text-gray-500 font-medium leading-none mb-1">Bakiye</p>
+                        <p class="font-bold text-[11px] tracking-wide">500 TONIX</p>
                     </div>
                 </div>
-                <button class="bg-[#1e1e1e] p-2 rounded-xl text-indigo-400 btn-active border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                <button class="bg-[#1e1e1e] p-1.5 rounded-lg text-indigo-400 btn-active border border-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
                 </button>
             </div>
         </header>
 
         <!-- Ana Bölüm: Madencilik Alanı -->
-        <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-4 transition-all duration-300">
-            <div class="relative w-44 h-44 mb-6 main-fan-wrapper">
-                <div class="absolute inset-0 bg-blue-600/5 blur-[50px] rounded-full"></div>
-                <div id="main-fan" class="fan-animation relative z-10 w-full h-full overflow-hidden rounded-full border-4 border-white/5 shadow-2xl">
+        <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-6 transition-all duration-300">
+            <!-- Fan Bölümü - Daha Kompakt -->
+            <div class="relative w-40 h-40 mb-5 main-fan-wrapper">
+                <div class="absolute inset-0 bg-blue-600/5 blur-[40px] rounded-full"></div>
+                <div id="main-fan" class="fan-animation relative z-10 w-full h-full overflow-hidden rounded-full border-2 border-white/5 shadow-2xl">
                     <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
                 </div>
             </div>
 
             <div class="text-center">
-                <h1 id="mining-counter" class="text-2xl font-bold counter-text tracking-tighter mb-2 mining-title">0.0000000000 TON</h1>
-                <div class="inline-flex items-center justify-center gap-1.5 text-gray-400 bg-white/5 py-1.5 px-4 rounded-full border border-white/5">
-                    <span class="text-[10px]">ℹ️</span>
-                    <span class="text-xs font-semibold"><span id="ghs-value">6</span> GH/s</span>
-                    <span class="text-orange-500 text-xs">⚡</span>
+                <h1 id="mining-counter" class="text-xl font-bold counter-text tracking-tighter mb-1.5 mining-title">0.0000000000 TON</h1>
+                <div class="inline-flex items-center justify-center gap-1.5 text-gray-400 bg-white/5 py-1 px-3.5 rounded-full border border-white/5">
+                    <span class="text-[9px]">ℹ️</span>
+                    <span class="text-[10px] font-semibold tracking-tight"><span id="ghs-value">6</span> GH/s</span>
+                    <span class="text-orange-500 text-[10px]">⚡</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 w-full mt-6">
-                <button onclick="claimMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-2 rounded-2xl font-bold flex flex-col items-center justify-center gap-0.5 btn-active transition-all shadow-lg shadow-indigo-500/20">
-                    <span class="text-sm">💰</span>
-                    <span class="text-[12px]">Topla</span>
+            <!-- Butonlar - Küçültüldü -->
+            <div class="grid grid-cols-2 gap-3 w-4/5 mt-5">
+                <button onclick="claimMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5 btn-active transition-all shadow-lg shadow-indigo-500/10">
+                    <span class="text-xs">💰</span>
+                    <span class="text-[11px] uppercase tracking-wide">Topla</span>
                 </button>
-                <button onclick="boostMining()" class="bg-[#1a1a1a] hover:bg-[#222] border border-white/5 py-2 rounded-2xl font-bold flex flex-col items-center justify-center gap-0.5 btn-active transition-all">
-                    <span class="text-sm">🚀</span>
-                    <span class="text-[12px] text-gray-300">Hızlandır</span>
+                <button onclick="boostMining()" class="bg-[#1a1a1a] hover:bg-[#222] border border-white/10 py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5 btn-active transition-all">
+                    <span class="text-xs">🚀</span>
+                    <span class="text-[11px] text-gray-300 uppercase tracking-wide">Hızlandır</span>
                 </button>
             </div>
         </main>
 
         <!-- Diğer Sekmeler (Gizli) -->
         <div id="view-wallet" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span class="text-2xl">👛</span>
+            <div class="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span class="text-xl">👛</span>
             </div>
-            <h2 class="text-xl font-bold mb-1">Cüzdanım</h2>
-            <p class="text-xs text-gray-400">Kazançlarınızı yönetin</p>
+            <h2 class="text-lg font-bold mb-1">Cüzdanım</h2>
+            <p class="text-[10px] text-gray-400">Kazançlarınızı yönetin</p>
         </div>
 
         <div id="view-friends" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <h2 class="text-xl font-bold mb-1">Arkadaşlar</h2>
-            <p class="text-xs text-gray-400">Arkadaşlarını davet et</p>
+            <h2 class="text-lg font-bold mb-1">Arkadaşlar</h2>
+            <p class="text-[10px] text-gray-400">Arkadaşlarını davet et</p>
         </div>
 
         <!-- Alt Navigasyon - navi.jpg Arka Planı Üzerine Şeffaf Butonlar -->
         <footer class="nav-footer pb-4">
-            <!-- Cüzdan Tıklama Alanı -->
             <button onclick="switchTab('wallet', this)" class="nav-item"></button>
-            
-            <!-- Arkadaşlar Tıklama Alanı -->
             <button onclick="switchTab('friends', this)" class="nav-item"></button>
-            
-            <!-- Ana Sayfa Tıklama Alanı (Aktif) -->
             <button onclick="switchTab('home', this)" class="nav-item active"></button>
-            
-            <!-- Görevler Tıklama Alanı -->
             <button onclick="switchTab('missions', this)" class="nav-item"></button>
-            
-            <!-- Daha Fazla Tıklama Alanı -->
             <button onclick="switchTab('more', this)" class="nav-item"></button>
         </footer>
 
         <!-- Bildirim -->
-        <div id="toast" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-6 py-2 rounded-xl text-[11px] font-bold opacity-0 pointer-events-none transition-all duration-300 shadow-2xl z-50">
+        <div id="toast" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-6 py-2 rounded-xl text-[10px] font-bold opacity-0 pointer-events-none transition-all duration-300 shadow-2xl z-50">
             Toplandı!
         </div>
     </div>
