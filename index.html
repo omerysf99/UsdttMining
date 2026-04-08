@@ -37,8 +37,8 @@
 
         /* Alt Navigasyon */
         .nav-active {
-            color: #ef4444; /* Kırmızı tema */
-            background: rgba(239, 68, 68, 0.1);
+            color: #3b82f6; /* Mavi tema (fan.jpg ile uyumlu) */
+            background: rgba(59, 130, 246, 0.1);
             border-radius: 12px;
         }
 
@@ -50,11 +50,6 @@
         /* Sayıların yumuşak değişimi */
         .counter-text {
             font-variant-numeric: tabular-nums;
-        }
-
-        /* Merkez İkon Parlaması */
-        .center-glow {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), inset 0 0 10px rgba(59, 130, 246, 0.5);
         }
     </style>
 </head>
@@ -69,7 +64,7 @@
                     <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Balance</p>
+                    <p class="text-xs text-gray-500">Bakiye</p>
                     <p class="font-bold text-sm tracking-wide" id="total-ton">7.6823 TON</p>
                 </div>
             </div>
@@ -81,11 +76,11 @@
         <!-- TONIX Bakiye Kartı -->
         <div class="glass-card rounded-2xl p-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full overflow-hidden border border-red-500/30 flex items-center justify-center bg-red-500/10">
+                <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-400/30 flex items-center justify-center bg-blue-400/10">
                     <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Balance</p>
+                    <p class="text-xs text-gray-500">Bakiye</p>
                     <p class="font-bold text-sm tracking-wide">500 TONIX</p>
                 </div>
             </div>
@@ -99,23 +94,15 @@
     <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-6 transition-all duration-300">
         <!-- Büyük Fan Görseli -->
         <div class="relative w-72 h-72 mb-10">
-            <!-- Arka Plan Parlaması (Temaya Göre Kırmızı/Mavi Karışımı) -->
-            <div class="absolute inset-0 bg-red-600/10 blur-[80px] rounded-full"></div>
+            <!-- Arka Plan Parlaması (Mavi tema) -->
+            <div class="absolute inset-0 bg-blue-600/10 blur-[80px] rounded-full"></div>
             
             <!-- Dönen Fan -->
-            <div id="main-fan" class="fan-animation relative z-10 w-full h-full">
-                <!-- Buradaki görseli dragon.jpg veya yeni paylaştığın kırmızı fan görseli yapabilirsin -->
-                <img src="dragon.jpg" alt="Fan" class="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(239,68,68,0.3)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+            <div id="main-fan" class="fan-animation relative z-10 w-full h-full overflow-hidden rounded-full border-4 border-white/5">
+                <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
             </div>
             
-            <!-- Ortadaki YUVARLAK KESİMLİ İkon (İstediğin Şey) -->
-            <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full p-[2px] shadow-[0_0_30px_rgba(59,130,246,0.6)] center-glow">
-                    <div class="w-full h-full bg-[#000] rounded-full flex items-center justify-center overflow-hidden border border-white/10">
-                        <img src="ton.jpg" class="w-10 h-10 object-contain" alt="Center Icon" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    </div>
-                </div>
-            </div>
+            <!-- Ortadaki İkon Kullanıcı İsteği Üzerine Kaldırıldı -->
         </div>
 
         <!-- Sayaç -->
@@ -132,54 +119,52 @@
         <div class="grid grid-cols-2 gap-4 w-full mt-12">
             <button onclick="claimMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 btn-active transition-all shadow-lg shadow-indigo-500/20">
                 <span class="text-lg">💰</span>
-                <span>Claim</span>
+                <span>Topla</span>
             </button>
             <button onclick="boostMining()" class="bg-[#222] hover:bg-[#333] border border-white/5 py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 btn-active transition-all">
                 <span class="text-lg">🚀</span>
-                <span>Boost</span>
+                <span>Hızlandır</span>
             </button>
         </div>
     </main>
 
     <!-- Diğer Sekmeler (Gizli) -->
-    <div id="view-wallet" class="hidden flex-1 p-6 flex flex-col items-center justify-center">
-        <div class="text-center">
-            <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span class="text-3xl">👛</span>
-            </div>
-            <h2 class="text-2xl font-bold mb-2">My Wallet</h2>
-            <p class="text-gray-400">Manage your earnings and transfers</p>
+    <div id="view-wallet" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">👛</span>
         </div>
+        <h2 class="text-2xl font-bold mb-2">Cüzdanım</h2>
+        <p class="text-gray-400">Kazançlarınızı ve transferlerinizi yönetin</p>
     </div>
 
     <!-- Alt Navigasyon -->
     <footer class="bg-[#0a0a0a] p-2 flex justify-between items-center px-4 border-t border-gray-900 pb-8">
         <button onclick="switchTab('wallet', this)" class="flex flex-col items-center gap-1 p-2 transition-all opacity-60">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
-            <span class="text-[10px]">Wallet</span>
+            <span class="text-[10px]">Cüzdan</span>
         </button>
         <button onclick="switchTab('friends', this)" class="flex flex-col items-center gap-1 p-2 transition-all opacity-60">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Z"></path></svg>
-            <span class="text-[10px]">Friends</span>
+            <span class="text-[10px]">Arkadaşlar</span>
         </button>
         <button onclick="switchTab('home', this)" class="nav-active flex flex-col items-center gap-1 p-2 px-4 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V120A15.87,15.87,0,0,0,219.31,108.68Z"></path></svg>
-            <span class="text-[10px]">Home</span>
+            <span class="text-[10px]">Ana Sayfa</span>
         </button>
         <button onclick="switchTab('missions', this)" class="flex flex-col items-center gap-1 p-2 relative transition-all opacity-60">
             <div class="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H40A16,16,0,0,0,24,48V208a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V48A16,16,0,0,0,216,32Z"></path></svg>
-            <span class="text-[10px]">Missions</span>
+            <span class="text-[10px]">Görevler</span>
         </button>
         <button onclick="switchTab('more', this)" class="flex flex-col items-center gap-1 p-2 transition-all opacity-60">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Z"></path></svg>
-            <span class="text-[10px]">More</span>
+            <span class="text-[10px]">Daha Fazla</span>
         </button>
     </footer>
 
     <!-- Bildirim -->
-    <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-3 rounded-2xl text-sm font-bold opacity-0 pointer-events-none transition-all duration-300 shadow-2xl">
-        Claimed!
+    <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-3 rounded-2xl text-sm font-bold opacity-0 pointer-events-none transition-all duration-300 shadow-2xl z-50">
+        Toplandı!
     </div>
 
     <script>
@@ -204,14 +189,14 @@
 
         function claimMining() {
             if (minedAmount < 0.000001) {
-                showToast("Not enough to claim!");
+                showToast("Toplanacak miktar yetersiz!");
                 return;
             }
             totalBalance += minedAmount;
             minedAmount = 0;
             balanceEl.innerText = totalBalance.toFixed(4) + " TON";
             counterEl.innerText = "0.0000000000 TON";
-            showToast("Success! TON Collected 💰");
+            showToast("Başarılı! TON Toplandı 💰");
         }
 
         function boostMining() {
@@ -220,13 +205,13 @@
             hashrate *= 2;
             ghsEl.innerText = hashrate;
             fanEl.classList.add('boosted');
-            showToast("Boost Active! 2x Speed 🚀");
+            showToast("Hızlandırma Aktif! 2x Hız 🚀");
             setTimeout(() => {
                 isBoosted = false;
                 hashrate /= 2;
                 ghsEl.innerText = hashrate;
                 fanEl.classList.remove('boosted');
-                showToast("Boost Ended");
+                showToast("Hızlandırma Sona Erdi");
             }, 10000);
         }
 
