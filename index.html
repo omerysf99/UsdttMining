@@ -20,7 +20,7 @@
             margin: 0;
         }
 
-        /* 9:18 oranında boyuna konteynır */
+        /* 9:18 oranında boyuna konteynır - Görseldeki koyu tema */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -48,10 +48,11 @@
             animation-duration: 2s;
         }
 
-        /* Kart Stilleri */
+        /* Kart Stilleri - Görseldeki navigasyon rengine yakın koyu gri */
         .glass-card {
-            background: #1a1a1a;
+            background: #121212;
             border-radius: 20px;
+            border: 1px solid #1f1f1f;
         }
 
         /* Buton Stilleri */
@@ -77,6 +78,8 @@
             align-items: stretch;
             flex-shrink: 0;
             position: relative;
+            background-color: #121212;
+            border-top: 1px solid #1f1f1f;
         }
 
         /* Tıklama Alanları - Görünmez butonlar */
@@ -101,11 +104,10 @@
     <div class="app-container">
         <!-- Üst Bölüm: Bakiyeler -->
         <header class="p-4 space-y-3">
-            <!-- TON Bakiye Kartı -->
+            <!-- TON Bakiye Kartı - Stil TONIX ile eşitlendi -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <!-- Yusyuvarlak TON Görseli -->
-                    <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-500/30 flex items-center justify-center bg-black">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
                         <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
@@ -113,23 +115,23 @@
                         <p class="font-bold text-sm tracking-wide" id="total-ton-header">0.0000 TON</p>
                     </div>
                 </div>
-                <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
+                <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-300 border border-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
                 </div>
             </div>
 
-            <!-- TONIX Bakiye Kartı -->
+            <!-- TONIX Bakiye Kartı - Stil TON ile eşitlendi -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center overflow-hidden">
-                        <img src="dragon.jpg" alt="TONIX" class="w-8 h-8 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-[#8b5cf6]/30 flex items-center justify-center bg-[#1a1a1a]">
+                        <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
                         <p class="font-bold text-sm tracking-wide">0 TONIX</p>
                     </div>
                 </div>
-                <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
+                <div class="bg-[#1e1e1e] p-2 rounded-xl text-gray-300 border border-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
                 </div>
             </div>
