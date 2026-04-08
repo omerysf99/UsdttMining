@@ -3,433 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Miner 3D - Ultimate Edition</title>
+    <title>TON Mining App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap');
-
-        :root {
-            --neon-blue: #38bdf8;
-            --neon-orange: #fbbf24;
-        }
-
         body {
-            background-color: #020617;
-            background-image: 
-                radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 70%),
-                linear-gradient(rgba(56, 189, 248, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
-            color: #f8fafc;
-            font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
-            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
             user-select: none;
-            touch-action: manipulation;
-        }
-
-        body::before {
-            content: " ";
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            z-index: 100;
-            background-size: 100% 4px;
-            pointer-events: none;
-        }
-
-        .sci-fi-border {
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(5px);
-            position: relative;
-            clip-path: polygon(15% 0, 85% 0, 100% 20%, 100% 80%, 85% 100%, 15% 100%, 0 80%, 0 20%);
-        }
-
-        .glow-text {
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
-        }
-
-        /* Kapsül Bar Tasarımı */
-        .hud-bar-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .hud-bar-container {
-            width: 32px;
-            height: 260px;
-            background: rgba(10, 15, 30, 0.9);
-            border: 2px solid rgba(100, 100, 100, 0.4);
-            border-radius: 999px;
-            position: relative;
-            padding: 4px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
             overflow: hidden;
         }
 
-        .bar-dots {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            z-index: 20;
-        }
-        .dot {
-            width: 4px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
+        /* Fan Dönme Animasyonu */
+        @keyframes rotate-fan {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .bar-fill {
-            width: 100%;
-            border-radius: 999px;
-            transition: height 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            position: relative;
+        .fan-animation {
+            animation: rotate-fan 4s linear infinite;
         }
 
-        .energy-fill {
-            background: linear-gradient(to top, #003366, #0077be, #38bdf8, #e0f2fe);
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        .fan-animation.boosted {
+            animation-duration: 1s;
         }
 
-        .limit-fill {
-            background: linear-gradient(to top, #7c2d12, #ea580c, #fbbf24, #fef3c7);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+        /* Cam Efekti Kartlar */
+        .glass-card {
+            background: #151515;
+            border: 1px solid #222;
         }
 
-        .canvas-container {
-            width: 100%;
-            height: 380px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Alt Navigasyon */
+        .nav-active {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
         }
 
-        /* Yenilenmiş Buton Tasarımı (Görsele Birebir) */
-        .btn-sci-fi {
-            position: relative;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: #ffffff;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            clip-path: polygon(10% 0, 90% 0, 100% 30%, 100% 70%, 90% 100%, 10% 100%, 0 70%, 0 30%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 54px;
-            width: 100%;
-            border: none;
-            outline: none;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        /* Buton Efektleri */
+        .btn-active:active {
+            transform: scale(0.95);
         }
 
-        /* Glossy (Parlaklık) Katmanı */
-        .btn-sci-fi::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 5%;
-            right: 5%;
-            height: 45%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
-            border-radius: 10px 10px 0 0;
-            pointer-events: none;
-        }
-
-        /* Mavi Aktif Buton */
-        .btn-blue-sci-fi {
-            background: linear-gradient(180deg, #0284c7 0%, #0369a1 40%, #0c4a6e 100%);
-            box-shadow: 
-                0 0 0 1px #0ea5e9, 
-                0 0 15px rgba(14, 165, 233, 0.6), 
-                inset 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-blue-sci-fi:active {
-            transform: scale(0.96);
-            filter: brightness(1.2);
-            box-shadow: 0 0 25px rgba(14, 165, 233, 0.8);
-        }
-
-        /* Gri Pasif Buton */
-        .btn-gray-sci-fi {
-            background: linear-gradient(180deg, #475569 0%, #334155 40%, #1e293b 100%);
-            box-shadow: 
-                0 0 0 1px #64748b, 
-                0 0 10px rgba(0, 0, 0, 0.5), 
-                inset 0 0 5px rgba(255, 255, 255, 0.1);
-            opacity: 0.8;
-            cursor: not-allowed;
-            color: #cbd5e1;
-        }
-
-        .nav-icon {
-            color: #475569;
-            font-size: 1.5rem;
-            transition: all 0.3s;
-        }
-        .nav-icon.active {
-            color: var(--neon-blue);
-            filter: drop-shadow(0 0 8px var(--neon-blue));
-        }
-
-        .tap-effect {
-            position: absolute;
-            color: #fff;
-            font-weight: 900;
-            pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
-            font-family: 'Orbitron', sans-serif;
-            z-index: 50;
-            text-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.8); opacity: 0; }
+        /* Sayıların yumuşak değişimi */
+        .counter-text {
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
-<body class="flex flex-col h-screen max-w-md mx-auto relative border-x border-slate-900 shadow-2xl">
+<body class="flex flex-col h-screen max-w-md mx-auto relative border-x border-gray-900 shadow-2xl">
 
-    <!-- Üst İstatistik Paneli -->
-    <div class="grid grid-cols-2 gap-4 p-4 mt-2 z-10">
-        <div class="sci-fi-border p-3 text-center">
-            <div class="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Pasif Madencilik</div>
-            <div class="text-sky-400 font-black text-lg orbitron tracking-tighter">+0.05</div>
-            <div class="text-[9px] text-slate-500 font-bold uppercase">USDT / Gün</div>
-        </div>
-        <div class="sci-fi-border p-3 text-center">
-            <div class="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Tap Getirisi</div>
-            <div class="text-sky-400 font-black text-lg orbitron tracking-tighter">+0.000250</div>
-            <div class="text-[9px] text-slate-500 font-bold uppercase">USDT / Tap</div>
-        </div>
-    </div>
-
-    <!-- Ana Bakiye -->
-    <div class="text-center mt-4 z-10">
-        <div class="text-[10px] text-slate-500 uppercase tracking-[0.4em] mb-1">Cüzdan Bakiyesi</div>
-        <div class="flex items-baseline justify-center gap-1">
-            <h1 id="balance" class="text-5xl font-black orbitron glow-text tracking-tighter leading-none">0.000000</h1>
-            <span class="text-sky-400 font-bold orbitron text-xl">USDT</span>
-        </div>
-    </div>
-
-    <!-- 3D Alan ve HUD Barlar -->
-    <div class="flex-grow flex items-center justify-center relative px-2">
-        <div class="hud-bar-wrapper">
-            <i class="fas fa-bolt text-sky-400 text-sm"></i>
-            <div class="hud-bar-container">
-                <div class="bar-dots"><div class="dot"></div><div class="dot"></div></div>
-                <div id="energy-fill" class="bar-fill energy-fill" style="height: 100%;"></div>
+    <!-- Üst Bölüm: Bakiyeler -->
+    <header class="p-4 space-y-3">
+        <!-- TON Bakiye Kartı -->
+        <div class="glass-card rounded-2xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
+                    <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400">Balance</p>
+                    <p class="font-bold text-sm tracking-wide" id="total-ton">7.6823 TON</p>
+                </div>
             </div>
-            <div class="text-center">
-                <span id="energy-text" class="text-[12px] font-black text-sky-400 orbitron">100</span>
-                <span class="block text-[8px] text-slate-500 uppercase font-bold">NRG</span>
-            </div>
-        </div>
-
-        <div id="canvas-container" class="canvas-container cursor-pointer"></div>
-
-        <div class="hud-bar-wrapper">
-            <i class="fas fa-bullseye text-orange-400 text-sm"></i>
-            <div class="hud-bar-container" style="border-color: rgba(245, 158, 11, 0.3);">
-                <div class="bar-dots"><div class="dot"></div><div class="dot"></div></div>
-                <div id="limit-fill" class="bar-fill limit-fill" style="height: 100%;"></div>
-            </div>
-            <div class="text-center">
-                <span id="limit-text" class="text-[12px] font-black text-orange-400 orbitron">2500</span>
-                <span class="block text-[8px] text-slate-500 uppercase font-bold">LMT</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Yenilenmiş Aksiyon Butonları -->
-    <div class="flex gap-4 px-4 mb-8 z-10">
-        <div class="flex-1">
-            <button id="buy-module-btn" class="btn-sci-fi btn-blue-sci-fi">
-                MODÜL SATIN AL
+            <button class="bg-indigo-500/20 p-2 rounded-xl text-indigo-400 btn-active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm0,128H56a8,8,0,0,1-8-8V85.33A23.86,23.86,0,0,0,56,88H216Zm-32-56a12,12,0,1,1,12,12A12,12,0,0,1,184,144Z"></path></svg>
             </button>
         </div>
-        <div class="flex-1">
-            <button id="withdraw-btn" class="btn-sci-fi btn-gray-sci-fi">
-                ÇEK
+
+        <!-- TONIX Bakiye Kartı -->
+        <div class="glass-card rounded-2xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-700 flex items-center justify-center">
+                    <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400">Balance</p>
+                    <p class="font-bold text-sm tracking-wide">500 TONIX</p>
+                </div>
+            </div>
+            <button class="bg-indigo-500/20 p-2 rounded-xl text-indigo-400 btn-active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm0,128H56a8,8,0,0,1-8-8V85.33A23.86,23.86,0,0,0,56,88H216Zm-32-56a12,12,0,1,1,12,12A12,12,0,0,1,184,144Z"></path></svg>
             </button>
+        </div>
+    </header>
+
+    <!-- Ana Bölüm: Madencilik Alanı -->
+    <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-6 transition-all duration-300">
+        <!-- Büyük Fan Görseli -->
+        <div class="relative w-64 h-64 mb-8">
+            <div class="absolute inset-0 bg-blue-500/10 blur-[60px] rounded-full"></div>
+            <div id="main-fan" class="fan-animation relative z-10 w-full h-full">
+                <img src="fan.jpg" alt="Fan" class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+            </div>
+            <!-- Ortadaki Sabit Logo -->
+            <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                <div class="w-12 h-12 bg-[#000000] border-2 border-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                   <img src="ton.jpg" class="w-8 h-8 opacity-90" onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sayaç -->
+        <div class="text-center">
+            <h1 id="mining-counter" class="text-3xl font-bold counter-text tracking-tighter mb-2">0.0000000000 TON</h1>
+            <div class="flex items-center justify-center gap-2 text-gray-400 bg-white/5 py-1 px-4 rounded-full">
+                <span class="text-xs">ℹ️</span>
+                <span class="text-sm font-semibold"><span id="ghs-value">6</span> GH/s</span>
+                <span class="text-orange-500">⚡</span>
+            </div>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="grid grid-cols-2 gap-4 w-full mt-10">
+            <button onclick="claimMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-4 rounded-2xl font-bold flex items-center justify-center gap-2 btn-active transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M200,56V200a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H192A8,8,0,0,1,200,56Zm-40,88a12,12,0,1,0,12,12A12,12,0,0,0,160,144Zm-64,0a12,12,0,1,0,12,12A12,12,0,0,0,96,144Z"></path></svg>
+                Claim
+            </button>
+            <button onclick="boostMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-4 rounded-2xl font-bold flex items-center justify-center gap-2 btn-active transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path></svg>
+                Boost
+            </button>
+        </div>
+    </main>
+
+    <!-- Diğer Sekmeler (Gizli) -->
+    <div id="view-wallet" class="hidden flex-1 p-6">
+        <h2 class="text-2xl font-bold mb-4">Cüzdan</h2>
+        <div class="glass-card rounded-3xl p-6 text-center">
+            <p class="text-gray-400 mb-2">Toplam Varlık</p>
+            <p class="text-4xl font-bold text-blue-400">$ 24.50</p>
         </div>
     </div>
 
     <!-- Alt Navigasyon -->
-    <div class="bg-slate-900/80 border-t border-slate-800 p-4 flex justify-between items-center rounded-t-3xl z-10">
-        <i class="fas fa-th-large nav-icon active"></i>
-        <i class="fas fa-wallet nav-icon"></i>
-        <i class="fas fa-microchip nav-icon"></i>
-        <i class="fas fa-users nav-icon"></i>
-        <i class="fas fa-newspaper nav-icon"></i>
-    </div>
+    <footer class="bg-[#0f0f0f] p-2 flex justify-between items-center px-4 border-t border-gray-900 pb-6">
+        <button onclick="switchTab('wallet', this)" class="flex flex-col items-center gap-1 p-2 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm-32,80a12,12,0,1,1,12-12A12,12,0,0,1,184,152Z"></path></svg>
+            <span class="text-[10px]">Wallet</span>
+        </button>
+        <button onclick="switchTab('friends', this)" class="flex flex-col items-center gap-1 p-2 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,117.33,72Zm64,88a48,48,0,1,0-48-48A48.05,48.05,0,0,0,181.33,160Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,181.33,80Zm-136,88a40,40,0,0,0-40,40,8,8,0,0,0,16,0,24,24,0,0,1,24-24,8,8,0,0,0,0-16Zm181.34,0a40,40,0,0,0-40,40,8,8,0,0,0,16,0,24,24,0,0,1,24-24,8,8,0,0,0,0-16Zm-160,32a48,48,0,0,0-48,48,8,8,0,0,0,16,0,32,32,0,0,1,32-32,8,8,0,0,0,0-16Z"></path></svg>
+            <span class="text-[10px]">Friends</span>
+        </button>
+        <button onclick="switchTab('home', this)" class="nav-active flex flex-col items-center gap-1 p-2 px-4 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V120A15.87,15.87,0,0,0,219.31,108.68ZM208,216H160V160a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"></path></svg>
+            <span class="text-[10px]">Home</span>
+        </button>
+        <button onclick="switchTab('missions', this)" class="flex flex-col items-center gap-1 p-2 relative transition-all">
+            <div class="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M200,32a16,16,0,0,0-16,16v8a8,8,0,0,1-8,8H80a8,8,0,0,1-8-8V48a16,16,0,0,0-16-16H40A16,16,0,0,0,24,48V208a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V48A16,16,0,0,0,216,32ZM216,208H40V48H56V56a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V48h16Z"></path></svg>
+            <span class="text-[10px]">Missions</span>
+        </button>
+        <button onclick="switchTab('more', this)" class="flex flex-col items-center gap-1 p-2 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Zm-28,64a28,28,0,1,0,28,28A28,28,0,0,0,128,192Zm0-128a28,28,0,1,0-28-28A28,28,0,0,0,128,64Z"></path></svg>
+            <span class="text-[10px]">More</span>
+        </button>
+    </footer>
 
-    <div id="passive-notice" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[200] hidden">
-        <div class="sci-fi-border p-8 text-center border-sky-500 max-w-[85%]">
-            <h2 class="text-2xl font-black orbitron text-sky-400 mb-2 tracking-tighter">SİSTEM ÇEVRİMİÇİ</h2>
-            <p id="passive-amount-text" class="text-sm text-slate-400 mb-6 font-medium leading-relaxed"></p>
-            <button onclick="closeNotice()" class="w-full py-3 bg-sky-600 rounded-lg font-black orbitron tracking-widest text-sm shadow-[0_0_20px_rgba(2,132,199,0.5)]">TOPLA</button>
-        </div>
+    <!-- Bildirim Kutusu -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full text-sm font-semibold opacity-0 pointer-events-none transition-all duration-300">
+        Claimed!
     </div>
 
     <script>
-        const getToday = () => new Date().toDateString();
+        // Uygulama Durumu (State)
+        let minedAmount = 0.0000000000;
+        let totalBalance = 7.6823;
+        let hashrate = 6; // GH/s
+        let isBoosted = false;
 
-        let state = {
-            balance: parseFloat(localStorage.getItem('miner_v3_balance')) || 0.0,
-            energy: parseInt(localStorage.getItem('miner_v3_energy')) || 100,
-            dailyTaps: parseInt(localStorage.getItem('miner_v3_daily_taps')) || 2500,
-            lastDate: localStorage.getItem('miner_v3_last_date') || getToday(),
-            lastUpdate: parseInt(localStorage.getItem('miner_v3_last_update')) || Date.now()
-        };
+        const counterEl = document.getElementById('mining-counter');
+        const balanceEl = document.getElementById('total-ton');
+        const ghsEl = document.getElementById('ghs-value');
+        const fanEl = document.getElementById('main-fan');
+        const toastEl = document.getElementById('toast');
 
-        const MAX_ENERGY = 100;
-        const MAX_DAILY_TAPS = 2500;
-        const TAP_VALUE = 0.000250;
-        const DAILY_PASSIVE = 0.05;
-        const PASSIVE_PER_MS = DAILY_PASSIVE / (24 * 60 * 60 * 1000);
-        const REGEN_TIME = 2000;
-        const WITHDRAW_LIMIT = 10.0;
-
-        const balanceEl = document.getElementById('balance');
-        const energyFill = document.getElementById('energy-fill');
-        const energyText = document.getElementById('energy-text');
-        const limitFill = document.getElementById('limit-fill');
-        const limitText = document.getElementById('limit-text');
-        const withdrawBtn = document.getElementById('withdraw-btn');
-        const canvasContainer = document.getElementById('canvas-container');
-
-        if (state.lastDate !== getToday()) {
-            state.dailyTaps = MAX_DAILY_TAPS;
-            state.lastDate = getToday();
+        // Madencilik Fonksiyonu
+        function updateMining() {
+            // Saniyede eklenecek miktar (Hıza göre ölçekli)
+            const increment = (hashrate * 0.000000005) + (Math.random() * 0.000000001);
+            minedAmount += increment;
+            counterEl.innerText = minedAmount.toFixed(10) + " TON";
         }
 
-        let scene, camera, renderer, fanMesh;
+        // Madencilik döngüsünü başlat (Her 100ms'de bir güncelle)
+        const miningInterval = setInterval(updateMining, 100);
 
-        function init3D() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            canvasContainer.appendChild(renderer.domElement);
+        // Toplama (Claim) Fonksiyonu
+        function claimMining() {
+            if (minedAmount <= 0) return;
 
-            const loader = new THREE.TextureLoader();
-            const fanTexture = loader.load('fan.jpg', (texture) => {
-                texture.center.set(0.5, 0.5);
+            totalBalance += minedAmount;
+            minedAmount = 0;
+            
+            // UI Güncelleme
+            balanceEl.innerText = totalBalance.toFixed(4) + " TON";
+            counterEl.innerText = "0.0000000000 TON";
+            
+            showToast("Success! TON Collected");
+        }
+
+        // Hızlandırma (Boost) Fonksiyonu
+        function boostMining() {
+            if (isBoosted) return;
+            
+            isBoosted = true;
+            hashrate *= 2;
+            ghsEl.innerText = hashrate;
+            fanEl.classList.add('boosted');
+            
+            showToast("Boost Active! 2x Speed");
+
+            // 10 saniye sonra boost biter
+            setTimeout(() => {
+                isBoosted = false;
+                hashrate /= 2;
+                ghsEl.innerText = hashrate;
+                fanEl.classList.remove('boosted');
+                showToast("Boost Ended");
+            }, 10000);
+        }
+
+        // Bildirim Göster
+        function showToast(message) {
+            toastEl.innerText = message;
+            toastEl.style.opacity = "1";
+            toastEl.style.bottom = "120px";
+            
+            setTimeout(() => {
+                toastEl.style.opacity = "0";
+                toastEl.style.bottom = "96px";
+            }, 2000);
+        }
+
+        // Sekme Değiştirme
+        function switchTab(tab, element) {
+            // Tüm sekmeleri gizle ve butonların stilini sıfırla
+            const tabs = ['home', 'wallet', 'friends', 'missions', 'more'];
+            tabs.forEach(t => {
+                const view = document.getElementById('view-' + t);
+                if (view) view.classList.add('hidden');
             });
 
-            // Boyut küçültüldü: 2.3 -> 1.5
-            const fanGeo = new THREE.CircleGeometry(1.5, 64);
-            const fanMat = new THREE.MeshBasicMaterial({ map: fanTexture, transparent: true, side: THREE.DoubleSide });
-            fanMesh = new THREE.Mesh(fanGeo, fanMat);
-            scene.add(fanMesh);
-            camera.position.z = 6.5;
+            const navButtons = document.querySelectorAll('footer button');
+            navButtons.forEach(btn => btn.classList.remove('nav-active'));
+
+            // Seçilen sekmeyi göster
+            const targetView = document.getElementById('view-' + tab);
+            if (targetView) targetView.classList.remove('hidden');
+            element.classList.add('nav-active');
+
+            // Eğer ana sayfadan çıkılırsa fan animasyonunu durdurarak enerji tasarrufu yapılabilir
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-
-        function updateUI() {
-            balanceEl.innerText = state.balance.toFixed(6);
-            energyFill.style.height = `${(state.energy / MAX_ENERGY) * 100}%`;
-            energyText.innerText = state.energy;
-            limitFill.style.height = `${(state.dailyTaps / MAX_DAILY_TAPS) * 100}%`;
-            limitText.innerText = state.dailyTaps;
-
-            // Dinamik Buton Güncellemesi (10 USDT Kontrolü)
-            if (state.balance >= WITHDRAW_LIMIT) {
-                withdrawBtn.classList.remove('btn-gray-sci-fi');
-                withdrawBtn.classList.add('btn-blue-sci-fi');
-                withdrawBtn.style.pointerEvents = 'auto';
-            } else {
-                withdrawBtn.classList.add('btn-gray-sci-fi');
-                withdrawBtn.classList.remove('btn-blue-sci-fi');
-                withdrawBtn.style.pointerEvents = 'none';
-            }
-            
-            localStorage.setItem('miner_v3_balance', state.balance);
-            localStorage.setItem('miner_v3_energy', state.energy);
-            localStorage.setItem('miner_v3_daily_taps', state.dailyTaps);
-            localStorage.setItem('miner_v3_last_date', state.lastDate);
-            localStorage.setItem('miner_v3_last_update', Date.now());
-        }
-
-        function handleTap(e) {
-            if (state.energy <= 0 || state.dailyTaps <= 0) return;
-            state.energy -= 1;
-            state.dailyTaps -= 1;
-            state.balance += TAP_VALUE;
-            if (fanMesh) {
-                fanMesh.scale.set(1.05, 1.05, 1.05);
-                setTimeout(() => fanMesh.scale.set(1, 1, 1), 60);
-            }
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-            if(x && y) createTapEffect(x, y);
-            updateUI();
-        }
-
-        function createTapEffect(x, y) {
-            const el = document.createElement('div');
-            el.className = 'tap-effect';
-            el.innerText = `+${TAP_VALUE.toFixed(6)}`;
-            el.style.left = `${x - 40}px`;
-            el.style.top = `${y - 20}px`;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
-
-        function calculatePassive() {
-            const now = Date.now();
-            const earned = (now - state.lastUpdate) * PASSIVE_PER_MS;
-            if (earned > 0.000001) {
-                state.balance += earned;
-                document.getElementById('passive-amount-text').innerText = `Siz yokken madencilik birimleriniz toplamda ${earned.toFixed(6)} USDT üretim yaptı.`;
-                document.getElementById('passive-notice').classList.remove('hidden');
-            }
-            updateUI();
-        }
-
-        function closeNotice() {
-            document.getElementById('passive-notice').classList.add('hidden');
-        }
-
-        setInterval(() => { if (state.energy < MAX_ENERGY) { state.energy++; updateUI(); } }, REGEN_TIME);
-        setInterval(() => { state.balance += (1000 * PASSIVE_PER_MS); updateUI(); }, 1000);
-
+        // İlk başlangıçta verileri yerel depolamadan çekme (Opsiyonel geliştirme)
         window.onload = () => {
-            init3D();
-            animate();
-            calculatePassive();
-            canvasContainer.addEventListener('mousedown', handleTap);
-            canvasContainer.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
-            window.onresize = () => {
-                camera.aspect = canvasContainer.offsetWidth / canvasContainer.offsetHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-            };
+            console.log("App started");
         };
     </script>
 </body>
