@@ -134,16 +134,10 @@
 
         <!-- Ana Bölüm: Madencilik -->
         <main id="view-home" class="flex-1 flex flex-col items-center justify-around px-6 py-4">
-            <!-- Büyük Fan -->
-            <div class="relative w-64 h-64">
+            <!-- Büyük Fan - Yuvarlak Kesim ve Ortası Boş -->
+            <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
                 <div id="main-fan" class="fan-animation w-full h-full relative z-10">
-                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
-                </div>
-                <!-- Ortadaki Logo -->
-                <div class="absolute inset-0 flex items-center justify-center z-20">
-                    <div class="w-14 h-14 bg-[#1a1a1a] rounded-full border border-blue-500/30 flex items-center justify-center shadow-lg">
-                        <img src="ton.jpg" alt="Center" class="w-8 h-8" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    </div>
+                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
                 </div>
             </div>
 
