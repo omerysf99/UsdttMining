@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000;
+            background-color: #0b0b0b;
             color: white;
             user-select: none;
             overflow: hidden;
@@ -20,7 +20,7 @@
             margin: 0;
         }
 
-        /* 9:16 En-Boy Oranı Konteynırı */
+        /* 9:16 En-Boy Oranı */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -29,75 +29,76 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid #1a1a1a;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
             max-height: 100vh;
             overflow: hidden;
         }
 
-        /* Fan Dönme Animasyonu */
+        /* Fan Animasyonları */
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
         .fan-animation {
-            animation: rotate-fan 4s linear infinite;
+            animation: rotate-fan 8s linear infinite;
         }
 
         .fan-animation.boosted {
-            animation-duration: 1s;
+            animation-duration: 2s;
         }
 
-        /* Cam Efekti Kartlar */
+        /* Kart Stilleri */
         .glass-card {
-            background: #121212;
-            border: 1px solid #222;
+            background: #1a1a1a;
+            border-radius: 20px;
         }
 
-        /* Navigasyon Stilleri - navi.jpg tamamen görseli sağlar */
-        .nav-footer {
-            background-image: url('navi.jpg');
-            background-size: 100% 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 65px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        /* Tıklama Alanları - Görünmez butonlar */
-        .nav-item {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        /* Aktif olanı hafifçe belli etmek için */
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        /* Buton Efektleri */
-        .btn-active:active {
-            transform: scale(0.95);
-        }
-
-        /* Sayıların yumuşak değişimi */
-        .counter-text {
-            font-variant-numeric: tabular-nums;
+        /* Buton Stilleri - Görseldeki Mor */
+        .btn-purple {
+            background-color: #7c66e3;
+            transition: all 0.2s ease;
         }
         
-        @media (max-height: 650px) {
-            .main-fan-wrapper { width: 110px; height: 110px; }
-            .mining-title { font-size: 1.25rem; }
+        .btn-purple:active {
+            transform: scale(0.95);
+            background-color: #6b56d2;
+        }
+
+        /* Alt Navigasyon - Görseldeki Tasarım */
+        .nav-footer {
+            background-color: #121212;
+            border-radius: 24px 24px 0 0;
+            padding: 12px 16px 24px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #888;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: #8b5cf6;
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 8px 4px;
+        }
+
+        .nav-item.active svg {
+            color: #8b5cf6;
+        }
+
+        /* Sayılar */
+        .counter-text {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.05em;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 40px rgba(124, 102, 227, 0.15);
         }
     </style>
 </head>
@@ -105,107 +106,114 @@
 
     <div class="app-container">
         <!-- Üst Bölüm: Bakiyeler -->
-        <header class="p-3 space-y-2">
-            <div class="glass-card rounded-xl p-2 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full overflow-hidden border border-blue-500/30 flex items-center justify-center bg-blue-500/10 shadow-lg shadow-blue-500/10">
-                        <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+        <header class="p-4 space-y-3">
+            <div class="glass-card p-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#0088cc] flex items-center justify-center overflow-hidden">
+                        <img src="ton.jpg" alt="TON" class="w-7 h-7 object-contain" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
-                        <p class="text-[9px] text-gray-500 font-medium leading-none mb-1">Bakiye</p>
-                        <p class="font-bold text-[11px] tracking-wide" id="total-ton">7.6823 TON</p>
+                        <p class="text-xs text-gray-400 font-medium">Balance</p>
+                        <p class="font-bold text-sm tracking-wide">7.6823 TON</p>
                     </div>
                 </div>
-                <button class="bg-[#1e1e1e] p-1.5 rounded-lg text-indigo-400 btn-active border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
-                </button>
+                <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                </div>
             </div>
 
-            <div class="glass-card rounded-xl p-2 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full overflow-hidden border border-blue-400/30 flex items-center justify-center bg-blue-400/10 shadow-lg shadow-blue-400/10">
-                        <img src="dragon.jpg" alt="TONIX" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
+            <div class="glass-card p-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center overflow-hidden">
+                        <img src="dragon.jpg" alt="TONIX" class="w-8 h-8 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                     </div>
                     <div>
-                        <p class="text-[9px] text-gray-500 font-medium leading-none mb-1">Bakiye</p>
-                        <p class="font-bold text-[11px] tracking-wide">500 TONIX</p>
+                        <p class="text-xs text-gray-400 font-medium">Balance</p>
+                        <p class="font-bold text-sm tracking-wide">1200 TONIX</p>
                     </div>
                 </div>
-                <button class="bg-[#1e1e1e] p-1.5 rounded-lg text-indigo-400 btn-active border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
-                </button>
+                <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                </div>
             </div>
         </header>
 
-        <!-- Ana Bölüm: Madencilik Alanı -->
-        <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-6 transition-all duration-300">
-            <!-- Fan Bölümü - Daha Kompakt -->
-            <div class="relative w-40 h-40 mb-5 main-fan-wrapper">
-                <div class="absolute inset-0 bg-blue-600/5 blur-[40px] rounded-full"></div>
-                <div id="main-fan" class="fan-animation relative z-10 w-full h-full overflow-hidden rounded-full border-2 border-white/5 shadow-2xl">
-                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+        <!-- Ana Bölüm: Madencilik -->
+        <main id="view-home" class="flex-1 flex flex-col items-center justify-center px-6">
+            <!-- Büyük Fan -->
+            <div class="relative w-64 h-64 mb-8">
+                <div id="main-fan" class="fan-animation w-full h-full relative z-10">
+                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+                </div>
+                <!-- Ortadaki Logo -->
+                <div class="absolute inset-0 flex items-center justify-center z-20">
+                    <div class="w-14 h-14 bg-[#1a1a1a] rounded-full border border-blue-500/30 flex items-center justify-center shadow-lg">
+                        <img src="ton.jpg" alt="Center" class="w-8 h-8" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                    </div>
                 </div>
             </div>
 
-            <div class="text-center">
-                <h1 id="mining-counter" class="text-xl font-bold counter-text tracking-tighter mb-1.5 mining-title">0.0000000000 TON</h1>
-                <div class="inline-flex items-center justify-center gap-1.5 text-gray-400 bg-white/5 py-1 px-3.5 rounded-full border border-white/5">
-                    <span class="text-[9px]">ℹ️</span>
-                    <span class="text-[10px] font-semibold tracking-tight"><span id="ghs-value">6</span> GH/s</span>
-                    <span class="text-orange-500 text-[10px]">⚡</span>
+            <!-- Sayaç -->
+            <div class="text-center mb-10">
+                <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">0.2301335743 TON</h1>
+                <div class="flex items-center justify-center gap-2 text-gray-500 font-semibold">
+                    <span class="text-xs">ℹ️</span>
+                    <span class="text-sm"><span id="ghs-value">6</span> GH/s</span>
+                    <span class="text-orange-500 text-sm">⚡</span>
                 </div>
             </div>
 
-            <!-- Butonlar - Küçültüldü -->
-            <div class="grid grid-cols-2 gap-3 w-4/5 mt-5">
-                <button onclick="claimMining()" class="bg-[#7c66e3] hover:bg-[#6b56d2] py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5 btn-active transition-all shadow-lg shadow-indigo-500/10">
-                    <span class="text-xs">💰</span>
-                    <span class="text-[11px] uppercase tracking-wide">Topla</span>
+            <!-- Aksiyon Butonları -->
+            <div class="flex gap-4 w-full px-2 mb-4">
+                <button onclick="claimMining()" class="btn-purple flex-1 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                    Claim
                 </button>
-                <button onclick="boostMining()" class="bg-[#1a1a1a] hover:bg-[#222] border border-white/10 py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5 btn-active transition-all">
-                    <span class="text-xs">🚀</span>
-                    <span class="text-[11px] text-gray-300 uppercase tracking-wide">Hızlandır</span>
+                <button onclick="boostMining()" class="btn-purple flex-1 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path></svg>
+                    Boost
                 </button>
             </div>
         </main>
 
-        <!-- Diğer Sekmeler (Gizli) -->
-        <div id="view-wallet" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <div class="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="text-xl">👛</span>
-            </div>
-            <h2 class="text-lg font-bold mb-1">Cüzdanım</h2>
-            <p class="text-[10px] text-gray-400">Kazançlarınızı yönetin</p>
-        </div>
-
-        <div id="view-friends" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <h2 class="text-lg font-bold mb-1">Arkadaşlar</h2>
-            <p class="text-[10px] text-gray-400">Arkadaşlarını davet et</p>
-        </div>
-
-        <!-- Alt Navigasyon - navi.jpg Arka Planı Üzerine Şeffaf Butonlar -->
-        <footer class="nav-footer pb-4">
-            <button onclick="switchTab('wallet', this)" class="nav-item"></button>
-            <button onclick="switchTab('friends', this)" class="nav-item"></button>
-            <button onclick="switchTab('home', this)" class="nav-item active"></button>
-            <button onclick="switchTab('missions', this)" class="nav-item"></button>
-            <button onclick="switchTab('more', this)" class="nav-item"></button>
+        <!-- Alt Navigasyon -->
+        <footer class="nav-footer flex justify-between">
+            <button onclick="switchTab('wallet', this)" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
+                <span class="text-[10px] font-bold">Wallet</span>
+            </button>
+            <button onclick="switchTab('friends', this)" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Z"></path></svg>
+                <span class="text-[10px] font-bold">Friends</span>
+            </button>
+            <button onclick="switchTab('home', this)" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 12c0-3 2.5-5.5 5.5-5.5S23 9 23 12s-2.5 5.5-5.5 5.5S12 15 12 12z"></path><path d="M12 12c-3 0-5.5-2.5-5.5-5.5S9 1 12 1s5.5 2.5 5.5 5.5S15 12 12 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('missions', this)" class="nav-item relative">
+                <div class="absolute top-1 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#121212]"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Z"></path></svg>
+                <span class="text-[10px] font-bold">Missions</span>
+            </button>
+            <button onclick="switchTab('more', this)" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Z"></path></svg>
+                <span class="text-[10px] font-bold">More</span>
+            </button>
         </footer>
 
-        <!-- Bildirim -->
-        <div id="toast" class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-6 py-2 rounded-xl text-[10px] font-bold opacity-0 pointer-events-none transition-all duration-300 shadow-2xl z-50">
-            Toplandı!
+        <!-- Toast Mesajı -->
+        <div id="toast" class="absolute bottom-24 left-1/2 -translate-x-1/2 bg-[#1a1a1a] border border-white/10 px-6 py-2 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 shadow-2xl z-50">
+            Collected!
         </div>
     </div>
 
     <script>
-        let minedAmount = 0.0000000000;
+        let minedAmount = 0.2301335743;
         let totalBalance = 7.6823;
         let hashrate = 6;
         let isBoosted = false;
 
         const counterEl = document.getElementById('mining-counter');
-        const balanceEl = document.getElementById('total-ton');
         const ghsEl = document.getElementById('ghs-value');
         const fanEl = document.getElementById('main-fan');
         const toastEl = document.getElementById('toast');
@@ -219,15 +227,8 @@
         setInterval(updateMining, 100);
 
         function claimMining() {
-            if (minedAmount < 0.000001) {
-                showToast("Miktar yetersiz!");
-                return;
-            }
-            totalBalance += minedAmount;
+            showToast("Success! TON Collected 💰");
             minedAmount = 0;
-            balanceEl.innerText = totalBalance.toFixed(4) + " TON";
-            counterEl.innerText = "0.0000000000 TON";
-            showToast("Başarılı! TON Toplandı 💰");
         }
 
         function boostMining() {
@@ -236,38 +237,28 @@
             hashrate *= 2;
             ghsEl.innerText = hashrate;
             fanEl.classList.add('boosted');
-            showToast("2x Hız Aktif! 🚀");
+            showToast("Boost Active! 2x Speed 🚀");
             setTimeout(() => {
                 isBoosted = false;
                 hashrate /= 2;
                 ghsEl.innerText = hashrate;
                 fanEl.classList.remove('boosted');
-                showToast("Hızlandırma Bitti");
-            }, 10000);
+            }, 5000);
         }
 
         function showToast(message) {
             toastEl.innerText = message;
             toastEl.style.opacity = "1";
-            toastEl.style.transform = "translateX(-50%) translateY(-10px)";
+            toastEl.style.bottom = "110px";
             setTimeout(() => {
                 toastEl.style.opacity = "0";
-                toastEl.style.transform = "translateX(-50%) translateY(0px)";
-            }, 2500);
+                toastEl.style.bottom = "96px";
+            }, 2000);
         }
 
         function switchTab(tab, element) {
-            const tabs = ['home', 'wallet', 'friends', 'missions', 'more'];
-            tabs.forEach(t => {
-                const view = document.getElementById('view-' + t);
-                if (view) view.classList.add('hidden');
-            });
-            const navButtons = document.querySelectorAll('footer .nav-item');
-            navButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const targetView = document.getElementById('view-' + tab);
-            if (targetView) targetView.classList.remove('hidden');
+            const buttons = document.querySelectorAll('.nav-item');
+            buttons.forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
         }
     </script>
