@@ -94,6 +94,11 @@
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.05em;
         }
+        
+        /* Merkez Logo Parlaması */
+        .center-logo-glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -108,7 +113,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
-                        <p class="font-bold text-sm tracking-wide">7.6823 TON</p>
+                        <p class="font-bold text-sm tracking-wide" id="total-ton-header">0.0000 TON</p>
                     </div>
                 </div>
                 <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
@@ -123,7 +128,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
-                        <p class="font-bold text-sm tracking-wide">1200 TONIX</p>
+                        <p class="font-bold text-sm tracking-wide">0 TONIX</p>
                     </div>
                 </div>
                 <div class="bg-[#2a2a2a] p-2 rounded-xl text-gray-300">
@@ -134,16 +139,27 @@
 
         <!-- Ana Bölüm: Madencilik -->
         <main id="view-home" class="flex-1 flex flex-col items-center justify-around px-6 py-4">
-            <!-- Büyük Fan - Yuvarlak Kesim ve Ortası Boş -->
-            <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
-                <div id="main-fan" class="fan-animation w-full h-full relative z-10">
-                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+            <!-- Büyük Fan - Yuvarlak Kesim ve Merkezde TON Logosu -->
+            <div class="relative w-64 h-64">
+                <!-- Arka plan parlaması -->
+                <div class="absolute inset-0 bg-blue-500/10 blur-[50px] rounded-full"></div>
+                
+                <!-- Dönen Fan -->
+                <div class="w-full h-full overflow-hidden rounded-full border border-white/10 shadow-2xl fan-animation">
+                    <img src="fan.jpg" id="main-fan-img" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
+                </div>
+
+                <!-- Sabit Merkez Logo -->
+                <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                    <div class="w-16 h-16 bg-[#000] border-2 border-blue-400/50 rounded-full flex items-center justify-center center-logo-glow overflow-hidden">
+                        <img src="ton.jpg" class="w-10 h-10 object-contain" alt="TON Center" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                    </div>
                 </div>
             </div>
 
             <!-- Sayaç ve GH/s Bilgisi -->
             <div class="text-center">
-                <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">0.2301335743 TON</h1>
+                <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">0.0000000000 TON</h1>
                 <div class="flex items-center justify-center gap-2 text-gray-500 font-semibold">
                     <span class="text-xs">ℹ️</span>
                     <span class="text-sm"><span id="ghs-value">6</span> GH/s</span>
@@ -180,15 +196,16 @@
     </div>
 
     <script>
-        let minedAmount = 0.2301335743;
-        let totalBalance = 7.6823;
+        let minedAmount = 0.0000000000;
+        let totalBalance = 0.0000;
         let hashrate = 6;
         let isBoosted = false;
 
         const counterEl = document.getElementById('mining-counter');
         const ghsEl = document.getElementById('ghs-value');
-        const fanEl = document.getElementById('main-fan');
+        const fanContainer = document.querySelector('.fan-animation');
         const toastEl = document.getElementById('toast');
+        const headerBalanceEl = document.getElementById('total-ton-header');
 
         function updateMining() {
             const increment = (hashrate * 0.000000005) + (Math.random() * 0.000000001);
@@ -199,8 +216,13 @@
         setInterval(updateMining, 100);
 
         function claimMining() {
-            showToast("Success! TON Collected 💰");
-            minedAmount = 0;
+            if (minedAmount > 0) {
+                totalBalance += minedAmount;
+                headerBalanceEl.innerText = totalBalance.toFixed(4) + " TON";
+                minedAmount = 0;
+                counterEl.innerText = "0.0000000000 TON";
+                showToast("Success! TON Collected 💰");
+            }
         }
 
         function boostMining() {
@@ -208,13 +230,13 @@
             isBoosted = true;
             hashrate *= 2;
             ghsEl.innerText = hashrate;
-            fanEl.classList.add('boosted');
+            fanContainer.classList.add('boosted');
             showToast("Boost Active! 2x Speed 🚀");
             setTimeout(() => {
                 isBoosted = false;
                 hashrate /= 2;
                 ghsEl.innerText = hashrate;
-                fanEl.classList.remove('boosted');
+                fanContainer.classList.remove('boosted');
             }, 5000);
         }
 
@@ -229,10 +251,7 @@
         }
 
         function switchTab(tab, element) {
-            // Görünmez butonlar olduğu için aktif sınıfı sadece mantıksal olarak işler
             console.log("Switched to tab:", tab);
-            const views = ['home', 'wallet', 'friends', 'missions', 'more'];
-            // Burada sekmeler arası geçiş mantığı eklenebilir
         }
     </script>
 </body>
