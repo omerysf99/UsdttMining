@@ -20,7 +20,7 @@
             margin: 0;
         }
 
-        /* Boyuna çok az genişletilmiş (9:18 oranında) konteynır */
+        /* 9:18 oranında boyuna konteynır */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -34,7 +34,7 @@
             border: 1px solid #1a1a1a;
         }
 
-        /* Fan Animasyonları */
+        /* Fan Dönme Animasyonu */
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -65,13 +65,13 @@
             background-color: #6b56d2;
         }
 
-        /* Alt Navigasyon - Tamamen navi.jpg görseli kullanılır */
+        /* Alt Navigasyon - navi.jpg görseli */
         .nav-footer {
             background-image: url('navi.jpg');
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
-            height: 85px; /* Görselin tam sığması için yükseklik */
+            height: 85px;
             display: flex;
             justify-content: space-between;
             align-items: stretch;
@@ -94,11 +94,6 @@
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.05em;
         }
-        
-        /* Merkez Logo Parlaması */
-        .center-logo-glow {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-        }
     </style>
 </head>
 <body>
@@ -106,10 +101,12 @@
     <div class="app-container">
         <!-- Üst Bölüm: Bakiyeler -->
         <header class="p-4 space-y-3">
+            <!-- TON Bakiye Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#0088cc] flex items-center justify-center overflow-hidden">
-                        <img src="ton.jpg" alt="TON" class="w-7 h-7 object-contain" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                    <!-- Yusyuvarlak TON Görseli -->
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-500/30 flex items-center justify-center bg-black">
+                        <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 font-medium">Balance</p>
@@ -121,6 +118,7 @@
                 </div>
             </div>
 
+            <!-- TONIX Bakiye Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center overflow-hidden">
@@ -139,25 +137,18 @@
 
         <!-- Ana Bölüm: Madencilik -->
         <main id="view-home" class="flex-1 flex flex-col items-center justify-around px-6 py-4">
-            <!-- Büyük Fan - Yuvarlak Kesim ve Merkezde TON Logosu -->
-            <div class="relative w-64 h-64">
+            <!-- Büyük Fan - Ortası Boş, Yusyuvarlak Kesim -->
+            <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
                 <!-- Arka plan parlaması -->
                 <div class="absolute inset-0 bg-blue-500/10 blur-[50px] rounded-full"></div>
                 
-                <!-- Dönen Fan -->
-                <div class="w-full h-full overflow-hidden rounded-full border border-white/10 shadow-2xl fan-animation">
-                    <img src="fan.jpg" id="main-fan-img" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
-                </div>
-
-                <!-- Sabit Merkez Logo -->
-                <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                    <div class="w-16 h-16 bg-[#000] border-2 border-blue-400/50 rounded-full flex items-center justify-center center-logo-glow overflow-hidden">
-                        <img src="ton.jpg" class="w-10 h-10 object-contain" alt="TON Center" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    </div>
+                <!-- Dönen Fan Görseli -->
+                <div id="main-fan" class="fan-animation w-full h-full relative z-10">
+                    <img src="fan.jpg" alt="Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
                 </div>
             </div>
 
-            <!-- Sayaç ve GH/s Bilgisi -->
+            <!-- Sayaç ve Hız Bilgisi -->
             <div class="text-center">
                 <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">0.0000000000 TON</h1>
                 <div class="flex items-center justify-center gap-2 text-gray-500 font-semibold">
@@ -180,7 +171,7 @@
             </div>
         </main>
 
-        <!-- Alt Navigasyon - Tamamen navi.jpg Arka Planı Üzerine Şeffaf Tıklama Alanları -->
+        <!-- Alt Navigasyon - navi.jpg Üzerine Şeffaf Butonlar -->
         <footer class="nav-footer">
             <button onclick="switchTab('wallet', this)" class="nav-item"></button>
             <button onclick="switchTab('friends', this)" class="nav-item"></button>
@@ -189,13 +180,14 @@
             <button onclick="switchTab('more', this)" class="nav-item"></button>
         </footer>
 
-        <!-- Toast Mesajı -->
+        <!-- Bildirim Kutusu -->
         <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a] border border-white/10 px-6 py-2 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 shadow-2xl z-50">
             Collected!
         </div>
     </div>
 
     <script>
+        // Rakamlar 0'dan başlar
         let minedAmount = 0.0000000000;
         let totalBalance = 0.0000;
         let hashrate = 6;
@@ -251,7 +243,7 @@
         }
 
         function switchTab(tab, element) {
-            console.log("Switched to tab:", tab);
+            console.log("Sekme değiştirildi:", tab);
         }
     </script>
 </body>
