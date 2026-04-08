@@ -250,7 +250,7 @@
         }
 
         // Three.js Kurulumu
-        let scene, camera, renderer, fanMesh;
+        let scene, camera, renderer, fanMesh, particles;
 
         function init3D() {
             scene = new THREE.Scene();
@@ -261,18 +261,11 @@
             canvasContainer.appendChild(renderer.domElement);
 
             const loader = new THREE.TextureLoader();
-            // fan.jpg dosyasını direkt olarak yüklüyoruz.
             const fanTexture = loader.load('fan.jpg', (texture) => {
-                // Dokunun en-boy oranını korumasını sağlıyoruz
                 texture.center.set(0.5, 0.5);
             });
 
-            // Yuvarlak kesim için CircleGeometry. 
-            // 2.2 yarıçapında, pürüzsüzlük için 64 segment.
             const geometry = new THREE.CircleGeometry(2.2, 64);
-            
-            // MeshBasicMaterial kullanarak görselin parlamalardan veya ışıklardan etkilenip bozulmasını önlüyoruz.
-            // Bu sayede görsel "normal" ve net görünür.
             const material = new THREE.MeshBasicMaterial({ 
                 map: fanTexture,
                 transparent: true,
@@ -280,16 +273,50 @@
             });
 
             fanMesh = new THREE.Mesh(geometry, material);
-            // Herhangi bir rotasyon (yan yatırma) yok. Tam karşıya bakıyor.
             fanMesh.rotation.set(0, 0, 0); 
             scene.add(fanMesh);
 
-            // Kamera pozisyonu
+            // Beyaz Parçacıklar (Particles) Ekleme
+            const particlesCount = 150;
+            const pGeometry = new THREE.BufferGeometry();
+            const pPositions = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 2.4 + Math.random() * 0.6; // Görselin hemen dışından başlar
+                const z = (Math.random() - 0.5) * 1.0;
+
+                pPositions[i * 3] = Math.cos(angle) * radius;
+                pPositions[i * 3 + 1] = Math.sin(angle) * radius;
+                pPositions[i * 3 + 2] = z;
+            }
+
+            pGeometry.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+            const pMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.03,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            particles = new THREE.Points(pGeometry, pMaterial);
+            scene.add(particles);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambientLight);
+
             camera.position.z = 5;
         }
 
         function animate() {
             requestAnimationFrame(animate);
+            
+            // Parçacıkların fan etrafında dönmesi
+            if (particles) {
+                particles.rotation.z += 0.003;
+            }
+            
             renderer.render(scene, camera);
         }
 
@@ -314,8 +341,6 @@
             state.dailyTaps -= 1;
             state.balance += TAP_VALUE;
 
-            // Görsel geri bildirim için sadece çok hafif bir büyüme.
-            // Yerinden oynama veya ileri-geri hareketi yok.
             if (fanMesh) {
                 fanMesh.scale.set(1.03, 1.03, 1.03);
                 setTimeout(() => fanMesh.scale.set(1, 1, 1), 50);
