@@ -123,17 +123,21 @@
             }
         }
 
+        /* Normal TON Görseli İçin Parçacık Stili */
         .ton-particle {
             position: absolute;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            background-image: url('ton.jpg');
-            background-size: cover;
+            /* Normal TON logosu CDN kullanılarak eklendi */
+            background-image: url('https://cryptologos.cc/logos/toncoin-ton-logo.png');
+            background-size: 80%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #0088cc;
             pointer-events: none;
             z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 136, 204, 0.6);
-            /* Animasyon süresi 3 saniyeye düşürüldü ve hız eğrisi iyileştirildi */
+            box-shadow: 0 0 15px rgba(0, 136, 204, 0.7);
             animation: fly-to-balance 3s forwards cubic-bezier(0.6, -0.28, 0.735, 0.045);
         }
 
@@ -162,7 +166,6 @@
                     </div>
                     <div>
                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Balance</p>
-                        <!-- Başlangıçta 0 görünecek şekilde ayarlandı -->
                         <p class="font-bold text-sm tracking-wide" id="total-ton-header">0 TON</p>
                     </div>
                 </div>
@@ -217,11 +220,11 @@
             <div class="flex gap-4 w-full px-2">
                 <button onclick="claimMining()" class="btn-purple flex-1 py-4 rounded-2xl shadow-lg shadow-indigo-500/10 gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
-                    <span>Claim</span>
+                    <span>Topla</span>
                 </button>
                 <button onclick="boostMining()" class="btn-purple flex-1 py-4 rounded-2xl shadow-lg shadow-indigo-500/10 gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path></svg>
-                    <span>Boost</span>
+                    <span>Hızlandır</span>
                 </button>
             </div>
         </main>
@@ -272,20 +275,18 @@
                 minedAmount = 0;
                 counterEl.innerText = "0.0000000000 TON";
 
-                // Daha fazla parçacıkla daha yoğun bir görünüm
                 const particleCount = 12;
                 for (let i = 0; i < particleCount; i++) {
                     setTimeout(() => {
                         createTonParticle();
-                    }, i * 80); // Daha hızlı çıkış
+                    }, i * 80);
                 }
 
-                // 2.8 saniye sonra bakiyeyi güncelle (3 saniyelik animasyonun sonuna doğru)
                 setTimeout(() => {
                     updateTotalBalance(amountToClaim);
                 }, 2800);
 
-                showToast("Collecting... ⚡");
+                showToast("Toplanıyor... ⚡");
             }
         }
 
@@ -293,19 +294,16 @@
             const particle = document.createElement('div');
             particle.className = 'ton-particle';
             
-            // Başlangıç Pozisyonu (Sayaç Alanı)
             const startRect = counterEl.getBoundingClientRect();
             const containerRect = appContainer.getBoundingClientRect();
             
-            const startX = startRect.left - containerRect.left + (startRect.width / 2) - 14;
+            const startX = startRect.left - containerRect.left + (startRect.width / 2) - 13;
             const startY = startRect.top - containerRect.top;
             
-            // Hedef Pozisyonu (Bakiye Kartı İkon Merkezi)
             const targetRect = tonCard.getBoundingClientRect();
             const dx = (targetRect.left - containerRect.left + 30) - startX;
             const dy = (targetRect.top - containerRect.top + 25) - startY;
 
-            // "Fıskiye" efekti için başlangıç sıçraması
             const jumpX = (Math.random() - 0.5) * 100;
             const jumpY = -50 - (Math.random() * 50);
 
@@ -318,35 +316,26 @@
 
             appContainer.appendChild(particle);
             
-            // Animasyon bitince temizle
             setTimeout(() => {
                 particle.remove();
             }, 3000);
         }
 
-        /**
-         * Bakiyeyi formatlayan yardımcı fonksiyon
-         * - Gereksiz sıfırları siler (0.0100 -> 0.01)
-         * - Noktadan sonra max 8 basamak destekler
-         */
         function formatTONBalance(num) {
             if (num === 0) return "0";
-            // toFixed(8) ile hassasiyeti koru, regex ile sondaki sıfırları temizle
+            // Gereksiz sıfırları siler (Örn: 0.01000000 -> 0.01)
             return num.toFixed(8).replace(/\.?0+$/, "");
         }
 
         function updateTotalBalance(amount) {
             totalBalance += amount;
-            
-            // Yeni formatlama mantığı uygulandı
             headerBalanceEl.innerText = formatTONBalance(totalBalance) + " TON";
             
-            // Bakiye Kartı Efekti
             tonCard.classList.remove('pulse-active');
-            void tonCard.offsetWidth; // Reflow zorla
+            void tonCard.offsetWidth; 
             tonCard.classList.add('pulse-active');
             
-            showToast("Success! 💰");
+            showToast("Başarılı! 💰");
         }
 
         function boostMining() {
@@ -355,7 +344,7 @@
             hashrate *= 2;
             ghsEl.innerText = hashrate;
             fanContainer.classList.add('boosted');
-            showToast("Boost Active! 2x Speed 🚀");
+            showToast("Hızlandırma Aktif! 🚀");
             setTimeout(() => {
                 isBoosted = false;
                 hashrate /= 2;
@@ -375,7 +364,7 @@
         }
 
         function switchTab(tab, element) {
-            console.log("Tab changed to: " + tab);
+            console.log("Sekme: " + tab);
         }
     </script>
 </body>
