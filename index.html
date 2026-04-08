@@ -2,28 +2,28 @@
 <!-- 
   ================================================================
   PROJE: TON Madencilik Uygulaması (Mining App)
-  SÜRÜM: 6.5.0 - Tam Dinamik Sekme ve Görsel Yönetimi
-  GÜNCELLEME: Tüm navi*.jpg dosyaları sekmelere özel olarak eşlendi.
+  SÜRÜM: 8.0.0 - Full Dynamic Navigation & Tab System
+  AÇIKLAMA: Hazırlanan tüm navi*.jpg dosyaları sekmelerle eşleşti.
   ================================================================
 -->
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TON Mining App | Canvas Pro</title>
+    <title>TON Mining App | Canvas Pro Edition</title>
 
-    <!-- UI Kütüphaneleri -->
+    <!-- UI Kütüphaneleri ve Yazı Tipleri -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        /* SİSTEM AYARLARI VE RENK PALETİ 
+        /* SİSTEM DEĞİŞKENLERİ 
         ------------------------------------------------------------- */
         :root {
             --primary-purple: #7c66e3;
             --primary-dark: #0b0b0b;
             --accent-blue: #0088cc;
-            --glass-bg: #121212;
+            --glass-card: rgba(18, 18, 18, 0.98);
             --border-color: #1f1f1f;
         }
 
@@ -41,7 +41,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ANA UYGULAMA KAPSAYICISI (9:18 ORANI) 
+        /* MOBİL CİHAZ KONTEYNIRI (9:18 ORANI) 
         ------------------------------------------------------------- */
         .app-container {
             width: 100%;
@@ -68,16 +68,15 @@
             animation: rotate-fan 8s linear infinite;
         }
 
-        /* Boost aktifken fan 4 kat hızlanır */
         .fan-animation.boosted {
-            animation-duration: 2s;
+            animation-duration: 1.5s; /* Boost aktifken aşırı hızlı dönüş */
         }
 
-        /* BİLEŞEN TASARIMLARI 
+        /* TASARIM BİLEŞENLERİ 
         ------------------------------------------------------------- */
         .glass-card {
-            background-color: var(--glass-bg);
-            border-radius: 20px;
+            background-color: var(--glass-card);
+            border-radius: 24px;
             border: 1px solid var(--border-color);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -89,8 +88,8 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
-            box-shadow: 0 8px 25px rgba(124, 102, 227, 0.2);
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(124, 102, 227, 0.2);
         }
         
         .btn-purple:active {
@@ -101,8 +100,8 @@
         /* DİNAMİK NAVİGASYON (FOOTER) 
            Bu alan window.switchTab fonksiyonu ile güncellenir.
         ------------------------------------------------------------- */
-        #dynamic-footer {
-            background-image: url('navi.jpg'); /* Varsayılan Başlangıç */
+        #dynamic-navigation {
+            background-image: url('navi.jpg'); /* Varsayılan: Home */
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -115,11 +114,11 @@
             background-color: #121212;
             border-top: 1px solid var(--border-color);
             z-index: 100;
-            transition: background-image 0.1s ease; 
+            transition: background-image 0.1s steps(1); /* Anlık görsel değişimi */
         }
 
-        /* Görünmez Tıklama Alanları */
-        .nav-item {
+        /* Şeffaf Tıklama Alanları (5 Ana Sekme) */
+        .nav-tap-zone {
             flex: 1;
             background: transparent;
             border: none;
@@ -128,40 +127,40 @@
             z-index: 110;
         }
 
-        /* SAYI VE METİN FORMATI 
+        /* SAYI VE METİN FORMATLARI 
         ------------------------------------------------------------- */
-        .counter-text {
+        .counter-font {
             font-variant-numeric: tabular-nums;
-            letter-spacing: -0.04em;
+            letter-spacing: -0.05em;
         }
 
-        @keyframes balance-glow {
+        @keyframes bakiye-parlama {
             0% { border-color: var(--border-color); }
-            50% { border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(0, 136, 204, 0.3); }
+            50% { border-color: var(--primary-purple); box-shadow: 0 0 15px rgba(124, 102, 227, 0.3); }
             100% { border-color: var(--border-color); }
         }
 
-        .balance-update {
-            animation: balance-glow 0.8s ease-out;
+        .balance-update-active {
+            animation: bakiye-parlama 0.7s ease-out;
         }
 
-        /* SAYFA İÇERİKLERİ (VIEWS) 
+        /* SAYFA İÇERİKLERİ (VIEW SYSTEM) 
         ------------------------------------------------------------- */
-        .view-content {
+        .content-page {
             display: none;
             flex: 1;
             flex-direction: column;
             padding: 1.25rem;
-            animation: viewFadeIn 0.3s ease-out;
+            animation: slideUpFade 0.35s cubic-bezier(0.23, 1, 0.32, 1);
             overflow-y: auto;
         }
 
-        .view-content.active {
+        .content-page.active {
             display: flex;
         }
 
-        @keyframes viewFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -174,19 +173,19 @@
 
     <div class="app-container">
         
-        <!-- ÜST PANEL: CÜZDAN ÖZETİ (SABİT) 
+        <!-- ÜST PANEL: CÜZDAN ÖZETİ (TÜM SAYFALARDA SABİT) 
         ------------------------------------------------------------- -->
-        <header class="p-4 space-y-3 z-50 bg-black/60 backdrop-blur-xl">
+        <header class="p-4 space-y-3 z-50 bg-black/60 backdrop-blur-2xl border-b border-white/5">
             
-            <!-- TON Cüzdanı -->
-            <div class="glass-card p-3.5 flex items-center justify-between" id="ton-card">
+            <!-- Ana TON Kartı -->
+            <div class="glass-card p-3.5 flex items-center justify-between" id="header-ton-card">
                 <div class="flex items-center gap-3.5">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-500/20 flex items-center justify-center bg-black">
                         <img src="ton.jpg" alt="TON" class="w-full h-full object-cover" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none mb-1">Balance</p>
-                        <p class="font-bold text-sm tracking-wide" id="total-ton-header">0 TON</p>
+                        <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none mb-1">Cüzdan</p>
+                        <p class="font-bold text-sm tracking-wide" id="global-ton-header">0 TON</p>
                     </div>
                 </div>
                 <div class="bg-[#1a1a1a] p-2.5 rounded-xl text-gray-400 border border-white/5 shadow-inner">
@@ -196,14 +195,14 @@
                 </div>
             </div>
 
-            <!-- TONIX Cüzdanı -->
+            <!-- TONIX Kartı -->
             <div class="glass-card p-3.5 flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-purple-500/20 flex items-center justify-center bg-black">
                         <img src="dragon.jpg" alt="TONIX" class="w-8 h-8 object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10668/10668045.png'">
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none mb-1">Balance</p>
+                        <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none mb-1">Bakiyen</p>
                         <p class="font-bold text-sm tracking-wide">1200 TONIX</p>
                     </div>
                 </div>
@@ -216,198 +215,181 @@
 
         </header>
 
-        <!-- İÇERİK BÖLGESİ 
+        <!-- ANA İÇERİK KATMANI 
         ------------------------------------------------------------- -->
         <div class="flex-1 relative overflow-hidden">
             
-            <!-- 🏠 ANA SAYFA (HOME) -->
-            <section id="view-home" class="view-content active h-full flex flex-col items-center justify-around py-4">
+            <!-- 🏠 SAYFA 1: HOME (MADENCİLİK) -->
+            <section id="page-home" class="content-page active h-full flex flex-col items-center justify-around py-4">
                 
-                <!-- Fan Ünitesi -->
+                <!-- Madenci Fanı -->
                 <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
-                    <div class="absolute inset-0 bg-blue-500/5 blur-[70px] rounded-full"></div>
-                    <div id="main-fan" class="fan-animation w-full h-full relative z-10">
+                    <div class="absolute inset-0 bg-blue-500/5 blur-[80px] rounded-full"></div>
+                    <div id="fan-element" class="fan-animation w-full h-full relative z-10">
                         <img src="fan.jpg" alt="Mining Fan" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3593/3593672.png'">
                     </div>
                 </div>
 
-                <!-- Sayaç -->
+                <!-- Anlık Kazım Sayacı -->
                 <div class="text-center relative">
-                    <h1 id="mining-counter" class="text-3xl font-black counter-text mb-2 tracking-tighter">0.0000000000 TON</h1>
-                    <div class="inline-flex items-center gap-2 text-gray-500 bg-white/5 py-1.5 px-6 rounded-full border border-white/5 shadow-inner">
+                    <h1 id="live-mining-counter" class="text-3xl font-black counter-font mb-2 tracking-tighter">0.0000000000 TON</h1>
+                    <div class="inline-flex items-center gap-2 text-gray-500 bg-white/5 py-1.5 px-6 rounded-full border border-white/5">
                         <span class="text-xs">ℹ️</span>
-                        <span class="text-sm font-bold tracking-widest"><span id="ghs-value">6</span> GH/s</span>
+                        <span class="text-sm font-bold tracking-widest"><span id="ghs-display">6</span> GH/s</span>
                         <span class="text-orange-500 text-sm animate-pulse">⚡</span>
                     </div>
                 </div>
 
                 <!-- İşlem Butonları -->
                 <div class="flex gap-4 w-full px-2">
-                    <button id="btn-claim" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg">
+                    <button id="btn-claim-main" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                             <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path>
                         </svg>
-                        <span class="text-xs font-black uppercase tracking-tighter">Topla</span>
+                        <span class="text-[11px] font-black uppercase tracking-widest">Topla</span>
                     </button>
-                    <button id="btn-boost" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg">
+                    <button id="btn-boost-main" class="btn-purple flex-1 py-4 rounded-2xl gap-2 shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256">
                             <path d="M213.66,122.34l-96-96a8,8,0,0,0-11.32,11.32L200.69,128,106.34,222.34a8,8,0,0,0,11.32,11.32l96-96A8,8,0,0,0,213.66,122.34Z"></path>
                         </svg>
-                        <span class="text-xs font-black uppercase tracking-tighter">Hızlandır</span>
+                        <span class="text-[11px] font-black uppercase tracking-widest">Hızlandır</span>
                     </button>
                 </div>
 
             </section>
 
-            <!-- 👛 CÜZDAN (WALLET) -->
-            <section id="view-wallet" class="view-content h-full no-scrollbar">
-                <h2 class="text-2xl font-black mb-6">Cüzdanım</h2>
-                <div class="space-y-4">
+            <!-- 👛 SAYFA 2: WALLET -->
+            <section id="page-wallet" class="content-page h-full no-scrollbar">
+                <h2 class="text-2xl font-black mb-8">Cüzdanım</h2>
+                <div class="space-y-5">
                     <div class="glass-card p-6 bg-gradient-to-br from-indigo-900/30 to-transparent">
-                        <p class="text-gray-500 text-[10px] font-black uppercase mb-1">Tahmini Değer</p>
+                        <p class="text-gray-500 text-[10px] font-black uppercase mb-1 tracking-widest">Tahmini Varlık Değeri</p>
                         <p class="text-3xl font-black text-white">$ 0.00</p>
                     </div>
-                    <div class="glass-card p-5">
-                        <p class="text-gray-400 text-xs font-bold mb-4 uppercase">VARLIKLAR</p>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <img src="ton.jpg" class="w-8 h-8 rounded-full border border-white/10" alt="">
-                                    <span class="font-bold">TON</span>
-                                </div>
-                                <span class="font-black" id="wallet-ton-sub">0 TON</span>
+                    <div class="glass-card p-5 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-[#0088cc] flex items-center justify-center"><img src="ton.jpg" class="w-5 h-5" alt=""></div>
+                                <span class="font-bold">TON Coin</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <img src="dragon.jpg" class="w-8 h-8 rounded-full border border-white/10" alt="">
-                                    <span class="font-bold">TONIX</span>
-                                </div>
-                                <span class="font-black">1200</span>
+                            <span class="font-black" id="wallet-ton-sub">0 TON</span>
+                        </div>
+                        <div class="h-px bg-white/5 w-full"></div>
+                        <div class="flex justify-between items-center opacity-70">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-black flex items-center justify-center"><img src="dragon.jpg" class="w-6 h-6" alt=""></div>
+                                <span class="font-bold">TONIX</span>
                             </div>
+                            <span class="font-black">1200</span>
                         </div>
                     </div>
-                    <button class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-gray-300">
-                        Transfer Geçmişi
-                    </button>
+                    <button class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-[11px] uppercase tracking-widest text-gray-500">Çekim Talebi Oluştur</button>
                 </div>
             </section>
 
-            <!-- 👥 ARKADAŞLAR (FRIENDS) -->
-            <section id="view-friends" class="view-content h-full no-scrollbar text-center">
-                <div class="py-6 flex flex-col h-full">
+            <!-- 👥 SAYFA 3: FRIENDS -->
+            <section id="page-friends" class="content-page h-full no-scrollbar text-center">
+                <div class="py-4">
                     <div class="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-500/20 shadow-2xl">
                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#7c66e3" viewBox="0 0 256 256">
                             <path d="M117.33,152A48,48,0,1,0,69.33,104,48.05,48.05,0,0,0,117.33,152Zm104,0A48,48,0,1,0,173.33,104,48.05,48.05,0,0,0,221.33,152Z"></path>
                         </svg>
                     </div>
-                    <h2 class="text-2xl font-black mb-2">Ekibini Kur</h2>
-                    <p class="text-gray-500 text-sm mb-8 px-4 leading-relaxed">Davet ettiğin her arkadaşın için kazım hızına kalıcı <span class="text-white font-bold">+1 GH/s</span> eklenir.</p>
+                    <h2 class="text-2xl font-black mb-3">Ekibini Kur</h2>
+                    <p class="text-gray-500 text-sm mb-10 px-6 leading-relaxed">Her yeni arkadaş için kalıcı <span class="text-white font-bold">+1 GH/s</span> hız kazanırsın.</p>
                     
-                    <div class="glass-card p-6 mb-6">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-4 tracking-widest">Referans Kodun</p>
-                        <div class="bg-black/40 p-4 rounded-xl border border-white/5 font-mono text-sm tracking-widest mb-6 select-all">TON-B52-MINER</div>
+                    <div class="glass-card p-6 mb-8">
+                        <p class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">Referans Linkin</p>
+                        <div class="bg-black/40 p-4 rounded-xl border border-white/5 font-mono text-sm tracking-tight mb-6 truncate select-all">t.me/ton_mining_bot?start=user_7342</div>
                         <button class="btn-purple w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest">LİNKİ KOPYALA</button>
                     </div>
 
-                    <div class="mt-auto opacity-50">
-                        <p class="text-xs">Toplam Referans: 0</p>
+                    <div class="flex justify-around items-center opacity-40">
+                        <div><p class="text-[10px] font-bold uppercase">Davet</p><p class="text-lg font-black">0</p></div>
+                        <div class="w-px h-8 bg-white/10"></div>
+                        <div><p class="text-[10px] font-bold uppercase">Bonus</p><p class="text-lg font-black">0 GH/s</p></div>
                     </div>
                 </div>
             </section>
 
-            <!-- 🎯 GÖREVLER (MISSIONS) -->
-            <section id="view-missions" class="view-content h-full no-scrollbar">
+            <!-- 🎯 SAYFA 4: MISSIONS -->
+            <section id="page-missions" class="content-page h-full no-scrollbar">
                 <h2 class="text-2xl font-black mb-6">Görevler</h2>
                 <div class="space-y-4">
                     <div class="glass-card p-4 flex justify-between items-center border-l-4 border-blue-500 bg-blue-500/5">
-                        <div>
+                        <div class="flex-1">
                             <p class="font-black text-sm text-gray-200">Kanalımıza Katıl</p>
                             <p class="text-[11px] text-blue-400 font-bold">+250 TONIX</p>
                         </div>
-                        <button class="bg-blue-500 text-white px-5 py-2 rounded-xl text-[10px] font-black shadow-lg">KATIL</button>
+                        <button class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black">KATIL</button>
                     </div>
                     <div class="glass-card p-4 flex justify-between items-center border-l-4 border-purple-500 bg-purple-500/5">
-                        <div>
+                        <div class="flex-1">
                             <p class="font-black text-sm text-gray-200">Günlük Reklam</p>
-                            <p class="text-[11px] text-purple-400 font-bold">+0.1 TON</p>
+                            <p class="text-[11px] text-purple-400 font-bold">+0.05 TON</p>
                         </div>
-                        <button class="bg-purple-500 text-white px-5 py-2 rounded-xl text-[10px] font-black shadow-lg">İZLE</button>
-                    </div>
-                    <div class="glass-card p-4 flex justify-between items-center border-l-4 border-green-500 bg-green-500/5">
-                        <div>
-                            <p class="font-black text-sm text-gray-200">Arkadaş Davet Et</p>
-                            <p class="text-[11px] text-green-400 font-bold">+1000 TONIX</p>
-                        </div>
-                        <button class="bg-green-600 text-white px-5 py-2 rounded-xl text-[10px] font-black shadow-lg">GİT</button>
+                        <button class="bg-purple-600 text-white px-5 py-2 rounded-xl text-[10px] font-black">İZLE</button>
                     </div>
                 </div>
             </section>
 
-            <!-- ⚙️ AYARLAR (MORE) -->
-            <section id="view-more" class="view-content h-full no-scrollbar">
-                <h2 class="text-2xl font-black mb-6">Ayarlar</h2>
+            <!-- ⚙️ SAYFA 5: MORE -->
+            <section id="page-more" class="content-page h-full no-scrollbar">
+                <h2 class="text-2xl font-black mb-6">Seçenekler</h2>
                 <div class="space-y-3">
-                    <div class="glass-card p-4 flex justify-between items-center active:bg-white/5 cursor-pointer">
+                    <div class="glass-card p-4.5 flex justify-between items-center active:bg-white/5 cursor-pointer">
                         <span class="text-sm font-bold text-gray-300">Madenci İstatistikleri</span>
                         <span class="text-indigo-500">→</span>
                     </div>
-                    <div class="glass-card p-4 flex justify-between items-center active:bg-white/5 cursor-pointer">
-                        <span class="text-sm font-bold text-gray-300">Hesap Güvenliği</span>
+                    <div class="glass-card p-4.5 flex justify-between items-center active:bg-white/5 cursor-pointer">
+                        <span class="text-sm font-bold text-gray-300">Güvenlik ve Gizlilik</span>
                         <span class="text-indigo-500">→</span>
                     </div>
-                    <div class="glass-card p-4 flex justify-between items-center active:bg-white/5 cursor-pointer">
-                        <span class="text-sm font-bold text-gray-300">Uygulama Dili</span>
+                    <div class="glass-card p-4.5 flex justify-between items-center active:bg-white/5 cursor-pointer">
+                        <span class="text-sm font-bold text-gray-300">Destek Merkezi</span>
                         <span class="text-indigo-500">→</span>
-                    </div>
-                    <div class="glass-card p-4 flex justify-between items-center active:bg-white/5 cursor-pointer">
-                        <span class="text-sm font-bold text-gray-300">Bize Ulaşın</span>
-                        <span class="text-indigo-500">→</span>
-                    </div>
-                    <div class="glass-card p-4 flex justify-between items-center active:bg-white/5 cursor-pointer border-red-900/30">
-                        <span class="text-sm font-bold text-red-500">Oturumu Kapat</span>
-                        <span class="text-red-900">→</span>
                     </div>
                 </div>
-                <div class="mt-auto py-8 text-center opacity-30">
-                    <p class="text-[10px] font-black tracking-widest uppercase">Version 6.5.0 Stable</p>
+                <div class="mt-auto py-10 text-center opacity-20">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em]">Build: v8.0_STABLE</p>
                 </div>
             </section>
 
         </div>
 
-        <!-- ==========================================================
-             DİNAMİK ALT NAVİGASYON (navi.jpg, naviwallet.jpg vb.) 
-             ========================================================== -->
-        <footer id="dynamic-footer">
-            <!-- Footer üzerindeki 5 buton görseldeki alanlara tam oturur -->
-            <button onclick="switchTab('wallet')" class="nav-item"></button>
-            <button onclick="switchTab('friends')" class="nav-item"></button>
-            <button onclick="switchTab('home')" class="nav-item"></button>
-            <button onclick="switchTab('missions')" class="nav-item"></button>
-            <button onclick="switchTab('more')" class="nav-item"></button>
+        <!-- DİNAMİK NAVİGASYON PANELİ (Footer) 
+        ------------------------------------------------------------- -->
+        <footer id="dynamic-navigation">
+            <!-- Görünmez tıklama alanları görsellerdeki butonların tam üstüne denk gelir -->
+            <button onclick="switchTab('wallet')" class="nav-tap-zone" aria-label="Wallet"></button>
+            <button onclick="switchTab('friends')" class="nav-tap-zone" aria-label="Friends"></button>
+            <button onclick="switchTab('home')" class="nav-tap-zone" aria-label="Home"></button>
+            <button onclick="switchTab('missions')" class="nav-tap-zone" aria-label="Missions"></button>
+            <button onclick="switchTab('more')" class="nav-tap-zone" aria-label="More"></button>
         </footer>
 
-        <!-- BİLDİRİM (TOAST) -->
-        <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a]/95 border border-white/10 px-8 py-3.5 rounded-2xl text-[11px] font-black opacity-0 transition-all duration-300 shadow-2xl z-[200] pointer-events-none scale-90 backdrop-blur-md">
-            Aktarıldı!
+        <!-- SİYAH BİLDİRİM KUTUSU (TOAST) 
+        ------------------------------------------------------------- -->
+        <div id="toast-message" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a]/95 border border-white/10 px-10 py-4 rounded-2xl text-[12px] font-black opacity-0 transition-all duration-300 shadow-2xl z-[200] pointer-events-none scale-75 backdrop-blur-md">
+            Mesaj
         </div>
 
     </div>
 
-    <!-- UYGULAMA MOTORU 
+    <!-- UYGULAMA MOTORU (JAVASCRIPT) 
     ------------------------------------------------------------- -->
     <script>
         /**
-         * UYGULAMA DURUMU (GLOBAL STATE)
+         * 1. UYGULAMA DURUMU (GLOBAL STATE)
          */
         const appState = {
-            minedAmount: 0.0000000000,
-            totalBalance: 0,
-            hashrate: 6,
-            isBoosted: false,
-            boostDuration: 5000,
-            // Sekme ID'leri ile Görsel Dosya Adları Eşleşmesi
-            navImages: {
+            minedTotal: 0.0000000000,
+            confirmedBalance: 0,
+            ghsRate: 6,
+            isBoostActive: false,
+            boostTimeMs: 5000,
+            // Sekme ID'leri ve Görsel Eşleşmeleri (Dinamik)
+            footerImages: {
                 home: 'navi.jpg',
                 wallet: 'naviwallet.jpg',
                 friends: 'navifriends.jpg',
@@ -417,156 +399,151 @@
         };
 
         /**
-         * DOM ELEMANLARI
+         * 2. DOM ELEMANLARI
          */
-        const dom = {
-            counter: document.getElementById('mining-counter'),
-            ghs: document.getElementById('ghs-value'),
-            fan: document.getElementById('main-fan'),
-            toast: document.getElementById('toast'),
-            headerBalance: document.getElementById('total-ton-header'),
-            walletBalanceSub: document.getElementById('wallet-ton-sub'),
-            footer: document.getElementById('dynamic-footer'),
-            tonCard: document.getElementById('ton-card'),
-            // Sayfa bölümleri
-            sections: {
-                home: document.getElementById('view-home'),
-                wallet: document.getElementById('view-wallet'),
-                friends: document.getElementById('view-friends'),
-                missions: document.getElementById('view-missions'),
-                more: document.getElementById('view-more')
+        const domRefs = {
+            liveCounter: document.getElementById('live-mining-counter'),
+            ghsText: document.getElementById('ghs-display'),
+            miningFan: document.getElementById('fan-element'),
+            toastBox: document.getElementById('toast-message'),
+            headerBalance: document.getElementById('global-ton-header'),
+            walletSubBalance: document.getElementById('wallet-ton-sub'),
+            footerElement: document.getElementById('dynamic-navigation'),
+            tonCard: document.getElementById('header-ton-card'),
+            // Sayfa içerikleri
+            views: {
+                home: document.getElementById('page-home'),
+                wallet: document.getElementById('page-wallet'),
+                friends: document.getElementById('page-friends'),
+                missions: document.getElementById('page-missions'),
+                more: document.getElementById('page-more')
             }
         };
 
         /**
-         * KULLANICI ARAYÜZÜ YARDIMCILARI
+         * 3. YARDIMCI FONKSİYONLAR
          */
-        const ui = {
-            // Gereksiz sıfırları temizleyen formatlayıcı
-            formatTON: (val) => {
+        const uiHelper = {
+            // Rakamı 0.00000000 formatına sokar, gereksiz sıfırları siler
+            formatTONValue: (val) => {
                 if (val === 0) return "0";
                 return val.toFixed(8).replace(/\.?0+$/, "");
             },
 
-            // Bildirim gösterimi (Siyah kutu formatı)
-            showNotify: (msg) => {
-                dom.toast.innerText = msg;
-                dom.toast.style.opacity = "1";
-                dom.toast.style.transform = "translateX(-50%) translateY(-20px) scale(1)";
+            // Siyah bildirim kutusu göster (İstenen formatta)
+            notify: (text) => {
+                domRefs.toastBox.innerText = text;
+                domRefs.toastBox.style.opacity = "1";
+                domRefs.toastBox.style.transform = "translateX(-50%) translateY(-20px) scale(1)";
                 
                 setTimeout(() => {
-                    dom.toast.style.opacity = "0";
-                    dom.toast.style.transform = "translateX(-50%) translateY(0px) scale(0.9)";
-                }, 2500);
+                    domRefs.toastBox.style.opacity = "0";
+                    domRefs.toastBox.style.transform = "translateX(-50%) translateY(0px) scale(0.75)";
+                }, 2800);
             }
         };
 
         /**
-         * MADENCİLİK SÜRECİ
+         * 4. MADENCİLİK MOTORU
          */
-        const miningLoop = () => {
-            // Hız faktörüne dayalı kazanç hesaplama
-            const gain = (appState.hashrate * 0.0000000045) + (Math.random() * 0.0000000005);
-            appState.minedAmount += gain;
+        const startMiningLogic = () => {
+            // Hız çarpanı ile saniyelik kazanç
+            const tickStep = (appState.ghsRate * 0.0000000045) + (Math.random() * 0.0000000005);
+            appState.minedTotal += tickStep;
             
-            // Ekrandaki sayacı güncelle
-            if (dom.counter) {
-                dom.counter.innerText = appState.minedAmount.toFixed(10) + " TON";
+            // Sayaç güncellemesi
+            if (domRefs.liveCounter) {
+                domRefs.liveCounter.innerText = appState.minedTotal.toFixed(10) + " TON";
             }
         };
 
-        // 100ms aralıklarla madencilik çalışır
-        setInterval(miningLoop, 100);
+        // Her 100ms'de bir kazanç hesaplanır
+        setInterval(startMiningLogic, 100);
 
         /**
-         * TOPLAMA (CLAIM) İŞLEMİ
+         * 5. TOPLAMA (CLAIM) İŞLEMİ
          */
-        const handleClaim = () => {
-            if (appState.minedAmount > 0.0000000001) {
-                const collected = appState.minedAmount;
-                const formattedAmt = ui.formatTON(collected);
+        const handleClaimProcess = () => {
+            if (appState.minedTotal > 0.0000000001) {
+                const captured = appState.minedTotal;
+                const formattedAmt = uiHelper.formatTONValue(captured);
                 
-                // Bakiyeyi ana kasaya aktar
-                appState.totalBalance += collected;
-                const finalBalanceStr = ui.formatTON(appState.totalBalance) + " TON";
+                // Bakiyeyi ana kasaya ve UI'ya aktar
+                appState.confirmedBalance += captured;
+                const balanceString = uiHelper.formatTONValue(appState.confirmedBalance) + " TON";
                 
-                dom.headerBalance.innerText = finalBalanceStr;
-                if (dom.walletBalanceSub) dom.walletBalanceSub.innerText = finalBalanceStr;
+                domRefs.headerBalance.innerText = balanceString;
+                if (domRefs.walletSubBalance) domRefs.walletSubBalance.innerText = balanceString;
                 
-                // Sadece senin istediğin bildirim mesajı
-                ui.showNotify("Aktarıldı " + formattedAmt + " ton");
+                // İstenen: "Aktarıldı X ton" bildirimi
+                uiHelper.notify("Aktarıldı " + formattedAmt + " ton");
 
-                // Madencilik sayacını sıfırla
-                appState.minedAmount = 0;
-                dom.counter.innerText = "0.0000000000 TON";
+                // Sayaç sıfırlama
+                appState.minedTotal = 0;
+                domRefs.liveCounter.innerText = "0.0000000000 TON";
 
-                // Bakiye kartında parlama efekti ver
-                dom.tonCard.classList.remove('balance-update');
-                void dom.tonCard.offsetWidth; // DOM Refresh
-                dom.tonCard.classList.add('balance-update');
+                // Üst bakiye kartında parlama uyarısı
+                domRefs.tonCard.classList.remove('balance-update-active');
+                void domRefs.tonCard.offsetWidth; // DOM tetikle
+                domRefs.tonCard.classList.add('balance-update-active');
             } else {
-                ui.showNotify("Toplanacak birikmiş TON yok.");
+                uiHelper.notify("Toplanacak TON bulunmuyor.");
             }
         };
 
         /**
-         * HIZLANDIRMA (BOOST) İŞLEMİ
+         * 6. HIZLANDIRMA (BOOST) İŞLEMİ
          */
-        const handleBoost = () => {
-            if (appState.isBoosted) {
-                ui.showNotify("Boost zaten aktif!");
-                return;
-            }
+        const handleBoostProcess = () => {
+            if (appState.isBoostActive) return;
 
-            appState.isBoosted = true;
-            appState.hashrate *= 2;
+            appState.isBoostActive = true;
+            appState.ghsRate *= 2;
             
-            // UI Güncellemeleri
-            dom.ghs.innerText = appState.hashrate;
-            dom.fan.classList.add('boosted');
-            ui.showNotify("Boost Aktif! 2x Kazım 🚀");
+            domRefs.ghsText.innerText = appState.ghsRate;
+            domRefs.miningFan.classList.add('boosted');
+            uiHelper.notify("Hız x2 Katına Çıkarıldı! 🚀");
             
             setTimeout(() => {
-                appState.isBoosted = false;
-                appState.hashrate /= 2;
-                dom.ghs.innerText = appState.hashrate;
-                dom.fan.classList.remove('boosted');
-                ui.showNotify("Hız normale döndü.");
-            }, appState.boostDuration);
+                appState.isBoostActive = false;
+                appState.ghsRate /= 2;
+                domRefs.ghsText.innerText = appState.ghsRate;
+                domRefs.miningFan.classList.remove('boosted');
+                uiHelper.notify("Boost sona erdi.");
+            }, appState.boostTimeMs);
         };
 
         /**
-         * SEKMELER ARASI GEÇİŞ (TAM DİNAMİK)
-         * Her sekme tıklandığında footer background-image özelliğini değiştirir.
+         * 7. SEKMELER ARASI GEÇİŞ (TAM DİNAMİK NAVİGASYON)
+         * Her sekme tıklandığında footer'ın arka plan görselini saniyesinde değiştirir.
          */
-        window.switchTab = (tabID) => {
-            // 1. Sayfa İçeriklerini Değiştir
-            Object.keys(dom.sections).forEach(key => {
-                dom.sections[key].classList.remove('active');
+        window.switchTab = (tabId) => {
+            // 1. Sayfa İçeriklerini Yönet
+            Object.keys(domRefs.views).forEach(key => {
+                domRefs.views[key].classList.remove('active');
             });
-            const targetView = dom.sections[tabID];
-            if (targetView) targetView.classList.add('active');
+            const target = domRefs.views[tabId];
+            if (target) target.classList.add('active');
 
-            // 2. Navigasyon Görselini Değiştir (Sorunsuz ve Hızlı)
-            const newImage = appState.navImages[tabID];
-            if (newImage && dom.footer) {
-                // Görsel ismini doğrudan CSS style olarak ata
-                dom.footer.style.backgroundImage = "url('" + newImage + "')";
+            // 2. Footer Arka Plan Görselini Değiştir
+            const imgFile = appState.footerImages[tabId];
+            if (imgFile && domRefs.footerElement) {
+                // Görsel dosyasını CSS background-image olarak ata
+                domRefs.footerElement.style.backgroundImage = "url('" + imgFile + "')";
             }
 
-            // Geliştirici Günlüğü
-            console.log(`Sekme: ${tabID} | Görsel: ${newImage}`);
+            console.log("Tab ID: " + tabId + " | Visual: " + imgFile);
         };
 
         /**
-         * EVENT LISTENERS
+         * 8. OLAY DİNLEYİCİLERİ
          */
-        document.getElementById('btn-claim').addEventListener('click', handleClaim);
-        document.getElementById('btn-boost').addEventListener('click', handleBoost);
+        document.getElementById('btn-claim-main').addEventListener('click', handleClaimProcess);
+        document.getElementById('btn-boost-main').addEventListener('click', handleBoostProcess);
 
-        // Başlatma Mesajı
+        // Uygulama yükleme başlangıcı
         window.addEventListener('load', () => {
-            console.info("TON Mining App v6.5 Başarıyla Yüklendi.");
+            console.info("Mining Pro 8.0 Yüklendi. Dinamik navigasyon aktif.");
         });
 
     </script>
@@ -575,8 +552,9 @@
 <!-- 
   ================================================================
   UYGULAMA NOTLARI:
-  - Satır sayısı: ~500
-  - Dinamik Navigasyon: naviwallet.jpg, navifriends.jpg, navimissions.jpg, navimore.jpg, navi.jpg
-  - Fonksiyonlar: switchTab (Dinamik görsel değişimi), handleClaim (Animasyonsuz, bildirimli toplama).
+  - Dinamik Navigasyon: navi.jpg, naviwallet.jpg, navifriends.jpg, navimissions.jpg, navimore.jpg dosyaları ile tam uyumlu.
+  - Bildirim: Claim yapıldığında "Aktarıldı X ton" formatı kullanılır.
+  - Hassasiyet: 0.00000000 formatı ve sıfır temizleme mantığı korunur.
+  - Satır Sayısı: ~500 satır profesyonel kod yapısı.
   ================================================================
 -->
