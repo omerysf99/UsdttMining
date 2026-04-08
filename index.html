@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TON Mining App</title>
 
-    <!-- Tailwind CSS ve Google Fonts -->
+    <!-- Stil ve Yazı Tipi Kaynakları -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Temel Uygulama Tasarımı */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0b0b0b;
@@ -23,7 +24,7 @@
             margin: 0;
         }
 
-        /* 9:18 En-Boy Oranı Konteynırı */
+        /* 9:18 Mobil En-Boy Oranı */
         .app-container {
             width: 100%;
             max-width: 380px; 
@@ -35,10 +36,10 @@
             max-height: 98vh;
             overflow: hidden;
             border: 1px solid #1a1a1a;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
         }
 
-        /* Fan Dönme Animasyonu */
+        /* Madencilik Fanı Animasyonu */
         @keyframes rotate-fan {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -52,18 +53,18 @@
             animation-duration: 2s;
         }
 
-        /* Kart ve Cam Efekti Tasarımları */
+        /* Kart Stilleri */
         .glass-card {
             background-color: #121212;
             border-radius: 20px;
             border: 1px solid #1f1f1f;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        /* Buton Stilleri */
+        /* Mor Buton Teması */
         .btn-purple {
             background-color: #7c66e3;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -72,11 +73,11 @@
         }
         
         .btn-purple:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
             background-color: #6b56d2;
         }
 
-        /* Navigasyon Çubuğu (navi.jpg tabanlı) */
+        /* Alt Menü (Görsel Tabanlı) */
         .nav-footer {
             background-image: url('navi.jpg');
             background-size: 100% 100%;
@@ -101,64 +102,67 @@
             z-index: 10;
         }
 
-        /* Sayıların Görünümü */
+        /* Sayı Gösterim Formatı */
         .counter-text {
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
         }
 
-        /* Geliştirilmiş TON Uçuş Animasyonu (3 Saniye) */
-        @keyframes fly-to-balance {
+        /* GELİŞTİRİLMİŞ TON PARÇACIK ANİMASYONU (3 Saniye) */
+        @keyframes coin-flow {
             0% { 
                 transform: translate(0, 0) scale(0) rotate(0deg); 
                 opacity: 0; 
             }
-            15% {
-                transform: translate(var(--start-x), var(--start-y)) scale(1.2) rotate(45deg);
+            10% {
+                transform: translate(var(--pop-x), var(--pop-y)) scale(1.1) rotate(45deg);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(var(--pop-x), calc(var(--pop-y) - 20px)) scale(1.2) rotate(90deg);
                 opacity: 1;
             }
             100% { 
-                transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(1080deg); 
-                opacity: 0.2; 
+                transform: translate(var(--dest-x), var(--dest-y)) scale(0.4) rotate(720deg); 
+                opacity: 0.1; 
             }
         }
 
-        /* Normal TON Görseli İçin Parçacık Stili */
         .ton-particle {
             position: absolute;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            /* Normal TON logosu CDN kullanılarak eklendi */
             background-image: url('https://cryptologos.cc/logos/toncoin-ton-logo.png');
-            background-size: 80%;
+            background-size: 75%;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #0088cc;
             pointer-events: none;
             z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 136, 204, 0.7);
-            animation: fly-to-balance 3s forwards cubic-bezier(0.6, -0.28, 0.735, 0.045);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.6), inset 0 0 4px rgba(255,255,255,0.4);
+            /* Animasyon Ayarı */
+            animation: coin-flow 3s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95);
         }
 
-        /* Bakiye Parlama Animasyonu */
-        @keyframes pulse-border {
-            0% { border-color: #1f1f1f; transform: scale(1); }
-            50% { border-color: #7c66e3; transform: scale(1.03); }
-            100% { border-color: #1f1f1f; transform: scale(1); }
+        /* Bakiye Güncelleme Parlaması */
+        @keyframes balance-glow {
+            0% { border-color: #1f1f1f; box-shadow: none; }
+            50% { border-color: #0088cc; box-shadow: 0 0 15px rgba(0, 136, 204, 0.4); }
+            100% { border-color: #1f1f1f; box-shadow: none; }
         }
 
-        .pulse-active {
-            animation: pulse-border 0.5s ease-in-out;
+        .balance-update {
+            animation: balance-glow 0.6s ease-out;
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- ÜST PANEL: Bakiyeler -->
+        <!-- Üst Bölüm: Bakiyeler -->
         <header class="p-4 space-y-3">
-            <!-- TON Bakiye Kartı -->
+            <!-- TON Cüzdan Kartı -->
             <div class="glass-card p-3 flex items-center justify-between" id="ton-card">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-500/20 flex items-center justify-center bg-black">
@@ -176,7 +180,7 @@
                 </div>
             </div>
 
-            <!-- TONIX Bakiye Kartı -->
+            <!-- TONIX Kartı -->
             <div class="glass-card p-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden border border-blue-400/20 flex items-center justify-center bg-[#1a1a1a]">
@@ -195,10 +199,10 @@
             </div>
         </header>
 
-        <!-- ANA PANEL: Madencilik Bölümü -->
+        <!-- Ana Madencilik Alanı -->
         <main id="view-home" class="flex-1 flex flex-col items-center justify-around px-6 py-4">
             
-            <!-- Madencilik Fanı -->
+            <!-- Merkezi Dönen Fan -->
             <div class="relative w-64 h-64 overflow-hidden rounded-full border border-white/10 shadow-2xl">
                 <div class="absolute inset-0 bg-blue-500/5 blur-[50px] rounded-full"></div>
                 <div id="main-fan" class="fan-animation w-full h-full relative z-10">
@@ -206,7 +210,7 @@
                 </div>
             </div>
 
-            <!-- Sayaç Alanı -->
+            <!-- Sayaç ve Hız Göstergesi -->
             <div class="text-center relative">
                 <h1 id="mining-counter" class="text-3xl font-bold counter-text mb-2 tracking-tight">0.0000000000 TON</h1>
                 <div class="inline-flex items-center gap-2 text-gray-500 bg-white/5 py-1 px-4 rounded-full border border-white/5">
@@ -216,7 +220,7 @@
                 </div>
             </div>
 
-            <!-- İşlem Butonları -->
+            <!-- Ana Butonlar -->
             <div class="flex gap-4 w-full px-2">
                 <button onclick="claimMining()" class="btn-purple flex-1 py-4 rounded-2xl shadow-lg shadow-indigo-500/10 gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"></path></svg>
@@ -229,7 +233,7 @@
             </div>
         </main>
 
-        <!-- ALT PANEL: Navigasyon -->
+        <!-- Navigasyon Çubuğu -->
         <footer class="nav-footer">
             <button onclick="switchTab('wallet', this)" class="nav-item"></button>
             <button onclick="switchTab('friends', this)" class="nav-item"></button>
@@ -240,12 +244,12 @@
 
         <!-- Toast Bildirimi -->
         <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-[#1a1a1a] border border-white/10 px-6 py-2 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 shadow-2xl z-50">
-            Collected!
+            Toplandı!
         </div>
     </div>
 
+    <!-- Uygulama Mantığı -->
     <script>
-        // Oyun Durumu
         let minedAmount = 0.0000000000;
         let totalBalance = 0;
         let hashrate = 6;
@@ -253,13 +257,13 @@
 
         const counterEl = document.getElementById('mining-counter');
         const ghsEl = document.getElementById('ghs-value');
-        const fanContainer = document.querySelector('.fan-animation');
+        const fanContainer = document.getElementById('main-fan');
         const toastEl = document.getElementById('toast');
         const headerBalanceEl = document.getElementById('total-ton-header');
         const appContainer = document.querySelector('.app-container');
         const tonCard = document.getElementById('ton-card');
 
-        // Madencilik Döngüsü
+        // Madencilik Sayaç Döngüsü
         function updateMining() {
             const increment = (hashrate * 0.0000000045) + (Math.random() * 0.0000000005);
             minedAmount += increment;
@@ -268,28 +272,37 @@
 
         setInterval(updateMining, 100);
 
-        // Claim ve Geliştirilmiş Animasyon Fonksiyonu (3 Saniye)
+        /**
+         * Toplama (Claim) Fonksiyonu
+         * Parçacıkları fırlatır ve 3 saniye sonra bakiyeyi günceller.
+         */
         function claimMining() {
             if (minedAmount > 0.0000000001) {
                 const amountToClaim = minedAmount;
                 minedAmount = 0;
                 counterEl.innerText = "0.0000000000 TON";
 
-                const particleCount = 12;
+                // 15 parçacıklı yoğun akış
+                const particleCount = 15;
                 for (let i = 0; i < particleCount; i++) {
                     setTimeout(() => {
                         createTonParticle();
-                    }, i * 80);
+                    }, i * 60);
                 }
 
+                // 3 saniyelik animasyonun bitişine yakın bakiye güncellemesi
                 setTimeout(() => {
                     updateTotalBalance(amountToClaim);
-                }, 2800);
+                }, 2700);
 
                 showToast("Toplanıyor... ⚡");
             }
         }
 
+        /**
+         * TON Parçacığı Oluşturma
+         * Dinamik pozisyon hesaplaması yapar.
+         */
         function createTonParticle() {
             const particle = document.createElement('div');
             particle.className = 'ton-particle';
@@ -297,47 +310,52 @@
             const startRect = counterEl.getBoundingClientRect();
             const containerRect = appContainer.getBoundingClientRect();
             
-            const startX = startRect.left - containerRect.left + (startRect.width / 2) - 13;
+            const startX = startRect.left - containerRect.left + (startRect.width / 2) - 14;
             const startY = startRect.top - containerRect.top;
             
             const targetRect = tonCard.getBoundingClientRect();
-            const dx = (targetRect.left - containerRect.left + 30) - startX;
-            const dy = (targetRect.top - containerRect.top + 25) - startY;
+            const destX = (targetRect.left - containerRect.left + 30) - startX;
+            const destY = (targetRect.top - containerRect.top + 25) - startY;
 
-            const jumpX = (Math.random() - 0.5) * 100;
-            const jumpY = -50 - (Math.random() * 50);
+            // Fıskiye Patlama Efekti (Rastgele sıçrama)
+            const popX = (Math.random() - 0.5) * 120;
+            const popY = -40 - (Math.random() * 60);
 
             particle.style.left = startX + 'px';
             particle.style.top = startY + 'px';
-            particle.style.setProperty('--start-x', `${jumpX}px`);
-            particle.style.setProperty('--start-y', `${jumpY}px`);
-            particle.style.setProperty('--dx', `${dx}px`);
-            particle.style.setProperty('--dy', `${dy}px`);
+            particle.style.setProperty('--pop-x', `${popX}px`);
+            particle.style.setProperty('--pop-y', `${popY}px`);
+            particle.style.setProperty('--dest-x', `${destX}px`);
+            particle.style.setProperty('--dest-y', `${destY}px`);
 
             appContainer.appendChild(particle);
             
+            // Animasyon tamamlandığında DOM'dan kaldır
             setTimeout(() => {
                 particle.remove();
-            }, 3000);
+            }, 3100);
         }
 
+        // Bakiye formatlama (Gereksiz sıfırları siler)
         function formatTONBalance(num) {
             if (num === 0) return "0";
-            // Gereksiz sıfırları siler (Örn: 0.01000000 -> 0.01)
             return num.toFixed(8).replace(/\.?0+$/, "");
         }
 
+        // Ana Bakiyeyi Güncelleme
         function updateTotalBalance(amount) {
             totalBalance += amount;
             headerBalanceEl.innerText = formatTONBalance(totalBalance) + " TON";
             
-            tonCard.classList.remove('pulse-active');
+            // Kart üzerinde görsel geri bildirim
+            tonCard.classList.remove('balance-update');
             void tonCard.offsetWidth; 
-            tonCard.classList.add('pulse-active');
+            tonCard.classList.add('balance-update');
             
-            showToast("Başarılı! 💰");
+            showToast("Bakiyeye eklendi! 💰");
         }
 
+        // Hızlandırma Fonksiyonu
         function boostMining() {
             if (isBoosted) return;
             isBoosted = true;
@@ -345,6 +363,7 @@
             ghsEl.innerText = hashrate;
             fanContainer.classList.add('boosted');
             showToast("Hızlandırma Aktif! 🚀");
+            
             setTimeout(() => {
                 isBoosted = false;
                 hashrate /= 2;
@@ -353,6 +372,7 @@
             }, 5000);
         }
 
+        // Bildirim Kutusu
         function showToast(message) {
             toastEl.innerText = message;
             toastEl.style.opacity = "1";
@@ -364,7 +384,7 @@
         }
 
         function switchTab(tab, element) {
-            console.log("Sekme: " + tab);
+            console.log("Navigasyon: " + tab);
         }
     </script>
 </body>
