@@ -2,937 +2,352 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DRAGON Miner Pro</title>
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Reklam SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='10839932' data-sdk='show_10839932'></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Miner 3D</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #5b5df2;
-            --accent-color: #7169e6;
-            --bg-dark: #000000;
-            --card-bg: #111111;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: white;
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
+            margin: 0;
             user-select: none;
             touch-action: manipulation;
-            height: 100dvh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
         }
-        /* Telegram zorunluluk ekranı */
-        #telegram-only-overlay {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px;
-        }
-        .app-container {
-            width: 100%;
-            height: 100%;
-            max-width: 500px;
-            display: none; 
-            flex-direction: column;
-            position: relative;
-            background-color: #000;
-        }
-        .header-section {
-            padding: 12px 16px 4px 16px;
-            flex-shrink: 0;
-        }
-        .balance-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 10px;
-        }
-        .main-content {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 0 20px;
-            scrollbar-width: none;
-        }
-        .main-content::-webkit-scrollbar { display: none; }
 
-        .fan-container {
+        .sci-fi-border {
+            border: 2px solid #1e293b;
             position: relative;
-            width: 55vw;
-            height: 55vw;
-            max-width: 210px;
-            max-height: 210px;
-            flex-shrink: 0;
-            margin: 10px auto;
+            background: rgba(15, 23, 42, 0.8);
+            clip-path: polygon(10% 0, 90% 0, 100% 20%, 100% 80%, 90% 100%, 10% 100%, 0 80%, 0 20%);
         }
-        .fan-image {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            animation: spin 2.5s linear infinite;
-            box-shadow: 0 0 45px rgba(91, 93, 242, 0.2);
-        }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .nav-bar {
-            height: 85px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 10px 10px 10px;
-            background: linear-gradient(to top, #000 70%, rgba(0,0,0,0.8));
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        .sci-fi-border::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid #38bdf8;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+        }
+
+        .energy-bar-container {
+            width: 12px;
+            height: 200px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .energy-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            transition: height 0.3s ease;
+            background: linear-gradient(to top, #0ea5e9, #38bdf8);
+            box-shadow: 0 0 15px #0ea5e9;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+        }
+
+        .tap-effect {
+            position: absolute;
+            color: #38bdf8;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            font-family: 'Orbitron', sans-serif;
             z-index: 50;
         }
-        .nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 55px;
-            color: #444;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .nav-emoji { font-size: 20px; filter: grayscale(1); margin-bottom: 2px; }
-        .nav-active { color: #fff; transform: translateY(-6px); }
-        .nav-active .nav-emoji { filter: grayscale(0); font-size: 24px; }
-        .nav-active::after {
-            content: ''; position: absolute; bottom: -2px; width: 6px; height: 6px;
-            background: var(--primary-color); border-radius: 50%; box-shadow: 0 0 10px var(--primary-color);
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
 
-        .tab-content { display: none; width: 100%; min-height: 100%; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
-        .tab-content.active { display: flex; opacity: 1; }
+        .btn-blue {
+            background: linear-gradient(135deg, #1e40af 0%, #0369a1 100%);
+            box-shadow: 0 0 15px rgba(3, 105, 161, 0.5);
+            transition: all 0.2s;
+        }
+        .btn-blue:active { transform: scale(0.95); filter: brightness(1.2); }
 
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.96);
-            backdrop-filter: blur(12px); z-index: 100; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-content {
-            background: #0a0a0a; border-radius: 28px; width: 100%; max-width: 340px;
-            border: 1px solid rgba(255,255,255,0.08); max-height: 90vh; display: flex; flex-direction: column;
-        }
-        .modal-body { padding: 20px; overflow-y: auto; }
-
-        .withdraw-input-group {
-            background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 18px;
-            padding: 14px 18px; width: 100%; display: flex; align-items: center; gap: 10px;
-        }
-        .withdraw-input-group input { background: transparent; border: none; outline: none; color: white; font-size: 14px; width: 100%; font-weight: 600; }
-        
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: #1a1a1a; border: 1px solid #333; padding: 12px 24px; border-radius: 20px;
-            z-index: 1000; transition: transform 0.4s; display: flex; align-items: center; gap: 10px;
-        }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-
-        .status-badge {
-            background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 5px 14px;
-            border-radius: 12px; font-size: 9px; font-weight: 800; border: 1px solid rgba(34, 197, 94, 0.2);
-            width: fit-content; margin: 0 auto;
-        }
-        .mission-card {
-            background: #111; border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; gap: 15px; margin-bottom: 12px;
-        }
-        .invite-btn-purple {
-            background: var(--accent-color);
-            color: white;
-            font-weight: 800;
-            padding: 16px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            transition: all 0.1s;
-            box-shadow: 0 4px 15px rgba(113, 105, 230, 0.3);
-        }
-        .invite-btn-purple:active { transform: scale(0.97); }
-
-        /* Admin Styles */
-        .admin-input {
-            background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px;
-            color: white; font-size: 12px; width: 100%; outline: none; margin-bottom: 10px;
-        }
-        .admin-card {
-            background: #111; border: 1px solid #333; border-radius: 20px; padding: 20px; margin-top: 20px;
+        .btn-gray {
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        .sync-indicator {
-            position: fixed; top: 15px; right: 15px; 
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 100px;
-            border: 1px solid rgba(16, 185, 129, 0.2); z-index: 100;
+        .nav-icon {
+            color: #64748b;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        .nav-icon.active {
+            color: #38bdf8;
+            filter: drop-shadow(0 0 5px #38bdf8);
         }
     </style>
 </head>
-<body>
+<body class="flex flex-col h-screen max-w-md mx-auto relative border-x border-slate-800">
 
-    <!-- Bildirim Baloncuğu -->
-    <div id="toast">
-        <span id="toast-emoji">✅</span>
-        <span id="toast-text" class="text-xs font-bold uppercase tracking-widest">İşlem Başarılı</span>
-    </div>
-
-    <!-- Senkronizasyon Göstergesi -->
-    <div class="sync-indicator">
-        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-tighter">Live Sync</span>
-    </div>
-
-    <!-- KESİN TELEGRAM ZORUNLULUK EKRANI -->
-    <div id="telegram-only-overlay">
-        <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-indigo-500 animate-pulse" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=dragon'">
-        <h2 class="text-xl font-black mb-2 uppercase" style="color:white">Giriş Engellendi</h2>
-        <p class="text-gray-500 text-xs px-10 leading-relaxed">Lütfen bu uygulamayı mobil Telegram uygulaması üzerinden açın.</p>
-    </div>
-
-    <div class="app-container" id="main-app-container">
-        <header class="header-section">
-            <!-- TON Bakiye Kartı -->
-            <div class="balance-card flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <img src="ton.jpg" class="w-10 h-10 rounded-full shadow-lg shadow-blue-500/20" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                    <div>
-                        <p class="text-[8px] text-gray-500 font-black uppercase">TON Bakiye</p>
-                        <p class="text-white font-black text-sm tracking-tight"><span id="total-ton-balance">0.0000</span></p>
-                    </div>
-                </div>
-                <button onclick="window.openWithdraw('TON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center active:scale-90 transition-transform">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                </button>
-            </div>
-
-            <!-- DRAGON Bakiye Kartı -->
-            <div class="balance-card flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <img src="dragon.jpg" class="w-10 h-10 rounded-full shadow-lg shadow-orange-500/20" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=dragon'">
-                    <div>
-                        <p class="text-[8px] text-gray-500 font-black uppercase">$DRAGON</p>
-                        <p class="text-white font-black text-sm tracking-tight"><span id="dragon-balance">0</span></p>
-                    </div>
-                </div>
-                <button onclick="window.openWithdraw('DRAGON')" class="w-9 h-9 bg-[#222] rounded-xl flex items-center justify-center active:scale-90 transition-transform">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                </button>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <!-- ANA SAYFA TAB -->
-            <section id="tab-home" class="tab-content active items-center justify-center">
-                <div class="status-badge"><div class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-2 shadow-[0_0_8px_#22c55e]"></div>7/24 AKTİF BULUT KAZIM</div>
-                <div class="flex-1 flex flex-col items-center justify-center min-h-[250px]">
-                    <div class="fan-container"><img src="fan.jpg" class="fan-image" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=fan'"></div>
-                    <div class="text-center">
-                        <h2 class="text-3xl font-black text-white tracking-tighter mb-1"><span id="mining-display">0.0000000000</span> <span class="text-blue-500 text-lg">TON</span></h2>
-                        <div class="flex flex-col items-center gap-1.5">
-                            <div class="inline-flex items-center gap-2 bg-[#111] px-5 py-2 rounded-full border border-white/5">
-                                <span id="ghs-speed-display" class="text-xs font-bold text-gray-400">11.00</span>
-                                <span class="text-[10px] font-black text-orange-500 uppercase tracking-widest">GH/S ⚡</span>
-                            </div>
-                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5">
-                                Günlük: <span id="daily-yield-display" class="text-green-400">0.11</span> TON
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex w-full gap-4 mb-6">
-                    <button id="claim-btn" class="flex-1 bg-gradient-to-br from-[#5b5df2] to-[#4042b8] py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-blue-900/20">Aktar</button>
-                    <button id="boost-trigger" class="flex-1 bg-gradient-to-br from-[#7169e6] to-[#5a52c7] py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-indigo-900/30">Hızlandır</button>
-                </div>
-            </section>
-
-            <!-- CÜZDAN SEKMESİ -->
-            <section id="tab-wallet" class="tab-content py-4">
-                <h3 class="text-lg font-black uppercase mb-4 tracking-tight">Cüzdan Özeti</h3>
-                <div class="bg-[#111] p-6 rounded-2xl border border-white/5 space-y-4">
-                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Toplam Kazılan</span><span id="stats-total-mined" class="text-white">0.0000 TON</span></div>
-                    <div class="flex justify-between text-[10px] uppercase font-black"><span class="text-gray-500">Günlük Sabit Gelir</span><span id="stats-daily" class="text-green-400">0.11 TON</span></div>
-                </div>
-                <div class="mt-8">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-3 ml-2 tracking-widest">Geçmiş İşlemler</p>
-                    <div id="transaction-history" class="bg-[#111] rounded-[24px] border border-white/5 p-10 text-center text-gray-600 text-[10px] uppercase font-black tracking-widest">
-                        Henüz bir işlem yok
-                    </div>
-                </div>
-            </section>
-
-            <!-- DAVET SEKMESİ -->
-            <section id="tab-friends" class="tab-content py-6 space-y-6">
-                <div class="text-center">
-                    <h2 class="text-3xl font-black tracking-tighter mb-1 uppercase text-white">Invite Friends!</h2>
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest leading-none">Arkadaşlarını davet et, ödülleri topla</p>
-                </div>
-
-                <div class="bg-[#111] p-6 rounded-[30px] border border-white/5 shadow-2xl space-y-4">
-                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Senin Davet Kodun</h4>
-                    <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
-                        <div id="referral-code-display" class="text-lg font-black tracking-[0.2em] text-indigo-400 uppercase">YÜKLENİYOR...</div>
-                        <button id="copy-code-btn" class="text-gray-500 active:scale-90 transition-transform">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button id="invite-friend-btn" class="invite-btn-purple text-xs tracking-widest flex-1">
-                            <span class="text-lg">✨</span> ARKADAŞINI DAVET ET
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-[#111] p-6 rounded-[28px] border border-white/5" id="referral-entry-card">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">Sizi kim davet etti?</p>
-                    <div id="referral-input-container" class="flex gap-2">
-                        <input type="text" id="referral-input" placeholder="DAVET KODUNU BURAYA YAZ" class="flex-1 bg-black rounded-xl p-4 text-[10px] font-bold uppercase outline-none border border-white/5 focus:border-indigo-500 transition-colors">
-                        <button id="apply-referral-btn" class="bg-white text-black font-black px-6 rounded-xl text-[10px] active:scale-95 transition-all">OK</button>
-                    </div>
-                    <div id="referral-used-container" class="hidden py-3 bg-green-500/10 rounded-xl border border-green-500/20 text-center">
-                        <p class="text-green-500 text-[10px] font-black uppercase">Başarıyla Uygulandı ✅</p>
-                    </div>
-                </div>
-
-                <button onclick="window.openFriendsList()" class="invite-btn-purple !bg-[#1a1a1a] !shadow-none border border-white/5 text-[10px]">
-                    <span class="text-lg">📋</span> DAVETLİ LİSTESİNİ GÖR
-                </button>
-            </section>
-
-            <!-- GÖREVLER SEKMESİ -->
-            <section id="tab-missions" class="tab-content py-6 space-y-4">
-                <h3 class="text-xl font-extrabold tracking-tight mb-2 uppercase">Aktif Görevler</h3>
-                
-                <div class="mission-card" id="mission-channel-card">
-                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner">📢</div>
-                    <div class="flex-1">
-                        <p class="text-white text-[11px] font-black uppercase">Resmi Kanala Katıl</p>
-                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.001 TON | +1 $DRAGON</p>
-                    </div>
-                    <button id="mission-action-btn" class="bg-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-indigo-900/30 active:scale-95 transition-all">KATIL</button>
-                </div>
-
-                <div class="mission-card" id="mission-ad-card">
-                    <div class="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner">📺</div>
-                    <div class="flex-1">
-                        <p class="text-white text-[11px] font-black uppercase">Reklam İzle</p>
-                        <p class="text-[9px] text-green-400 font-bold uppercase tracking-tight">+0.0003 TON | +3 $DRAGON</p>
-                    </div>
-                    <button id="mission-ad-btn" class="bg-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-indigo-900/30 active:scale-95 transition-all">İZLE</button>
-                </div>
-            </section>
-
-            <!-- ADMIN TAB -->
-            <section id="tab-admin" class="tab-content py-6 space-y-4">
-                <h3 class="text-xl font-black uppercase text-indigo-400">Ejderha Paneli (ADMIN)</h3>
-                <div class="admin-card">
-                    <p class="text-[10px] font-black uppercase text-gray-500 mb-3">Kullanıcı Sorgula (ID veya Ref Kod)</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="admin-search-input" placeholder="UID" class="admin-input flex-1 !mb-0">
-                        <button id="admin-search-btn" class="bg-indigo-600 px-6 rounded-xl font-black text-xs">ARA</button>
-                    </div>
-                </div>
-
-                <div id="admin-user-details" class="hidden admin-card !mt-4 animate-in fade-in">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 id="admin-user-name" class="text-sm font-black uppercase">Düzenleniyor...</h4>
-                        <span id="admin-user-id-display" class="text-[9px] text-gray-500 font-bold"></span>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">TON Bakiye</p>
-                            <input type="number" id="admin-edit-ton" class="admin-input">
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">$DRAGON Bakiye</p>
-                            <input type="number" id="admin-edit-dragon" class="admin-input">
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-gray-500 uppercase mb-1">GH/S Hızı</p>
-                            <input type="number" id="admin-edit-ghs" class="admin-input">
-                        </div>
-                        <button id="admin-save-btn" class="w-full bg-green-600 py-4 rounded-xl font-black text-xs uppercase tracking-widest mt-4">KAYDET</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- AYARLAR / DAHA SEKMESİ -->
-            <section id="tab-more" class="tab-content py-4 space-y-4">
-                <h3 class="text-lg font-black uppercase mb-4 tracking-tight">Ayarlar</h3>
-                
-                <div class="bg-[#111] p-6 rounded-2xl border border-white/5">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-2 tracking-widest">Senin UID</p>
-                    <div class="flex items-center justify-between bg-black p-3 rounded-xl border border-white/5">
-                        <span id="my-uid-display" class="font-mono text-xs text-indigo-400">Yükleniyor...</span>
-                        <button onclick="window.copyMyId()" class="text-slate-500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-                    </div>
-                </div>
-
-                <div class="bg-[#111] p-6 rounded-2xl border border-white/5 text-center">
-                    <p class="text-gray-500 text-[10px] font-black uppercase mb-4 tracking-widest">Hesap Yönetimi</p>
-                    <button id="reset-data-btn" class="w-full bg-red-600/10 text-red-500 border border-red-500/20 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest">⚠️ Verileri Sıfırla</button>
-                </div>
-            </section>
-        </main>
-
-        <!-- Navigasyon -->
-        <nav class="nav-bar">
-            <button onclick="window.switchTab('wallet')" class="nav-btn" id="nav-wallet"><span class="nav-emoji">💼</span><span class="text-[7px] font-black uppercase tracking-tight">Cüzdan</span></button>
-            <button onclick="window.switchTab('friends')" class="nav-btn" id="nav-friends"><span class="nav-emoji">👥</span><span class="text-[7px] font-black uppercase tracking-tight">Davet</span></button>
-            <button onclick="window.switchTab('home')" class="nav-btn nav-active" id="nav-home"><span class="nav-emoji">🏠</span><span class="text-[7px] font-black uppercase tracking-tight">Ev</span></button>
-            <button onclick="window.switchTab('missions')" class="nav-btn" id="nav-missions"><span class="nav-emoji">🎯</span><span class="text-[7px] font-black uppercase tracking-tight">Görevler</span></button>
-            <button onclick="window.switchTab('more')" class="nav-btn" id="nav-more"><span class="nav-emoji">⚙️</span><span class="text-[7px] font-black uppercase tracking-tight">Daha</span></button>
-            <button id="nav-admin" onclick="window.switchTab('admin')" class="nav-btn hidden"><span class="nav-emoji">🛡️</span><span class="text-[7px] font-black uppercase tracking-tight">Admin</span></button>
-        </nav>
-    </div>
-
-    <!-- Modallar -->
-    <!-- Para Çekme Modal -->
-    <div id="withdraw-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="flex gap-2 mb-6">
-                    <div class="bg-[#111] rounded-xl py-3 px-4 border border-white/5 flex-1 flex items-center gap-3">
-                        <img src="ton.jpg" class="w-4 h-4 rounded-full" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'"><span class="text-[10px] font-black text-white" id="wd-ton-bal">0.00 TON</span>
-                    </div>
-                    <div class="bg-[#111] rounded-xl py-3 px-4 border border-white/5 flex-1 flex items-center gap-3">
-                        <img src="dragon.jpg" class="w-4 h-4 rounded-full" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=dragon'"><span class="text-[10px] font-black text-white" id="wd-dragon-bal">0 $D</span>
-                    </div>
-                </div>
-                <h3 class="text-lg font-black text-center uppercase mb-1 tracking-tight" id="wd-title">Withdrawal</h3>
-                <p class="text-center text-gray-500 text-[10px] font-bold mb-8 uppercase tracking-widest">Min: 10 <span id="wd-min-asset">TON</span> | Fee: 0.01</p>
-                
-                <div class="space-y-4">
-                    <div class="withdraw-input-group">
-                        <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                            <img src="ton.jpg" class="w-4 h-4 rounded-full" id="wd-tag-img" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                            <span id="wd-tag-text" class="text-[10px] font-black uppercase">TON</span>
-                        </div>
-                        <div class="flex-grow"></div>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-                    </div>
-                    <div class="withdraw-input-group"><input type="text" id="wd-address" placeholder="YOUR WALLET ADDRESS" class="text-xs uppercase placeholder:text-gray-700"></div>
-                    <div class="withdraw-input-group">
-                        <input type="number" id="wd-amount" placeholder="AMOUNT" class="text-xs placeholder:text-gray-700">
-                        <button class="text-indigo-500 font-black text-[10px] uppercase" id="wd-max-btn">MAX</button>
-                    </div>
-                </div>
-
-                <div class="text-center mt-8 p-5 bg-white/5 rounded-[24px] border border-white/5">
-                    <p class="text-white text-[11px] font-black uppercase tracking-widest">Net Receive: <span id="wd-receive" class="text-blue-400">0</span> <span id="wd-receive-asset">TON</span></p>
-                </div>
-
-                <div class="mt-8 space-y-3">
-                    <button id="wd-send-btn" class="w-full bg-[#5b5df2] text-white font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20 active:scale-95 transition-all">Send</button>
-                    <button onclick="window.closeWithdraw()" class="w-full bg-[#1a1a1a] text-gray-500 font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em]">Not Now</button>
-                </div>
-            </div>
+    <!-- Üst İstatistik Paneli -->
+    <div class="grid grid-cols-2 gap-4 p-4 mt-2">
+        <div class="sci-fi-border p-2 text-center">
+            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Pasif madencilik</div>
+            <div class="text-sky-400 font-bold text-sm">+0.05</div>
+            <div class="text-[10px] text-slate-500">USDT / gün</div>
+        </div>
+        <div class="sci-fi-border p-2 text-center">
+            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Tap getirisi</div>
+            <div class="text-sky-400 font-bold text-sm">+0.000250</div>
+            <div class="text-[10px] text-slate-500">USDT</div>
         </div>
     </div>
 
-    <!-- Referans Listesi Modal -->
-    <div id="friends-list-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#0a0a0a]">
-                <h3 class="font-black uppercase text-sm tracking-widest text-white">Davetli Listesi</h3>
-                <button onclick="window.closeFriendsList()" class="text-gray-500 font-bold text-2xl">×</button>
+    <!-- Ana Bakiye -->
+    <div class="text-center mt-6">
+        <h1 id="balance" class="text-4xl font-bold orbitron glow-text tracking-widest">0.000000</h1>
+        <span class="text-sky-400 font-bold ml-1">USDT</span>
+        <p class="text-[11px] text-slate-500 mt-2 uppercase tracking-widest">Otomatik madenciliği artırmak için bir modül satın alın</p>
+    </div>
+
+    <!-- 3D Alan ve Enerji -->
+    <div class="flex-grow flex items-center justify-center relative px-6">
+        <!-- Sol Enerji Barı -->
+        <div class="flex flex-col items-center gap-2">
+            <div class="energy-bar-container">
+                <div id="energy-fill-left" class="energy-fill" style="height: 100%;"></div>
             </div>
-            <div class="modal-body bg-black" id="friends-list-render">
-                <p class="text-center text-gray-600 text-[10px] py-16 uppercase font-black tracking-widest">Henüz kimse yok</p>
+            <span class="text-[10px] text-sky-400 font-bold" id="energy-text">100/100</span>
+        </div>
+
+        <!-- 3D Çekirdek -->
+        <div id="canvas-container" class="canvas-container cursor-pointer">
+            <!-- Three.js buraya render edilecek -->
+        </div>
+
+        <!-- Sağ Isı/Enerji Barı (Görsel) -->
+        <div class="flex flex-col items-center gap-2">
+            <div class="energy-bar-container">
+                <div class="energy-fill" style="height: 40%; background: linear-gradient(to top, #f97316, #fbbf24); box-shadow: 0 0 15px #f97316;"></div>
             </div>
+            <span class="text-[10px] text-orange-400 font-bold uppercase">TEMP</span>
         </div>
     </div>
 
-    <!-- Welcome Modal -->
-    <div id="welcome-modal" class="modal-overlay">
-        <div class="modal-content p-8 flex flex-col items-center text-center">
-            <img src="dragon.jpg" class="w-20 h-20 rounded-full mb-6 border-2 border-orange-500/20 shadow-2xl" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=dragon'">
-            <h2 class="text-2xl font-black mb-1 uppercase tracking-tighter text-white">Hoş Geldin!</h2>
-            <p class="text-gray-500 text-[10px] mb-8 font-bold uppercase tracking-widest">Hediye paketini hemen al!</p>
-            <div class="w-full space-y-3 mb-10">
-                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">TON</span><span class="text-green-400 font-black text-base">+0.05</span></div>
-                <div class="flex justify-between bg-[#111] p-4 rounded-2xl border border-white/5"><span class="text-[10px] font-black text-gray-500 uppercase">$DRAGON</span><span class="text-orange-400 font-black text-base">+50</span></div>
-            </div>
-            <button id="collect-reward-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-blue-900/30">Al ve Başla</button>
+    <!-- Butonlar -->
+    <div class="flex gap-4 px-4 mb-6">
+        <button class="flex-1 py-4 rounded-xl btn-blue font-bold uppercase tracking-widest text-sm">Modül Satın Al</button>
+        <button class="flex-1 py-4 rounded-xl btn-gray font-bold uppercase tracking-widest text-sm">Çek</button>
+    </div>
+
+    <!-- Alt Navigasyon -->
+    <div class="bg-slate-900/80 border-t border-slate-800 p-4 flex justify-between items-center rounded-t-3xl">
+        <i class="fas fa-th-large nav-icon active"></i>
+        <i class="fas fa-wallet nav-icon"></i>
+        <i class="fas fa-microchip nav-icon"></i>
+        <i class="fas fa-users nav-icon"></i>
+        <i class="fas fa-newspaper nav-icon"></i>
+    </div>
+
+    <!-- Bilgi Mesajı -->
+    <div id="passive-notice" class="fixed top-0 left-0 w-full h-full bg-black/80 flex items-center justify-center z-[100] hidden">
+        <div class="bg-slate-800 p-6 rounded-2xl text-center border border-sky-500 max-w-[80%]">
+            <h2 class="text-xl font-bold mb-2 text-sky-400">Hoş Geldiniz!</h2>
+            <p id="passive-amount-text" class="text-sm text-slate-300 mb-4"></p>
+            <button onclick="closeNotice()" class="px-6 py-2 bg-sky-600 rounded-lg font-bold">TOPLA</button>
         </div>
     </div>
 
-    <!-- Boost Modal (Hızlandırıcı) -->
-    <div id="boost-modal" class="modal-overlay">
-        <div class="modal-content p-6 flex flex-col items-center">
-            <div class="w-14 h-14 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-500/20 text-xl">⚡</div>
-            <h3 class="text-lg font-black mb-1 uppercase text-white">Hızlandırıcı</h3>
-            <p class="text-gray-500 text-[9px] text-center mb-6 px-2 font-bold uppercase leading-relaxed">
-                REKLAM İZLE VE <span class="text-white">+0.01 GH/S</span> KAZAN
-            </p>
-            <button id="watch-ad-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg shadow-indigo-900/30 active:scale-95 transition-transform">
-                HIZLANDIRICIYI BAŞLAT
-            </button>
-            <button onclick="document.getElementById('boost-modal').style.display='none'" class="mt-4 text-gray-600 text-[9px] font-black uppercase active:scale-90 transition-transform">Kapat</button>
-        </div>
-    </div>
-
-    <!-- Firebase ve Uygulama Mantığı -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDi7IqV474UDMtrKyKuO-2pct5WxwSB3jQ",
-            authDomain: "studio-9241589115-a403e.firebaseapp.com",
-            projectId: "studio-9241589115-a403e",
-            storageBucket: "studio-9241589115-a403e.firebasestorage.app",
-            messagingSenderId: "1010284036381",
-            appId: "1:1010284036381:web:cd6effcc67287c510e61f4"
+    <script>
+        // Oyun Ayarları ve Durumu
+        let state = {
+            balance: parseFloat(localStorage.getItem('miner_balance')) || 0.0,
+            energy: parseInt(localStorage.getItem('miner_energy')) || 100,
+            lastUpdate: parseInt(localStorage.getItem('miner_last_update')) || Date.now()
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const contextAppId = 'dragon-miner-pro-v7';
+        const MAX_ENERGY = 100;
+        const TAP_VALUE = 0.000250;
+        const DAILY_PASSIVE = 0.05;
+        const PASSIVE_PER_MS = DAILY_PASSIVE / (24 * 60 * 60 * 1000);
+        const REGEN_TIME = 2000; // 2 saniyede 1 enerji
 
-        // ADMIN ID: Belirttiğiniz 83924792 ID'si
-        const ADMIN_ID = "83924792"; 
+        const balanceEl = document.getElementById('balance');
+        const energyFillLeft = document.getElementById('energy-fill-left');
+        const energyText = document.getElementById('energy-text');
+        const canvasContainer = document.getElementById('canvas-container');
 
-        const tg = window.Telegram?.WebApp;
-        
-        // --- SIKI TELEGRAM KONTROLÜ ---
-        const isTelegram = tg && tg.initData && tg.initData !== "";
-        if (!isTelegram) {
-            document.getElementById('telegram-only-overlay').style.display = 'flex';
-            document.getElementById('main-app-container').style.display = 'none';
-            console.warn("Uygulama Telegram dışında açıldı. Güvenlik sebebiyle kısıtlandı.");
-        } else {
-            document.getElementById('telegram-only-overlay').style.display = 'none';
-            document.getElementById('main-app-container').style.display = 'flex';
-            tg.expand();
+        // Three.js Kurulumu
+        let scene, camera, renderer, core;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Çekirdek yapısı (fan.jpg texture olarak kullanılacak)
+            // Not: fan.jpg yerelde olmadığı için bir placeholder renk kullanıyoruz, 
+            // kullanıcı kendi GitHub linkini buraya ekleyebilir.
+            const loader = new THREE.TextureLoader();
+            const texture = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/uv_grid_opengl.jpg'); // Fallback
+
+            const geometry = new THREE.IcosahedronGeometry(1.5, 0);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x0ea5e9,
+                wireframe: true,
+                emissive: 0x0369a1,
+                emissiveIntensity: 0.5
+            });
+            
+            const innerGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+            const innerMaterial = new THREE.MeshPhongMaterial({
+                color: 0x38bdf8,
+                emissive: 0x38bdf8,
+                emissiveIntensity: 1
+            });
+
+            core = new THREE.Group();
+            const outerMesh = new THREE.Mesh(geometry, material);
+            const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
+            
+            // Etrafındaki halkalar
+            const ringGeo = new THREE.TorusGeometry(2, 0.05, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.3 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+
+            core.add(outerMesh);
+            core.add(innerMesh);
+            core.add(ring);
+            scene.add(core);
+
+            const light = new THREE.PointLight(0x38bdf8, 2, 100);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            camera.position.z = 5;
         }
-        // -------------------------------------------------------------
 
-        const tgUserId = (tg?.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random()*1000000)).toString();
-        const tgName = tg?.initDataUnsafe?.user?.first_name || "Misafir";
+        function animate() {
+            requestAnimationFrame(animate);
+            if (core) {
+                core.rotation.y += 0.01;
+                core.rotation.x += 0.005;
+            }
+            renderer.render(scene, camera);
+        }
 
-        // Global State (OnSnapshot Yönetecek)
-        let stats = {
-            ghsSpeed: 11.0,
-            walletBalance: 0,
-            lastClaimTime: Date.now(),
-            dragonBalance: 0,
-            referralEarnings: 0,
-            referredBy: null,
-            totalMinedStats: 0,
-            mission_channel_completed: false
-        };
-
-        let adminTargetId = null;
-        let currentWdAsset = 'TON';
-
-        // UI Güncelleme Fonksiyonu
+        // Oyun Mantığı
         function updateUI() {
-            document.getElementById('total-ton-balance').textContent = (stats.walletBalance || 0).toFixed(4);
-            document.getElementById('dragon-balance').textContent = Math.floor(stats.dragonBalance || 0);
-            document.getElementById('ghs-speed-display').textContent = (stats.ghsSpeed || 11.0).toFixed(2);
-            document.getElementById('daily-yield-display').textContent = ((stats.ghsSpeed || 11.0) * 0.01).toFixed(2);
-            document.getElementById('stats-total-mined').textContent = (stats.totalMinedStats || 0).toFixed(4) + " TON";
-            document.getElementById('stats-daily').textContent = ((stats.ghsSpeed || 11.0) * 0.01).toFixed(2) + " TON";
-            document.getElementById('my-uid-display').textContent = tgUserId;
-
-            // Referans kodu girildiyse input'u gizle
-            if (stats.referredBy) {
-                const refCont = document.getElementById('referral-input-container');
-                if (refCont) refCont.classList.add('hidden');
-                const usedCont = document.getElementById('referral-used-container');
-                if (usedCont) usedCont.classList.remove('hidden');
-            }
-
-            // Görev Kanal Katılım Butonu
-            if (stats.mission_channel_completed) {
-                const mBtn = document.getElementById('mission-action-btn');
-                if(mBtn) {
-                    mBtn.textContent = "OK ✅";
-                    mBtn.className = "bg-green-500/10 text-green-500 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-none pointer-events-none";
-                    mBtn.disabled = true;
-                }
-            }
-        }
-
-        function showToast(text, emoji = '✅') {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-text').textContent = text;
-            document.getElementById('toast-emoji').textContent = emoji;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        // 1. Senkronizasyon Başlat (Live Sync)
-        async function startSync(user) {
-            const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
+            balanceEl.innerText = state.balance.toFixed(6);
+            energyFillLeft.style.height = `${(state.energy / MAX_ENERGY) * 100}%`;
+            energyText.innerText = `${state.energy}/${MAX_ENERGY}`;
             
-            // Gerçek Zamanlı Dinle (Firestore'dan her değişimde stats'ı ve UI'ı günceller)
-            onSnapshot(docRef, (snap) => {
-                if (snap.exists()) {
-                    stats = { ...stats, ...snap.data() };
-                    updateUI();
-                } else {
-                    // Yeni Kullanıcı Oluştur ve Welcome ekranını aç
-                    setDoc(docRef, {
-                        walletBalance: 0,
-                        dragonBalance: 0,
-                        ghsSpeed: 11.0,
-                        lastClaimTime: Date.now(),
-                        totalMinedStats: 0,
-                        tgName: tgName,
-                        mission_channel_completed: false
-                    });
-                    const welcome = document.getElementById('welcome-modal');
-                    if (welcome) welcome.style.display = 'flex';
-                }
-            });
-
-            // Davet Kodunu Göster
-            const myRefCode = tgUserId.substring(0, 8).toUpperCase();
-            document.getElementById('referral-code-display').textContent = myRefCode;
-            
-            // Referans Kayıt Ekle (Başkaları sorgulasın diye)
-            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', myRefCode);
-            setDoc(regRef, { ownerId: tgUserId, name: tgName }, { merge: true });
-
-            // Admin Paneli Kontrolü (Senin ID'n için)
-            if (tgUserId === ADMIN_ID) {
-                document.getElementById('nav-admin').classList.remove('hidden');
-            }
+            localStorage.setItem('miner_balance', state.balance);
+            localStorage.setItem('miner_energy', state.energy);
+            localStorage.setItem('miner_last_update', Date.now());
         }
 
-        // Kazım Döngüsü (Sadece Ekrandaki Sayıyı Hızlı Arttırır)
+        function handleTap(e) {
+            if (state.energy <= 0) return;
+
+            // Enerji düşür, bakiye ekle
+            state.energy -= 1;
+            state.balance += TAP_VALUE;
+
+            // 3D Animasyon tepkisi
+            core.scale.set(1.2, 1.2, 1.2);
+            setTimeout(() => core.scale.set(1, 1, 1), 100);
+
+            // Görsel efekt
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            createTapEffect(x, y);
+
+            updateUI();
+        }
+
+        function createTapEffect(x, y) {
+            const el = document.createElement('div');
+            el.className = 'tap-effect';
+            el.innerText = `+${TAP_VALUE}`;
+            el.style.left = `${x - 20}px`;
+            el.style.top = `${y - 20}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        // Pasif Gelir Hesaplama
+        function calculatePassive() {
+            const now = Date.now();
+            const diff = now - state.lastUpdate;
+            const earned = diff * PASSIVE_PER_MS;
+            
+            if (earned > 0.000001) {
+                state.balance += earned;
+                document.getElementById('passive-amount-text').innerText = `Siz yokken madencileriniz ${earned.toFixed(6)} USDT topladı!`;
+                document.getElementById('passive-notice').classList.remove('hidden');
+            }
+            updateUI();
+        }
+
+        function closeNotice() {
+            document.getElementById('passive-notice').classList.add('hidden');
+        }
+
+        // Enerji Yenilenmesi (2 sn'de 1)
         setInterval(() => {
-            const now = Date.now();
-            const elapsed = (now - (stats.lastClaimTime || Date.now())) / 1000;
-            const currentMined = Math.max(0, elapsed * (((stats.ghsSpeed || 11.0) * 0.01) / 86400));
-            document.getElementById('mining-display').textContent = currentMined.toFixed(10);
-        }, 100);
+            if (state.energy < MAX_ENERGY) {
+                state.energy += 1;
+                updateUI();
+            }
+        }, REGEN_TIME);
 
-        // Aksiyonlar / Tıklamalar
-        window.switchTab = (tabId) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('nav-active');
-            if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        };
+        // Pasif Güncelleme (Oyundayken de küçük artışlar için)
+        setInterval(() => {
+            state.balance += (1000 * PASSIVE_PER_MS);
+            updateUI();
+        }, 1000);
 
-        // Yeni kullanıcı için Hoş Geldin Hediyesi
-        document.getElementById('collect-reward-btn').onclick = async () => {
-            const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-            await updateDoc(docRef, {
-                walletBalance: (stats.walletBalance || 0) + 0.05,
-                dragonBalance: (stats.dragonBalance || 0) + 50,
-                totalMinedStats: (stats.totalMinedStats || 0) + 0.05,
-                lastClaimTime: Date.now()
+        // Başlatma
+        window.onload = () => {
+            init3D();
+            animate();
+            calculatePassive();
+
+            canvasContainer.addEventListener('mousedown', handleTap);
+            canvasContainer.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleTap(e);
             });
-            document.getElementById('welcome-modal').style.display = 'none';
-        };
 
-        // Puanı Cüzdana Aktarma (Claim)
-        document.getElementById('claim-btn').onclick = async () => {
-            const now = Date.now();
-            const elapsed = (now - stats.lastClaimTime) / 1000;
-            const gained = elapsed * ((stats.ghsSpeed * 0.01) / 86400);
-            
-            if (gained > 0) {
-                const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                await updateDoc(docRef, {
-                    walletBalance: (stats.walletBalance || 0) + gained,
-                    totalMinedStats: (stats.totalMinedStats || 0) + gained,
-                    lastClaimTime: now
-                });
-                showToast(`+${gained.toFixed(6)} TON Aktarıldı`);
-                if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            }
-        };
-
-        // 2. GÖREV: Kanal Linki Ekle (10 Saniye Sayaçlı)
-        const mAction = document.getElementById('mission-action-btn');
-        if (mAction) {
-            mAction.onclick = function() {
-                if (stats.mission_channel_completed) return;
-                
-                const link = "https://t.me/+8WTu-FmvmCxhNzE1"; // Belirtilen kanal linki
-                if (tg?.openTelegramLink) tg.openTelegramLink(link);
-                else window.open(link, '_blank');
-
-                let t = 10;
-                mAction.disabled = true;
-                const timer = setInterval(() => {
-                    mAction.textContent = t + "S Bekle";
-                    t--;
-                    if (t < 0) {
-                        clearInterval(timer);
-                        mAction.disabled = false;
-                        mAction.textContent = "ÖDÜLÜ AL";
-                        mAction.onclick = async () => {
-                            const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                            await updateDoc(docRef, {
-                                walletBalance: (stats.walletBalance || 0) + 0.001,
-                                dragonBalance: (stats.dragonBalance || 0) + 1,
-                                mission_channel_completed: true
-                            });
-                            showToast("Ödül Alındı!", "🎁");
-                        };
-                    }
-                }, 1000);
+            // Pencere yeniden boyutlandırma
+            window.onresize = () => {
+                camera.aspect = canvasContainer.offsetWidth / canvasContainer.offsetHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
             };
-        }
-
-        // 3. GÖREV: Reklam İzle (+3 DRAGON ve +0.0003 TON)
-        const mAdBtn = document.getElementById('mission-ad-btn');
-        if (mAdBtn) {
-            mAdBtn.onclick = function() {
-                if (typeof show_10839932 === 'function') {
-                    show_10839932().then(async () => {
-                        const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                        await updateDoc(docRef, {
-                            walletBalance: (stats.walletBalance || 0) + 0.0003,
-                            dragonBalance: (stats.dragonBalance || 0) + 3
-                        });
-                        showToast("+3 $D & +0.0003 TON Kazanıldı", "📺");
-                    }).catch(() => {
-                        showToast("Reklam tamamlanmadı", "❌");
-                    });
-                } else {
-                    showToast("Reklam SDK yüklenemedi", "⚠️");
-                }
-            };
-        }
-
-        // 4. HIZLANDIR (Pencere Açılır, 0.01 GH/S için 1 reklam)
-        document.getElementById('boost-trigger').onclick = () => {
-            const modal = document.getElementById('boost-modal');
-            if (modal) modal.style.display = 'flex';
         };
-
-        const watchAdBtn = document.getElementById('watch-ad-btn');
-        if (watchAdBtn) {
-            watchAdBtn.onclick = () => {
-                if (typeof show_10839932 === 'function') {
-                    show_10839932().then(async () => {
-                        const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                        await updateDoc(docRef, {
-                            ghsSpeed: (stats.ghsSpeed || 11.0) + 0.01
-                        });
-                        document.getElementById('boost-modal').style.display = 'none';
-                        showToast("Güç Artırıldı! +0.01 GH/S", "⚡");
-                    }).catch(() => {
-                        showToast("Reklam izlenmedi", "❌");
-                    });
-                } else {
-                    showToast("Reklam engellendi/yüklenmedi", "⚠️");
-                }
-            };
-        }
-
-        // Davet Sistemi ve Referans Listesi
-        document.getElementById('apply-referral-btn').onclick = async () => {
-            const input = document.getElementById('referral-input').value.trim().toUpperCase();
-            if (!input || input === tgUserId.substring(0, 8).toUpperCase()) return;
-
-            const regRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'referralRegistry', input);
-            const regSnap = await getDoc(regRef);
-
-            if (regSnap.exists()) {
-                const targetId = regSnap.data().ownerId;
-                // Kendine puan ekle ve referansı kaydet
-                const myRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                await updateDoc(myRef, { referredBy: targetId });
-
-                // Davet edene puan ekle
-                const targetRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', targetId);
-                const targetSnap = await getDoc(targetRef);
-                if (targetSnap.exists()) {
-                    const currentBal = targetSnap.data().walletBalance || 0;
-                    await updateDoc(targetRef, { walletBalance: currentBal + 0.03 });
-                    
-                    // Davet edenin listesine ekle
-                    const listCol = collection(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', targetId, 'referrals');
-                    await addDoc(listCol, { name: tgName, id: tgUserId, date: Date.now() });
-                }
-                showToast("Referans Başarılı!");
-            } else {
-                showToast("Geçersiz Kod", "❌");
-            }
-        };
-
-        window.openFriendsList = () => {
-            document.getElementById('friends-list-modal').style.display = 'flex';
-            const listEl = document.getElementById('friends-list-render');
-            const refCol = collection(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId, 'referrals');
-            
-            // Referans listesini canlı olarak bağla
-            onSnapshot(refCol, (snap) => {
-                if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-center text-gray-600 text-[10px] py-16 uppercase font-black tracking-widest">Henüz kimse yok</p>';
-                    return;
-                }
-                listEl.innerHTML = '';
-                snap.forEach(d => {
-                    const data = d.data();
-                    const div = document.createElement('div');
-                    div.className = 'bg-white/5 p-4 rounded-xl mb-2 flex justify-between items-center';
-                    div.innerHTML = `<div><p class="text-xs font-bold uppercase text-white">${data.name}</p><p class="text-[8px] text-gray-500">ID: ${data.id}</p></div><span class="text-green-400 font-bold text-xs">+0.03 TON</span>`;
-                    listEl.appendChild(div);
-                });
-            });
-        };
-
-        window.closeFriendsList = () => document.getElementById('friends-list-modal').style.display = 'none';
-
-        // 5. ADMIN PANELİ (Sadece ID: 83924792)
-        document.getElementById('admin-search-btn').onclick = async () => {
-            const uid = document.getElementById('admin-search-input').value.trim();
-            if (!uid) return;
-            
-            const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', uid);
-            const snap = await getDoc(userRef);
-
-            if (snap.exists()) {
-                const data = snap.data();
-                adminTargetId = uid;
-                document.getElementById('admin-user-details').classList.remove('hidden');
-                document.getElementById('admin-user-id-display').textContent = "UID: " + uid;
-                document.getElementById('admin-edit-ton').value = data.walletBalance || 0;
-                document.getElementById('admin-edit-dragon').value = data.dragonBalance || 0;
-                document.getElementById('admin-edit-ghs').value = data.ghsSpeed || 11.0;
-                showToast("Kullanıcı Bulundu", "🔍");
-            } else {
-                showToast("Kullanıcı Yok", "❌");
-            }
-        };
-
-        document.getElementById('admin-save-btn').onclick = async () => {
-            if (!adminTargetId) return;
-            const userRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', adminTargetId);
-            await updateDoc(userRef, {
-                walletBalance: parseFloat(document.getElementById('admin-edit-ton').value),
-                dragonBalance: parseFloat(document.getElementById('admin-edit-dragon').value),
-                ghsSpeed: parseFloat(document.getElementById('admin-edit-ghs').value)
-            });
-            showToast("Veriler Güncellendi", "🔥");
-        };
-
-        // Kopyalama, Withdraw ve Sıfırlama İşlemleri
-        window.copyMyId = () => {
-            const el = document.createElement('textarea');
-            el.value = tgUserId; document.body.appendChild(el); el.select();
-            document.execCommand('copy'); document.body.removeChild(el);
-            showToast("ID Kopyalandı");
-        };
-
-        const copyBtnSq = document.getElementById('copy-code-btn-square');
-        if (copyBtnSq) {
-            copyBtnSq.onclick = () => {
-                const code = tgUserId.substring(0, 8).toUpperCase();
-                const el = document.createElement('textarea');
-                el.value = code; document.body.appendChild(el); el.select();
-                document.execCommand('copy'); document.body.removeChild(el);
-                showToast("Referans Kodu Kopyalandı", "📋");
-            }
-        }
-
-        const inviteFriendBtn = document.getElementById('invite-friend-btn');
-        if (inviteFriendBtn) {
-            inviteFriendBtn.onclick = () => {
-                const code = tgUserId.substring(0, 8).toUpperCase();
-                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('http://t.me/DragTon_bot/Xc1')}&text=${encodeURIComponent('Bedava TON kazanıyorum, işte referans kodum: ' + code)}`;
-                if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
-            }
-        }
-
-        window.openWithdraw = (asset) => {
-            currentWdAsset = asset;
-            document.getElementById('withdraw-modal').style.display = 'flex';
-            document.getElementById('wd-title').textContent = `${asset} ÇEKİM TALEBİ`;
-            document.getElementById('wd-min-asset').textContent = asset;
-            document.getElementById('wd-receive-asset').textContent = asset;
-            document.getElementById('wd-tag-text').textContent = asset;
-            document.getElementById('wd-tag-img').src = asset === 'TON' ? 'ton.jpg' : 'dragon.jpg';
-            document.getElementById('wd-amount').value = '';
-            document.getElementById('wd-address').value = '';
-            updateWdReceive();
-        };
-
-        window.closeWithdraw = () => { document.getElementById('withdraw-modal').style.display = 'none'; };
-
-        const updateWdReceive = () => {
-            const amt = parseFloat(document.getElementById('wd-amount').value) || 0;
-            const fee = 0.01;
-            document.getElementById('wd-receive').textContent = amt > fee ? (amt - fee).toFixed(4) : "0";
-        };
-
-        document.getElementById('wd-amount').addEventListener('input', updateWdReceive);
-
-        document.getElementById('wd-max-btn').onclick = () => {
-            const bal = currentWdAsset === 'TON' ? stats.walletBalance : stats.dragonBalance;
-            document.getElementById('wd-amount').value = (bal || 0).toFixed(4);
-            updateWdReceive();
-        };
-
-        document.getElementById('wd-send-btn').onclick = async () => {
-            const amount = parseFloat(document.getElementById('wd-amount').value);
-            const address = document.getElementById('wd-address').value.trim();
-            if (!amount || amount <= 0 || !address) { showToast("Alanları doldurun", "⚠️"); return; }
-            
-            try {
-                if (amount < 10) throw new Error("MİN: 10 " + currentWdAsset);
-                const balance = currentWdAsset === 'TON' ? stats.walletBalance : stats.dragonBalance;
-                if (amount > balance) throw new Error("YETERSİZ BAKİYE!");
-                
-                const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                if (currentWdAsset === 'TON') {
-                    await updateDoc(docRef, { walletBalance: stats.walletBalance - amount });
-                } else {
-                    await updateDoc(docRef, { dragonBalance: stats.dragonBalance - amount });
-                }
-                
-                window.closeWithdraw(); 
-                showToast("TALEBİNİZ ALINDI!", "✅");
-            } catch (e) { 
-                showToast(e.message, "❌"); 
-            }
-        };
-
-        document.getElementById('reset-data-btn').onclick = () => {
-            if (confirm("Emin misin? Tüm verilerin silinecek ve puanların sıfırlanacak.")) {
-                const docRef = doc(db, 'artifacts', contextAppId, 'public', 'data', 'userProfiles', tgUserId);
-                deleteDoc(docRef).then(() => { window.location.reload(); });
-            }
-        };
-
-        // Sistemi Başlat (Sadece Telegram'da ise)
-        if (isTelegram) {
-            signInAnonymously(auth).then(res => startSync(res.user));
-        }
-
     </script>
 </body>
 </html>
