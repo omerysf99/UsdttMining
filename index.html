@@ -108,43 +108,6 @@
             letter-spacing: -0.02em;
         }
 
-        /* GELİŞTİRİLMİŞ TON PARÇACIK ANİMASYONU (3 Saniye) */
-        @keyframes coin-flow {
-            0% { 
-                transform: translate(0, 0) scale(0) rotate(0deg); 
-                opacity: 0; 
-            }
-            10% {
-                transform: translate(var(--pop-x), var(--pop-y)) scale(1.1) rotate(45deg);
-                opacity: 1;
-            }
-            25% {
-                transform: translate(var(--pop-x), calc(var(--pop-y) - 20px)) scale(1.2) rotate(90deg);
-                opacity: 1;
-            }
-            100% { 
-                transform: translate(var(--dest-x), var(--dest-y)) scale(0.4) rotate(720deg); 
-                opacity: 0.1; 
-            }
-        }
-
-        .ton-particle {
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-image: url('https://cryptologos.cc/logos/toncoin-ton-logo.png');
-            background-size: 75%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #0088cc;
-            pointer-events: none;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.6), inset 0 0 4px rgba(255,255,255,0.4);
-            /* Animasyon Ayarı */
-            animation: coin-flow 3s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        }
-
         /* Bakiye Güncelleme Parlaması */
         @keyframes balance-glow {
             0% { border-color: #1f1f1f; box-shadow: none; }
@@ -260,7 +223,6 @@
         const fanContainer = document.getElementById('main-fan');
         const toastEl = document.getElementById('toast');
         const headerBalanceEl = document.getElementById('total-ton-header');
-        const appContainer = document.querySelector('.app-container');
         const tonCard = document.getElementById('ton-card');
 
         // Madencilik Sayaç Döngüsü
@@ -272,87 +234,36 @@
 
         setInterval(updateMining, 100);
 
-        /**
-         * Toplama (Claim) Fonksiyonu
-         * Parçacıkları fırlatır ve 3 saniye sonra bakiyeyi günceller.
-         */
-        function claimMining() {
-            if (minedAmount > 0.0000000001) {
-                const amountToClaim = minedAmount;
-                minedAmount = 0;
-                counterEl.innerText = "0.0000000000 TON";
-
-                // 15 parçacıklı yoğun akış
-                const particleCount = 15;
-                for (let i = 0; i < particleCount; i++) {
-                    setTimeout(() => {
-                        createTonParticle();
-                    }, i * 60);
-                }
-
-                // 3 saniyelik animasyonun bitişine yakın bakiye güncellemesi
-                setTimeout(() => {
-                    updateTotalBalance(amountToClaim);
-                }, 2700);
-
-                showToast("Toplanıyor... ⚡");
-            }
-        }
-
-        /**
-         * TON Parçacığı Oluşturma
-         * Dinamik pozisyon hesaplaması yapar.
-         */
-        function createTonParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'ton-particle';
-            
-            const startRect = counterEl.getBoundingClientRect();
-            const containerRect = appContainer.getBoundingClientRect();
-            
-            const startX = startRect.left - containerRect.left + (startRect.width / 2) - 14;
-            const startY = startRect.top - containerRect.top;
-            
-            const targetRect = tonCard.getBoundingClientRect();
-            const destX = (targetRect.left - containerRect.left + 30) - startX;
-            const destY = (targetRect.top - containerRect.top + 25) - startY;
-
-            // Fıskiye Patlama Efekti (Rastgele sıçrama)
-            const popX = (Math.random() - 0.5) * 120;
-            const popY = -40 - (Math.random() * 60);
-
-            particle.style.left = startX + 'px';
-            particle.style.top = startY + 'px';
-            particle.style.setProperty('--pop-x', `${popX}px`);
-            particle.style.setProperty('--pop-y', `${popY}px`);
-            particle.style.setProperty('--dest-x', `${destX}px`);
-            particle.style.setProperty('--dest-y', `${destY}px`);
-
-            appContainer.appendChild(particle);
-            
-            // Animasyon tamamlandığında DOM'dan kaldır
-            setTimeout(() => {
-                particle.remove();
-            }, 3100);
-        }
-
-        // Bakiye formatlama (Gereksiz sıfırları siler)
+        // Bakiye formatlama (Gereksiz sıfırları siler, max 8 basamak)
         function formatTONBalance(num) {
             if (num === 0) return "0";
             return num.toFixed(8).replace(/\.?0+$/, "");
         }
 
-        // Ana Bakiyeyi Güncelleme
-        function updateTotalBalance(amount) {
-            totalBalance += amount;
-            headerBalanceEl.innerText = formatTONBalance(totalBalance) + " TON";
-            
-            // Kart üzerinde görsel geri bildirim
-            tonCard.classList.remove('balance-update');
-            void tonCard.offsetWidth; 
-            tonCard.classList.add('balance-update');
-            
-            showToast("Bakiyeye eklendi! 💰");
+        /**
+         * Toplama (Claim) Fonksiyonu
+         * Animasyonsuz doğrudan aktarım yapar.
+         */
+        function claimMining() {
+            if (minedAmount > 0.0000000001) {
+                const amountToClaim = minedAmount;
+                
+                // Bakiyeyi güncelle
+                totalBalance += amountToClaim;
+                headerBalanceEl.innerText = formatTONBalance(totalBalance) + " TON";
+                
+                // Bildirim mesajını göster
+                showToast("Aktarıldı " + formatTONBalance(amountToClaim) + " ton");
+
+                // Sayacı sıfırla
+                minedAmount = 0;
+                counterEl.innerText = "0.0000000000 TON";
+
+                // Kart üzerinde görsel geri bildirim
+                tonCard.classList.remove('balance-update');
+                void tonCard.offsetWidth; 
+                tonCard.classList.add('balance-update');
+            }
         }
 
         // Hızlandırma Fonksiyonu
