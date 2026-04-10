@@ -68,7 +68,6 @@
             text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
         }
 
-        /* Sayıların Görünümü */
         .balance-text {
             letter-spacing: -0.05em;
         }
@@ -79,13 +78,12 @@
     <!-- Arka Plan Görseli -->
     <div class="bg-curves"></div>
 
-    <!-- Üst Bakiyeler -->
+    <!-- Üst Bakiyeler (Sadece Claim edilenler görünür) -->
     <div class="space-y-3 z-10">
         <!-- SOL Kartı -->
         <div class="card-bg rounded-[24px] p-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-full bg-zinc-800 border border-white/10 overflow-hidden flex items-center justify-center">
-                    <!-- Siyahlık sorunu için arka planı hafif gri yaptım ve logoyu güçlendirdim -->
                     <img src="sol.jpg" class="w-full h-full object-cover" alt="SOL" onerror="this.src='https://cryptologos.cc/logos/solana-sol-logo.png'">
                 </div>
                 <div>
@@ -94,7 +92,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <p class="font-extrabold text-xl balance-text" id="sol-top">0.00 SOL</p>
+                <p class="font-extrabold text-xl balance-text" id="sol-top">0.000000 SOL</p>
                 <button class="w-10 h-10 rounded-xl btn-blue flex items-center justify-center btn-active">
                     <i class="fa-solid fa-wallet text-white text-sm"></i>
                 </button>
@@ -113,7 +111,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <p class="font-extrabold text-xl balance-text" id="ton-top">0.00 TON</p>
+                <p class="font-extrabold text-xl balance-text" id="ton-top">0.000000 TON</p>
                 <button class="w-10 h-10 rounded-xl btn-blue flex items-center justify-center btn-active">
                     <i class="fa-solid fa-wallet text-white text-sm"></i>
                 </button>
@@ -127,21 +125,19 @@
             <!-- Madenci Fan Görseli -->
             <img src="fan2.jpg" class="miner-fan w-full h-full border-4 border-white/5" alt="Miner Fan" onerror="this.style.display='none'; document.getElementById('fallback-fan').style.display='block';">
             
-            <!-- Görsel yüklenmezse diye yedek SVG -->
             <div id="fallback-fan" style="display:none;" class="w-full h-full">
                 <svg class="miner-fan w-full h-full" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="48" fill="#4c1d95" />
                     <path d="M50 10 L50 90 M10 50 L90 50" stroke="white" stroke-width="2" opacity="0.3"/>
                 </svg>
             </div>
-            
-            <!-- Miner ortası boş bırakıldı -->
         </div>
 
-        <!-- Göstergeler -->
+        <!-- Göstergeler (Aktif Madencilik) -->
         <div class="text-center space-y-1">
-            <h1 class="text-4xl font-extrabold balance-text text-white" id="sol-main">0.00 SOL</h1>
-            <h2 class="text-2xl font-bold balance-text text-blue-400" id="ton-main">0.00 TON</h2>
+            <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Mining Progress</p>
+            <h1 class="text-4xl font-extrabold balance-text text-white" id="sol-pending">0.0000000000 SOL</h1>
+            <h2 class="text-2xl font-bold balance-text text-blue-400" id="ton-pending">0.0000000000 TON</h2>
             
             <div class="flex items-center justify-center gap-2 text-gray-400 text-[13px] font-bold mt-4">
                 <i class="fa-solid fa-circle-info opacity-50"></i>
@@ -167,24 +163,24 @@
     <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a]/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center py-3 z-20">
         <button class="flex flex-col items-center gap-1 text-gray-500">
             <i class="fa-solid fa-wallet text-xl"></i>
-            <span class="text-[10px] font-bold uppercase tracking-tighter">Wallet</span>
+            <span class="text-[10px] font-bold uppercase">Wallet</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-gray-500">
             <i class="fa-solid fa-users text-xl"></i>
-            <span class="text-[10px] font-bold uppercase tracking-tighter">Friends</span>
+            <span class="text-[10px] font-bold uppercase">Friends</span>
         </button>
         <button class="flex flex-col items-center gap-1 nav-active">
             <i class="fa-solid fa-fan text-xl"></i>
-            <span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+            <span class="text-[10px] font-bold uppercase">Home</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-gray-500 relative">
             <i class="fa-solid fa-bullseye text-xl"></i>
-            <span class="text-[10px] font-bold uppercase tracking-tighter">Missions</span>
+            <span class="text-[10px] font-bold uppercase">Missions</span>
             <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></span>
         </button>
         <button class="flex flex-col items-center gap-1 text-gray-500">
             <i class="fa-solid fa-sliders text-xl"></i>
-            <span class="text-[10px] font-bold uppercase tracking-tighter">More</span>
+            <span class="text-[10px] font-bold uppercase">More</span>
         </button>
     </nav>
 
@@ -194,40 +190,48 @@
     </div>
 
     <script>
-        // Başlangıç hızı 1 GH/s olarak ayarlandı
-        let sol = 0, ton = 0, speed = 1;
+        // Cüzdan Bakiyeleri (Claim edilenler)
+        let claimedSol = 0;
+        let claimedTon = 0;
+
+        // Madencilik Bakiyeleri (Henüz toplanmamış olanlar)
+        let pendingSol = 0;
+        let pendingTon = 0;
+
+        // Hız Ayarları
+        let speed = 1;
         
-        // Madencilik Hesabı:
         // 1 GH/s = Günde 0.0001 birim
         const DAILY_TARGET = 0.0001; 
         const INTERVAL_MS = 100;
-        const INTERVALS_PER_DAY = (24 * 60 * 60 * 1000) / INTERVAL_MS; // 864,000
+        const INTERVALS_PER_DAY = (24 * 60 * 60 * 1000) / INTERVAL_MS; 
         const INCREMENT_PER_UNIT_SPEED = DAILY_TARGET / INTERVALS_PER_DAY;
 
-        const update = () => {
-            // Ana ekran bakiyeleri
-            document.getElementById('sol-main').innerText = `${sol.toFixed(10)} SOL`;
-            document.getElementById('ton-main').innerText = `${ton.toFixed(10)} TON`;
+        const updateDisplay = () => {
+            // Orta Alan (Bekleyen Madencilik)
+            document.getElementById('sol-pending').innerText = `${pendingSol.toFixed(10)} SOL`;
+            document.getElementById('ton-pending').innerText = `${pendingTon.toFixed(10)} TON`;
             
-            // Üst kartlar
-            document.getElementById('sol-top').innerText = `${sol.toFixed(6)} SOL`;
-            document.getElementById('ton-top').innerText = `${ton.toFixed(6)} TON`;
+            // Üst Kartlar (Sadece Claim Edilenler)
+            document.getElementById('sol-top').innerText = `${claimedSol.toFixed(6)} SOL`;
+            document.getElementById('ton-top').innerText = `${claimedTon.toFixed(6)} TON`;
             
             document.getElementById('speed-text').innerText = `${speed} GH/s`;
         };
 
+        // Madencilik Döngüsü
         setInterval(() => {
             if(speed > 0) {
-                // Her interval'da hıza bağlı olarak ekle
-                sol += INCREMENT_PER_UNIT_SPEED * speed;
-                ton += INCREMENT_PER_UNIT_SPEED * speed;
-                update();
+                pendingSol += INCREMENT_PER_UNIT_SPEED * speed;
+                pendingTon += INCREMENT_PER_UNIT_SPEED * speed;
+                updateDisplay();
             }
         }, INTERVAL_MS);
 
+        // Boost Butonu
         document.getElementById('boost-btn').onclick = () => {
             speed += 6;
-            update();
+            updateDisplay();
             const fan = document.querySelector('.miner-fan');
             const dur = parseFloat(getComputedStyle(fan).animationDuration);
             if(dur > 0.4) {
@@ -236,13 +240,22 @@
             showToast("Hız Artırıldı!");
         };
 
+        // Claim Butonu (Bekleyeni Cüzdana Aktar)
         document.getElementById('claim-btn').onclick = () => {
-            if(sol > 0 || ton > 0) {
-                showToast(`${sol.toFixed(6)} SOL & ${ton.toFixed(6)} TON Toplandı!`);
-                sol = 0; ton = 0;
-                update();
+            if(pendingSol > 0 || pendingTon > 0) {
+                // Değerleri aktar
+                claimedSol += pendingSol;
+                claimedTon += pendingTon;
+
+                showToast(`${pendingSol.toFixed(6)} SOL & ${pendingTon.toFixed(6)} TON toplandı!`);
+                
+                // Bekleyenleri sıfırla
+                pendingSol = 0;
+                pendingTon = 0;
+                
+                updateDisplay();
             } else {
-                showToast("Toplanacak bakiye yok.");
+                showToast("Henüz kazılmış bir bakiye yok.");
             }
         };
 
@@ -257,8 +270,7 @@
             }, 2000);
         }
 
-        // Sayfa yüklendiğinde ilk değerleri göster
-        window.onload = update;
+        window.onload = updateDisplay;
     </script>
 </body>
 </html>
