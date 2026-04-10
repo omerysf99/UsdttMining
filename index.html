@@ -133,18 +133,15 @@
                 </svg>
             </div>
             
-            <!-- Orta Logo -->
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-14 h-14 bg-[#121212] rounded-full border-2 border-purple-500/50 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)]">
-                    <img src="sol.jpg" class="w-8 h-8 rounded-full opacity-90" alt="Center Logo" onerror="this.src='https://cryptologos.cc/logos/solana-sol-logo.png'">
-                </div>
-            </div>
+            <!-- Miner ortası artık boş (Logo kaldırıldı) -->
         </div>
 
         <!-- Göstergeler -->
-        <div class="text-center">
-            <h1 class="text-4xl font-extrabold balance-text mb-1" id="sol-main">0.00 SOL</h1>
-            <div class="flex items-center justify-center gap-2 text-gray-400 text-[13px] font-bold">
+        <div class="text-center space-y-1">
+            <h1 class="text-4xl font-extrabold balance-text text-white" id="sol-main">0.00 SOL</h1>
+            <h2 class="text-2xl font-bold balance-text text-blue-400" id="ton-main">0.00 TON</h2>
+            
+            <div class="flex items-center justify-center gap-2 text-gray-400 text-[13px] font-bold mt-4">
                 <i class="fa-solid fa-circle-info opacity-50"></i>
                 <span id="speed-text">0 GH/s</span>
                 <i class="fa-solid fa-bolt text-orange-500"></i>
@@ -198,19 +195,25 @@
         let sol = 0, ton = 0, speed = 0;
         
         const update = () => {
-            document.getElementById('sol-main').innerText = `${sol.toFixed(2)} SOL`;
-            document.getElementById('sol-top').innerText = `${sol.toFixed(2)} SOL`;
-            document.getElementById('ton-top').innerText = `${ton.toFixed(2)} TON`;
+            // Ana ekran bakiyeleri
+            document.getElementById('sol-main').innerText = `${sol.toFixed(8)} SOL`;
+            document.getElementById('ton-main').innerText = `${ton.toFixed(8)} TON`;
+            
+            // Üst kartlardaki bakiyeler (kısaltılmış)
+            document.getElementById('sol-top').innerText = `${sol.toFixed(4)} SOL`;
+            document.getElementById('ton-top').innerText = `${ton.toFixed(4)} TON`;
+            
             document.getElementById('speed-text').innerText = `${speed} GH/s`;
         };
 
         setInterval(() => {
             if(speed > 0) {
-                sol += speed * 0.0001;
-                ton += speed * 0.0002;
+                // Saniyede biriken miktarlar (hıza göre)
+                sol += speed * 0.0000001;
+                ton += speed * 0.0000002;
                 update();
             }
-        }, 1000);
+        }, 100); // 100ms'de bir güncelleme (daha akıcı görünüm için)
 
         document.getElementById('boost-btn').onclick = () => {
             speed += 6;
@@ -224,10 +227,12 @@
         };
 
         document.getElementById('claim-btn').onclick = () => {
-            if(sol > 0) {
-                showToast(`${sol.toFixed(2)} SOL Toplandı!`);
+            if(sol > 0 || ton > 0) {
+                showToast("Tüm Bakiyeler Toplandı!");
                 sol = 0; ton = 0;
                 update();
+            } else {
+                showToast("Toplanacak bakiye yok.");
             }
         };
 
