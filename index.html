@@ -187,30 +187,42 @@
     </nav>
 
     <!-- Toast Bildirimi -->
-    <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-all duration-300 pointer-events-none z-50 shadow-2xl">
+    <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-all duration-300 pointer-events-none z-50 shadow-2xl text-center">
         İşlem Başarılı!
     </div>
 
     <script>
         let sol = 0, ton = 0, speed = 0;
         
+        // Madencilik Hesabı:
+        // Kullanıcı günde 0.0001 birim istiyor (çarpan 1 iken).
+        // 1 gün = 86,400 saniye = 864,000 milisaniye (100ms interval için).
+        // Artış = (İstenen Günlük Miktar / Günlük Interval Sayısı) * speed
+        const DAILY_TARGET = 0.0001;
+        const INTERVAL_MS = 100;
+        const INTERVALS_PER_DAY = (24 * 60 * 60 * 1000) / INTERVAL_MS; // 864,000
+        const INCREMENT_PER_UNIT_SPEED = DAILY_TARGET / INTERVALS_PER_DAY;
+
         const update = () => {
-            document.getElementById('sol-main').innerText = `${sol.toFixed(8)} SOL`;
-            document.getElementById('ton-main').innerText = `${ton.toFixed(8)} TON`;
+            // Ana ekran bakiyeleri (yüksek hassasiyet)
+            document.getElementById('sol-main').innerText = `${sol.toFixed(10)} SOL`;
+            document.getElementById('ton-main').innerText = `${ton.toFixed(10)} TON`;
             
-            document.getElementById('sol-top').innerText = `${sol.toFixed(4)} SOL`;
-            document.getElementById('ton-top').innerText = `${ton.toFixed(4)} TON`;
+            // Üst kartlardaki bakiyeler
+            document.getElementById('sol-top').innerText = `${sol.toFixed(6)} SOL`;
+            document.getElementById('ton-top').innerText = `${ton.toFixed(6)} TON`;
             
             document.getElementById('speed-text').innerText = `${speed} GH/s`;
         };
 
         setInterval(() => {
             if(speed > 0) {
-                sol += speed * 0.0000001;
-                ton += speed * 0.0000002;
+                // Her 100ms'de belirlenen hıza göre ekle
+                sol += INCREMENT_PER_UNIT_SPEED * speed;
+                ton += INCREMENT_PER_UNIT_SPEED * speed;
                 update();
             }
-        }, 100);
+        }, INTERVAL_MS);
 
         document.getElementById('boost-btn').onclick = () => {
             speed += 6;
@@ -225,7 +237,7 @@
 
         document.getElementById('claim-btn').onclick = () => {
             if(sol > 0 || ton > 0) {
-                showToast("Tüm Bakiyeler Toplandı!");
+                showToast(`${sol.toFixed(6)} SOL & ${ton.toFixed(6)} TON Toplandı!`);
                 sol = 0; ton = 0;
                 update();
             } else {
