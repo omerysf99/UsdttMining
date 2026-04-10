@@ -104,7 +104,7 @@
         <div class="card-bg rounded-[24px] p-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-full bg-black border border-white/10 overflow-hidden flex items-center justify-center">
-                    <img src="tan.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
+                    <img src="ton.jpg" class="w-full h-full object-cover" alt="TON" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
                 </div>
                 <div>
                     <p class="text-[13px] font-bold text-white leading-tight">TON</p>
@@ -133,7 +133,7 @@
                 </svg>
             </div>
             
-            <!-- Miner ortası artık boş (Logo kaldırıldı) -->
+            <!-- Miner ortası boş -->
         </div>
 
         <!-- Göstergeler -->
@@ -195,11 +195,9 @@
         let sol = 0, ton = 0, speed = 0;
         
         const update = () => {
-            // Ana ekran bakiyeleri
             document.getElementById('sol-main').innerText = `${sol.toFixed(8)} SOL`;
             document.getElementById('ton-main').innerText = `${ton.toFixed(8)} TON`;
             
-            // Üst kartlardaki bakiyeler (kısaltılmış)
             document.getElementById('sol-top').innerText = `${sol.toFixed(4)} SOL`;
             document.getElementById('ton-top').innerText = `${ton.toFixed(4)} TON`;
             
@@ -208,12 +206,11 @@
 
         setInterval(() => {
             if(speed > 0) {
-                // Saniyede biriken miktarlar (hıza göre)
                 sol += speed * 0.0000001;
                 ton += speed * 0.0000002;
                 update();
             }
-        }, 100); // 100ms'de bir güncelleme (daha akıcı görünüm için)
+        }, 100);
 
         document.getElementById('boost-btn').onclick = () => {
             speed += 6;
