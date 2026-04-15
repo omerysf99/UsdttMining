@@ -9,156 +9,179 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            background-image: radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%), 
-                              radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+            background: linear-gradient(-45deg, #f8fafc, #fff1f2, #f0f9ff, #f8fafc);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
 
         .glass-nav { 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
         }
 
         .pdf-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .pdf-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-            border-color: rgba(239, 68, 68, 0.2);
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            background: white;
         }
 
-        .btn-primary {
+        .btn-animate {
+            background: linear-gradient(90deg, #ef4444, #f87171, #ef4444);
+            background-size: 200% auto;
+            transition: 0.5s;
+        }
+
+        .btn-animate:hover {
+            background-position: right center;
+            transform: scale(1.03);
+        }
+
+        .search-input {
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .search-input:focus {
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+            transform: translateY(-2px);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.5s ease forwards;
+            animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
     </style>
 </head>
 <body class="min-h-screen text-slate-800">
 
     <!-- Navigasyon -->
-    <nav class="glass-nav sticky top-0 z-50 border-b border-slate-200/60">
+    <nav class="glass-nav sticky top-0 z-50 border-b border-white/40">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer group" onclick="showPage('home')">
-                <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-6 transition-transform">
-                    <i class="fas fa-file-pdf text-white text-lg"></i>
+                <div class="w-11 h-11 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-12 transition-transform duration-300">
+                    <i class="fas fa-file-pdf text-white text-xl"></i>
                 </div>
                 <span class="font-extrabold text-2xl tracking-tight text-slate-900">PDF<span class="text-red-600">Arşiv</span></span>
             </div>
-            <button onclick="showLogin()" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-full font-semibold transition-all">
-                <i class="fas fa-user-shield text-sm"></i>
-                <span>Yönetici</span>
+            <button onclick="showLogin()" class="flex items-center space-x-2 bg-white/80 hover:bg-white text-slate-700 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm border border-slate-200/50">
+                <i class="fab fa-telegram text-blue-500"></i>
+                <span>Yönetici Girişi</span>
             </button>
         </div>
     </nav>
 
     <!-- Ana Sayfa -->
-    <main id="home-page" class="max-w-7xl mx-auto px-6 py-16">
-        <div class="max-w-3xl mx-auto text-center mb-16 animate-fade-in">
-            <h1 class="text-5xl font-black text-slate-900 mb-6 leading-tight">Dökümanlarınıza <br/><span class="text-red-600">Tek Tıkla</span> Erişin</h1>
-            <p class="text-lg text-slate-500 leading-relaxed">Güvenli, hızlı ve doğrudan indirme bağlantılarıyla ihtiyacınız olan tüm dökümanlar elinizin altında.</p>
+    <main id="home-page" class="max-w-7xl mx-auto px-6 py-20">
+        <div class="max-w-3xl mx-auto text-center mb-20 animate-fade-in">
+            <h1 class="text-6xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
+                Dökümanları <br/>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-500">
+                    Hızla İndirin
+                </span>
+            </h1>
+            <p class="text-xl text-slate-500 leading-relaxed font-medium">Güvenli paylaşım, doğrudan erişim. Dosyalarınız için en hızlı çözüm.</p>
             
             <!-- Arama Çubuğu -->
-            <div class="mt-10 relative max-w-lg mx-auto">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="search-bar" onkeyup="filterPDFs()" placeholder="Döküman ismine göre ara..." 
-                       class="search-input w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none transition-all text-slate-700">
+            <div class="mt-12 relative max-w-xl mx-auto group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-orange-400 rounded-3xl blur opacity-10 group-hover:opacity-25 transition duration-1000"></div>
+                <div class="relative">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-bar" onkeyup="filterPDFs()" placeholder="İsme göre döküman ara..." 
+                           class="search-input w-full pl-14 pr-6 py-5 border border-slate-200/60 rounded-2xl outline-none text-slate-700 text-lg shadow-xl">
+                </div>
             </div>
         </div>
 
-        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             <!-- PDF Kartları -->
         </div>
 
-        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-32 opacity-60">
-            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-                <i class="fas fa-search text-slate-300 text-4xl"></i>
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-40">
+            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-8 shadow-inner">
+                <i class="fas fa-folder-open text-slate-200 text-5xl"></i>
             </div>
-            <p class="text-xl font-medium text-slate-400">Aradığınız kriterde dosya bulunamadı.</p>
+            <p class="text-2xl font-bold text-slate-400">Aradığınız dosya bulunamadı.</p>
         </div>
     </main>
 
     <!-- Admin Paneli -->
-    <main id="admin-page" class="hidden max-w-5xl mx-auto px-6 py-16 animate-fade-in">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <main id="admin-page" class="hidden max-w-6xl mx-auto px-6 py-20 animate-fade-in">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
             <div>
-                <h2 class="text-3xl font-black text-slate-900">Yönetim Paneli</h2>
-                <p class="text-slate-500 mt-1" id="stats-text">Toplam 0 döküman kayıtlı.</p>
+                <h2 class="text-4xl font-black text-slate-900">Yönetici Paneli</h2>
+                <p class="text-slate-500 text-lg mt-2" id="stats-text font-semibold">Sistem aktif ve dökümanlar yayında.</p>
             </div>
-            <button onclick="logout()" class="inline-flex items-center space-x-2 bg-white border border-slate-200 px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Güvenli Çıkış</span>
+            <button onclick="logout()" class="inline-flex items-center space-x-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-xl shadow-slate-200">
+                <i class="fas fa-power-off"></i>
+                <span>Oturumu Kapat</span>
             </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <!-- Form -->
-            <div class="lg:col-span-1">
-                <div class="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-28">
-                    <h3 class="text-xl font-bold mb-6 flex items-center">
-                        <span class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center mr-3 text-sm">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        Yeni PDF Ekle
+            <div class="lg:col-span-4">
+                <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 sticky top-32">
+                    <h3 class="text-2xl font-black mb-8 flex items-center text-slate-800">
+                        <i class="fas fa-circle-plus text-red-600 mr-3"></i>
+                        Yeni Ekle
                     </h3>
-                    <div class="space-y-5">
+                    <div class="space-y-6">
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Dosya Başlığı</label>
-                            <input type="text" id="pdf-name" placeholder="Örn: Teknik Çizim v2" 
-                                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
+                            <label class="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Döküman Adı</label>
+                            <input type="text" id="pdf-name" placeholder="Örn: 2024 Proje Detay" 
+                                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Dropbox Linki</label>
+                            <label class="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Dropbox Link</label>
                             <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." 
-                                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm">
+                                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
                         </div>
-                        <button onclick="addPDF()" class="btn-primary w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Sisteme Kaydet</span>
+                        <button onclick="addPDF()" class="btn-animate w-full text-white font-black py-5 rounded-2xl shadow-lg shadow-red-100 flex items-center justify-center space-x-3 text-lg">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                            <span>Sisteme Yükle</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Liste -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                    <div class="p-6 border-b border-slate-50 bg-slate-50/50">
-                        <h3 class="font-bold text-slate-700">Mevcut Dökümanlar</h3>
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="px-10 py-8 border-b border-slate-50 bg-slate-50/30">
+                        <h3 class="font-black text-xl text-slate-800">Dosya Yönetimi</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead class="bg-slate-50/30">
+                            <thead class="bg-slate-50/50">
                                 <tr>
-                                    <th class="px-8 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Dosya Adı</th>
-                                    <th class="px-8 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-400">Aksiyon</th>
+                                    <th class="px-10 py-5 text-left text-xs font-black uppercase tracking-widest text-slate-400">Dosya Bilgisi</th>
+                                    <th class="px-10 py-5 text-right text-xs font-black uppercase tracking-widest text-slate-400">İşlem</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-list" class="divide-y divide-slate-100">
-                                <!-- Liste Buraya -->
+                            <tbody id="admin-list" class="divide-y divide-slate-50">
+                                <!-- Kayıtlar -->
                             </tbody>
                         </table>
                     </div>
@@ -168,33 +191,36 @@
     </main>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-3xl p-10 max-w-md w-full shadow-2xl animate-fade-in">
-            <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-fingerprint text-slate-400 text-3xl"></i>
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-6">
+        <div class="bg-white rounded-[3rem] p-12 max-w-md w-full shadow-2xl animate-fade-in border border-white/20">
+            <div class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <i class="fab fa-telegram text-blue-600 text-4xl"></i>
             </div>
-            <h2 class="text-2xl font-black mb-2 text-center text-slate-900">Yönetici Yetkilendirme</h2>
-            <p class="text-slate-500 text-center mb-8 text-sm">Değişiklik yapmak için lütfen şifrenizi girin.</p>
+            <h2 class="text-3xl font-black mb-3 text-center text-slate-900 tracking-tight">Telegram Doğrulama</h2>
+            <p class="text-slate-500 text-center mb-10 font-medium">Yönetici paneline erişmek için Telegram üzerinden size iletilen kodu girin.</p>
             
-            <input type="password" id="admin-pass" placeholder="Şifre" 
-                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl mb-6 outline-none focus:ring-2 focus:ring-red-500 text-center text-lg tracking-widest transition-all">
+            <input type="text" id="admin-pass" placeholder="Kod Giriniz" 
+                   class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl mb-8 outline-none focus:ring-2 focus:ring-blue-600 text-center text-3xl tracking-widest transition-all shadow-inner font-bold">
             
             <div class="flex space-x-4">
-                <button onclick="closeLogin()" class="flex-1 px-6 py-3 text-slate-500 font-bold hover:bg-slate-100 rounded-xl transition">Vazgeç</button>
-                <button onclick="login()" class="flex-1 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg">Onayla</button>
+                <button onclick="closeLogin()" class="flex-1 px-6 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition">İptal</button>
+                <button onclick="login()" class="flex-1 px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-xl shadow-blue-100">Giriş Yap</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Bildirimi -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 transform translate-y-24 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-[200] flex items-center space-x-3">
-        <i class="fas fa-info-circle text-red-400"></i>
-        <span id="toast-msg" class="font-semibold tracking-wide">Mesaj</span>
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 transform translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-10 py-5 rounded-3xl shadow-2xl z-[200] flex items-center space-x-4 border border-white/10">
+        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-info-circle text-xs text-white"></i>
+        </div>
+        <span id="toast-msg" class="font-bold tracking-wide">İşlem Başarılı</span>
     </div>
 
     <script>
         let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [];
-        const ADMIN_PASSWORD = "1234"; 
+        // Yeni Yönetici Numarası/Kodu
+        const ADMIN_CODE = "8392479231"; 
         let isAdmin = false;
 
         function showPage(page) {
@@ -207,6 +233,7 @@
                 document.getElementById('home-page').classList.remove('hidden');
             }
             renderLists();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function formatDropboxUrl(url) {
@@ -236,7 +263,7 @@
                 pdf.name.toLowerCase().includes(filter.toLowerCase())
             );
 
-            statsText.innerText = `Toplam ${pdfData.length} döküman kayıtlı.`;
+            if (statsText) statsText.innerText = `Toplam ${pdfData.length} döküman yayında.`;
 
             if (filteredData.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -246,29 +273,34 @@
                 filteredData.forEach((pdf, index) => {
                     const directUrl = formatDropboxUrl(pdf.url);
 
-                    // Ana Sayfa Kartı
                     list.innerHTML += `
-                        <div class="pdf-card bg-white p-8 rounded-[2rem] animate-fade-in" style="animation-delay: ${index * 0.1}s">
-                            <div class="flex items-start justify-between mb-8">
-                                <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center">
-                                    <i class="fas fa-file-pdf text-2xl"></i>
+                        <div class="pdf-card p-10 rounded-[3rem] animate-fade-in relative overflow-hidden group" style="animation-delay: ${index * 0.1}s">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-[5rem] -mr-10 -mt-10 transition-all group-hover:bg-red-100"></div>
+                            <div class="relative z-10">
+                                <div class="w-16 h-16 bg-white shadow-xl shadow-red-50 text-red-600 rounded-3xl flex items-center justify-center mb-10 transition-transform group-hover:scale-110">
+                                    <i class="fas fa-file-pdf text-3xl"></i>
                                 </div>
-                                <span class="text-[10px] font-black uppercase tracking-[0.2em] bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Döküman</span>
+                                <h3 class="text-2xl font-black text-slate-800 mb-8 leading-tight min-h-[4rem]">${pdf.name}</h3>
+                                <a href="${directUrl}" target="_blank" class="btn-animate w-full inline-flex items-center justify-center px-8 py-5 text-white rounded-[2rem] font-black text-lg shadow-xl shadow-red-100">
+                                    <i class="fas fa-download mr-3"></i> İndir
+                                </a>
                             </div>
-                            <h3 class="text-xl font-extrabold text-slate-800 mb-6 leading-tight h-14 overflow-hidden">${pdf.name}</h3>
-                            <a href="${directUrl}" target="_blank" class="btn-primary w-full inline-flex items-center justify-center px-6 py-4 text-white rounded-2xl font-bold">
-                                <i class="fas fa-arrow-down-long mr-2"></i> İndirmeyi Başlat
-                            </a>
                         </div>
                     `;
 
-                    // Admin Listesi
                     adminList.innerHTML += `
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-8 py-5 text-sm font-bold text-slate-700">${pdf.name}</td>
-                            <td class="px-8 py-5 text-right">
-                                <button onclick="deletePDF(${pdf.id})" class="w-10 h-10 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
-                                    <i class="fas fa-trash-can"></i>
+                        <tr class="hover:bg-slate-50/80 transition-all group">
+                            <td class="px-10 py-7">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-700 text-lg">${pdf.name}</span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-7 text-right">
+                                <button onclick="deletePDF(${pdf.id})" class="w-12 h-12 inline-flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
+                                    <i class="fas fa-trash-can text-lg"></i>
                                 </button>
                             </td>
                         </tr>
@@ -289,7 +321,7 @@
             let url = urlInput.value.trim();
 
             if (!name || !url) {
-                showToast("Lütfen tüm alanları doldurun!");
+                showToast("Lütfen eksik alan bırakmayın!");
                 return;
             }
 
@@ -297,7 +329,7 @@
             saveData();
             nameInput.value = '';
             urlInput.value = '';
-            showToast("Döküman kütüphaneye eklendi.");
+            showToast("Döküman başarıyla eklendi.");
             renderLists();
         }
 
@@ -305,7 +337,7 @@
             pdfData = pdfData.filter(p => p.id !== id);
             saveData();
             renderLists();
-            showToast("Döküman başarıyla silindi.");
+            showToast("Dosya sistemden silindi.");
         }
 
         function saveData() {
@@ -322,14 +354,14 @@
         }
 
         function login() {
-            const pass = document.getElementById('admin-pass').value;
-            if (pass === ADMIN_PASSWORD) {
+            const code = document.getElementById('admin-pass').value.trim();
+            if (code === ADMIN_CODE) {
                 isAdmin = true;
                 closeLogin();
                 showPage('admin');
-                showToast("Yönetici girişi başarılı.");
+                showToast("Telegram doğrulaması başarılı.");
             } else {
-                showToast("Geçersiz şifre!");
+                showToast("Geçersiz Telegram kodu!");
             }
             document.getElementById('admin-pass').value = '';
         }
@@ -343,9 +375,9 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.remove('translate-y-32', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-24', 'opacity-0');
+                toast.classList.add('translate-y-32', 'opacity-0');
             }, 3000);
         }
 
