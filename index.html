@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Çoklu Giriş Paneli</title>
+    <title>Firebase Giriş Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass-card {
@@ -17,65 +17,51 @@
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 text-slate-800">
 
     <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl">
+        <!-- Giriş Arayüzü -->
         <div id="auth-ui">
             <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-slate-800">Giriş Yap</h1>
-                <p class="text-slate-500 mt-2">Tercih ettiğiniz yöntemi seçin</p>
+                <h1 class="text-2xl font-bold text-slate-800">Hoş Geldiniz</h1>
+                <p class="text-slate-500 mt-2">Devam etmek için bir yöntem seçin</p>
             </div>
 
-            <!-- Giriş Seçenekleri -->
-            <div id="auth-methods" class="space-y-3">
-                <!-- Google Login -->
+            <div class="space-y-4">
+                <!-- Google Giriş Düğmesi -->
                 <button onclick="signInWithGoogle()" 
-                    class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 font-semibold py-3 rounded-xl transition-all shadow-sm active:scale-95">
+                    id="google-btn"
+                    class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 font-semibold py-3 rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50">
                     <svg class="w-5 h-5" viewBox="0 0 48 48">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                     </svg>
                     Google ile Devam Et
                 </button>
 
-                <div class="relative py-4">
+                <div class="relative py-2">
                     <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-200"></span></div>
                     <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400">Veya</span></div>
                 </div>
 
                 <!-- E-posta Formu -->
-                <div class="space-y-2">
-                    <input type="email" id="email" placeholder="E-posta" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    <input type="password" id="password" placeholder="Şifre" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    <div class="flex gap-2">
-                        <button onclick="handleEmailAuth('signin')" class="flex-1 bg-slate-800 text-white py-2 rounded-lg text-sm font-semibold hover:bg-slate-700">Giriş Yap</button>
-                        <button onclick="handleEmailAuth('signup')" class="flex-1 border border-slate-800 text-slate-800 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Kayıt Ol</button>
+                <div class="space-y-3">
+                    <input type="email" id="email" placeholder="E-posta adresi" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <input type="password" id="password" placeholder="Şifre" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <div class="flex gap-3">
+                        <button onclick="handleEmailAuth('signin')" class="flex-1 bg-slate-800 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition-all active:scale-95">Giriş Yap</button>
+                        <button onclick="handleEmailAuth('signup')" class="flex-1 border border-slate-800 text-slate-800 py-3 rounded-xl font-semibold hover:bg-slate-50 transition-all active:scale-95">Kayıt Ol</button>
                     </div>
-                </div>
-
-                <div class="relative py-4">
-                    <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-200"></span></div>
-                </div>
-
-                <!-- Telefon Girişi -->
-                <div id="phone-section">
-                    <input type="tel" id="phoneNumber" placeholder="+90 5xx..." value="+90" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2">
-                    <div id="recaptcha-container"></div>
-                    <button onclick="sendOTP()" id="phone-btn" class="w-full bg-emerald-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 mt-2">Telefon ile Kod Gönder</button>
-                </div>
-
-                <div id="otp-section" class="hidden space-y-2">
-                    <input type="text" id="verificationCode" placeholder="6 Haneli Kod" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none text-center tracking-widest">
-                    <button onclick="verifyOTP()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold">Kodu Doğrula</button>
                 </div>
             </div>
         </div>
 
-        <!-- Başarı Ekranı -->
-        <div id="success-ui" class="hidden text-center">
-            <div id="user-photo-container" class="mb-4"></div>
-            <h2 class="text-xl font-bold" id="user-display-name">Hoş Geldiniz!</h2>
-            <p class="text-slate-500 text-sm mb-4" id="user-email-phone"></p>
-            <button onclick="signOutUser()" class="w-full py-2 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors">Çıkış Yap</button>
+        <!-- Başarı Arayüzü -->
+        <div id="success-ui" class="hidden text-center py-4">
+            <div id="user-photo-container" class="mb-6"></div>
+            <h2 class="text-2xl font-bold text-slate-800" id="user-display-name">Hoş Geldiniz!</h2>
+            <p class="text-slate-500 mt-1 mb-8" id="user-email-info"></p>
+            <button onclick="signOutUser()" class="w-full py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-all active:scale-95">Güvenli Çıkış Yap</button>
         </div>
 
-        <div id="message-box" class="mt-4 p-3 rounded-lg text-xs hidden text-center"></div>
+        <!-- Mesaj Kutusu -->
+        <div id="message-box" class="mt-6 p-4 rounded-xl text-sm hidden text-center"></div>
     </div>
 
     <script type="module">
@@ -86,8 +72,7 @@
             signInWithPopup, 
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword,
-            RecaptchaVerifier,
-            signInWithPhoneNumber,
+            onAuthStateChanged,
             signOut 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -107,75 +92,103 @@
 
         function showMessage(msg, isError = false) {
             const box = document.getElementById('message-box');
-            box.innerText = msg;
-            box.className = `mt-4 p-3 rounded-lg text-xs text-center ${isError ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`;
+            box.innerHTML = '';
+            box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-700', 'bg-amber-100', 'text-amber-800');
+            
+            if (isError) {
+                // auth/unauthorized-domain hatasını yakala ve kullanıcıya çözüm sun
+                if (msg.toLowerCase().includes('unauthorized-domain')) {
+                    const currentHostname = window.location.hostname;
+                    box.classList.add('bg-amber-100', 'text-amber-800');
+                    box.innerHTML = `
+                        <div class="text-left">
+                            <strong class="block mb-1">⚠️ Yetkisiz Alan Adı Saptandı!</strong>
+                            <p class="mb-2 text-[12px]">Bu uygulamanın Google ile giriş yapabilmesi için aşağıdaki adresi Firebase Console'a eklemelisiniz:</p>
+                            <div class="flex items-center gap-2 p-2 bg-white/60 rounded border border-amber-300 mb-2">
+                                <code class="flex-1 font-mono text-[10px] break-all">${currentHostname}</code>
+                            </div>
+                            <p class="text-[10px] opacity-80 italic">Yol: Firebase Console > Authentication > Settings > Authorized Domains</p>
+                        </div>
+                    `;
+                } else {
+                    box.classList.add('bg-red-100', 'text-red-700');
+                    box.innerText = msg;
+                }
+            } else {
+                box.classList.add('bg-emerald-100', 'text-emerald-700');
+                box.innerText = msg;
+            }
+            box.classList.remove('hidden');
         }
 
         function updateUI(user) {
+            const authUi = document.getElementById('auth-ui');
+            const successUi = document.getElementById('success-ui');
+            const nameEl = document.getElementById('user-display-name');
+            const emailEl = document.getElementById('user-email-info');
+            const photoEl = document.getElementById('user-photo-container');
+
             if (user) {
-                document.getElementById('auth-ui').classList.add('hidden');
-                document.getElementById('success-ui').classList.remove('hidden');
-                document.getElementById('user-display-name').innerText = user.displayName || 'Kullanıcı';
-                document.getElementById('user-email-phone').innerText = user.email || user.phoneNumber;
+                authUi.classList.add('hidden');
+                successUi.classList.remove('hidden');
+                document.getElementById('message-box').classList.add('hidden');
+                nameEl.innerText = user.displayName || 'Kullanıcı';
+                emailEl.innerText = user.email || 'E-posta tanımlı değil';
+                
                 if (user.photoURL) {
-                    document.getElementById('user-photo-container').innerHTML = `<img src="${user.photoURL}" class="w-20 h-20 rounded-full mx-auto shadow-md border-2 border-white">`;
+                    photoEl.innerHTML = `<img src="${user.photoURL}" class="w-24 h-24 rounded-full mx-auto shadow-xl border-4 border-white">`;
+                } else {
+                    photoEl.innerHTML = `<div class="w-24 h-24 bg-slate-200 rounded-full mx-auto flex items-center justify-center text-3xl text-slate-400">👤</div>`;
                 }
             } else {
-                document.getElementById('auth-ui').classList.remove('hidden');
-                document.getElementById('success-ui').classList.add('hidden');
-                document.getElementById('message-box').classList.add('hidden');
+                authUi.classList.remove('hidden');
+                successUi.classList.add('hidden');
             }
         }
 
-        // --- Google Login ---
         window.signInWithGoogle = async () => {
+            const btn = document.getElementById('google-btn');
+            btn.disabled = true;
             const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+
             try {
                 const result = await signInWithPopup(auth, provider);
                 updateUI(result.user);
-            } catch (e) { showMessage(e.message, true); }
+            } catch (error) {
+                console.error("Auth Error Details:", error);
+                showMessage(error.message || error.code, true);
+            } finally {
+                btn.disabled = false;
+            }
         };
 
-        // --- Email/Password ---
         window.handleEmailAuth = async (type) => {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
+
+            if (!email || !pass) {
+                showMessage("Lütfen alanları doldurun.", true);
+                return;
+            }
+
             try {
                 const result = (type === 'signup') 
                     ? await createUserWithEmailAndPassword(auth, email, pass)
                     : await signInWithEmailAndPassword(auth, email, pass);
                 updateUI(result.user);
-            } catch (e) { showMessage(e.message, true); }
+            } catch (error) {
+                showMessage(error.message, true);
+            }
         };
 
-        // --- Phone Login ---
-        window.setupRecaptcha = () => {
-            if (window.recaptchaVerifier) return;
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+        window.signOutUser = () => {
+            signOut(auth).then(() => {
+                location.reload();
+            });
         };
 
-        window.sendOTP = async () => {
-            const phone = document.getElementById('phoneNumber').value;
-            setupRecaptcha();
-            try {
-                window.confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-                document.getElementById('phone-section').classList.add('hidden');
-                document.getElementById('otp-section').classList.remove('hidden');
-                showMessage("Doğrulama kodu gönderildi.");
-            } catch (e) { showMessage(e.message, true); }
-        };
-
-        window.verifyOTP = async () => {
-            const code = document.getElementById('verificationCode').value;
-            try {
-                const result = await window.confirmationResult.confirm(code);
-                updateUI(result.user);
-            } catch (e) { showMessage("Hatalı kod.", true); }
-        };
-
-        window.signOutUser = () => signOut(auth).then(() => location.reload());
-
-        auth.onAuthStateChanged(updateUI);
+        onAuthStateChanged(auth, updateUI);
     </script>
 </body>
 </html>
