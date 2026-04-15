@@ -7,111 +7,196 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .pdf-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%), 
+                              radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+        }
+
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .pdf-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .pdf-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-primary {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
+<body class="min-h-screen text-slate-800">
 
     <!-- Navigasyon -->
-    <nav class="glass sticky top-0 z-50 border-b border-gray-200">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
-                <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
-                <span class="font-bold text-xl tracking-tight">PDF Depom</span>
+    <nav class="glass-nav sticky top-0 z-50 border-b border-slate-200/60">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="showPage('home')">
+                <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-6 transition-transform">
+                    <i class="fas fa-file-pdf text-white text-lg"></i>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight text-slate-900">PDF<span class="text-red-600">Arşiv</span></span>
             </div>
-            <button onclick="showLogin()" class="text-gray-600 hover:text-red-600 font-medium transition">
-                <i class="fas fa-lock-open mr-1"></i> Yönetici Girişi
+            <button onclick="showLogin()" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-full font-semibold transition-all">
+                <i class="fas fa-user-shield text-sm"></i>
+                <span>Yönetici</span>
             </button>
         </div>
     </nav>
 
-    <!-- Ana Sayfa (Ziyaretçi Görünümü) -->
-    <main id="home-page" class="max-w-6xl mx-auto px-4 py-12">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-extrabold mb-4">Döküman Arşivi</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">Aşağıdaki listeden ihtiyacınız olan PDF dosyasını seçip tek tıkla cihazınıza indirebilirsiniz.</p>
+    <!-- Ana Sayfa -->
+    <main id="home-page" class="max-w-7xl mx-auto px-6 py-16">
+        <div class="max-w-3xl mx-auto text-center mb-16 animate-fade-in">
+            <h1 class="text-5xl font-black text-slate-900 mb-6 leading-tight">Dökümanlarınıza <br/><span class="text-red-600">Tek Tıkla</span> Erişin</h1>
+            <p class="text-lg text-slate-500 leading-relaxed">Güvenli, hızlı ve doğrudan indirme bağlantılarıyla ihtiyacınız olan tüm dökümanlar elinizin altında.</p>
+            
+            <!-- Arama Çubuğu -->
+            <div class="mt-10 relative max-w-lg mx-auto">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="search-bar" onkeyup="filterPDFs()" placeholder="Döküman ismine göre ara..." 
+                       class="search-input w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none transition-all text-slate-700">
+            </div>
         </div>
 
-        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- PDF Kartları Buraya Gelecek -->
+        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- PDF Kartları -->
         </div>
 
-        <div id="empty-state" class="hidden text-center py-20">
-            <i class="fas fa-folder-open text-gray-300 text-6xl mb-4"></i>
-            <p class="text-gray-500">Henüz yüklenmiş bir döküman bulunmuyor.</p>
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-32 opacity-60">
+            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-search text-slate-300 text-4xl"></i>
+            </div>
+            <p class="text-xl font-medium text-slate-400">Aradığınız kriterde dosya bulunamadı.</p>
         </div>
     </main>
 
     <!-- Admin Paneli -->
-    <main id="admin-page" class="hidden max-w-4xl mx-auto px-4 py-12">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Yönetim Paneli</h2>
-            <button onclick="logout()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm transition">Güvenli Çıkış</button>
-        </div>
-
-        <!-- Yeni Ekleme Formu -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-            <h3 class="text-lg font-semibold mb-4">Yeni PDF Ekle</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Döküman Adı</label>
-                    <input type="text" id="pdf-name" placeholder="Örn: 2024 Kullanım Klavuzu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Dropbox Paylaşım Linki</label>
-                    <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
-                </div>
-                <button onclick="addPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-red-200">
-                    Sisteme Kaydet
-                </button>
+    <main id="admin-page" class="hidden max-w-5xl mx-auto px-6 py-16 animate-fade-in">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div>
+                <h2 class="text-3xl font-black text-slate-900">Yönetim Paneli</h2>
+                <p class="text-slate-500 mt-1" id="stats-text">Toplam 0 döküman kayıtlı.</p>
             </div>
+            <button onclick="logout()" class="inline-flex items-center space-x-2 bg-white border border-slate-200 px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Güvenli Çıkış</span>
+            </button>
         </div>
 
-        <!-- Mevcut Dosyaları Yönet -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-gray-50 border-b border-gray-100">
-                    <tr>
-                        <th class="px-6 py-4 text-sm font-semibold">Dosya Adı</th>
-                        <th class="px-6 py-4 text-sm font-semibold">İşlem</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-list">
-                    <!-- Yönetim Listesi -->
-                </tbody>
-            </table>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <!-- Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-28">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center mr-3 text-sm">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        Yeni PDF Ekle
+                    </h3>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Dosya Başlığı</label>
+                            <input type="text" id="pdf-name" placeholder="Örn: Teknik Çizim v2" 
+                                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Dropbox Linki</label>
+                            <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." 
+                                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm">
+                        </div>
+                        <button onclick="addPDF()" class="btn-primary w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Sisteme Kaydet</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-50 bg-slate-50/50">
+                        <h3 class="font-bold text-slate-700">Mevcut Dökümanlar</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50/30">
+                                <tr>
+                                    <th class="px-8 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Dosya Adı</th>
+                                    <th class="px-8 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-400">Aksiyon</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-list" class="divide-y divide-slate-100">
+                                <!-- Liste Buraya -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6 text-center">Yönetici Girişi</h2>
-            <input type="password" id="admin-pass" placeholder="Şifre" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 outline-none focus:border-red-500">
-            <div class="flex space-x-3">
-                <button onclick="closeLogin()" class="flex-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">İptal</button>
-                <button onclick="login()" class="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-800 transition">Giriş Yap</button>
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
+        <div class="bg-white rounded-3xl p-10 max-w-md w-full shadow-2xl animate-fade-in">
+            <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-fingerprint text-slate-400 text-3xl"></i>
             </div>
-            <p class="text-xs text-gray-400 mt-4 text-center">Varsayılan şifre: 1234</p>
+            <h2 class="text-2xl font-black mb-2 text-center text-slate-900">Yönetici Yetkilendirme</h2>
+            <p class="text-slate-500 text-center mb-8 text-sm">Değişiklik yapmak için lütfen şifrenizi girin.</p>
+            
+            <input type="password" id="admin-pass" placeholder="Şifre" 
+                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl mb-6 outline-none focus:ring-2 focus:ring-red-500 text-center text-lg tracking-widest transition-all">
+            
+            <div class="flex space-x-4">
+                <button onclick="closeLogin()" class="flex-1 px-6 py-3 text-slate-500 font-bold hover:bg-slate-100 rounded-xl transition">Vazgeç</button>
+                <button onclick="login()" class="flex-1 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg">Onayla</button>
+            </div>
         </div>
     </div>
 
-    <!-- Bildirim Kutusu -->
-    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl z-[200]">
-        Mesaj buraya gelecek.
+    <!-- Toast Bildirimi -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 transform translate-y-24 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-[200] flex items-center space-x-3">
+        <i class="fas fa-info-circle text-red-400"></i>
+        <span id="toast-msg" class="font-semibold tracking-wide">Mesaj</span>
     </div>
 
     <script>
-        // Veritabanı simülasyonu (LocalStorage)
         let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [];
-
         const ADMIN_PASSWORD = "1234"; 
         let isAdmin = false;
 
-        // Sayfa Değiştirme
         function showPage(page) {
             document.getElementById('home-page').classList.add('hidden');
             document.getElementById('admin-page').classList.add('hidden');
@@ -124,65 +209,66 @@
             renderLists();
         }
 
-        // Dropbox linkini direct linke çevirme fonksiyonu
         function formatDropboxUrl(url) {
             if (!url.includes("dropbox.com")) return url;
-            
             try {
-                let cleanUrl = url.split('?')[0]; // URL'in ana kısmını al
+                let cleanUrl = url.split('?')[0];
                 let urlObj = new URL(url);
                 let params = new URLSearchParams(urlObj.search);
-                
-                // Mevcut tüm parametreleri koru ama dl'yi 1 yap
                 params.set('dl', '1');
-                
                 return cleanUrl + "?" + params.toString();
             } catch (e) {
-                // Hata durumunda manuel değişim yap
                 if (url.includes("dl=0")) return url.replace("dl=0", "dl=1");
                 return url + (url.includes("?") ? "&dl=1" : "?dl=1");
             }
         }
 
-        // Listeleri Render Etme
-        function renderLists() {
+        function renderLists(filter = "") {
             const list = document.getElementById('pdf-list');
             const adminList = document.getElementById('admin-list');
             const emptyState = document.getElementById('empty-state');
+            const statsText = document.getElementById('stats-text');
             
             list.innerHTML = '';
             adminList.innerHTML = '';
+            
+            const filteredData = pdfData.filter(pdf => 
+                pdf.name.toLowerCase().includes(filter.toLowerCase())
+            );
 
-            if (pdfData.length === 0) {
+            statsText.innerText = `Toplam ${pdfData.length} döküman kayıtlı.`;
+
+            if (filteredData.length === 0) {
                 emptyState.classList.remove('hidden');
             } else {
                 emptyState.classList.add('hidden');
                 
-                pdfData.forEach(pdf => {
+                filteredData.forEach((pdf, index) => {
                     const directUrl = formatDropboxUrl(pdf.url);
 
                     // Ana Sayfa Kartı
                     list.innerHTML += `
-                        <div class="pdf-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                            <div class="mb-4">
-                                <div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center mb-4">
-                                    <i class="fas fa-file-pdf text-xl"></i>
+                        <div class="pdf-card bg-white p-8 rounded-[2rem] animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                            <div class="flex items-start justify-between mb-8">
+                                <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-file-pdf text-2xl"></i>
                                 </div>
-                                <h3 class="font-bold text-gray-800 line-clamp-2">${pdf.name}</h3>
+                                <span class="text-[10px] font-black uppercase tracking-[0.2em] bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Döküman</span>
                             </div>
-                            <a href="${directUrl}" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition group">
-                                <i class="fas fa-download mr-2 group-hover:bounce"></i> İndir
+                            <h3 class="text-xl font-extrabold text-slate-800 mb-6 leading-tight h-14 overflow-hidden">${pdf.name}</h3>
+                            <a href="${directUrl}" target="_blank" class="btn-primary w-full inline-flex items-center justify-center px-6 py-4 text-white rounded-2xl font-bold">
+                                <i class="fas fa-arrow-down-long mr-2"></i> İndirmeyi Başlat
                             </a>
                         </div>
                     `;
 
-                    // Admin Satırı
+                    // Admin Listesi
                     adminList.innerHTML += `
-                        <tr class="border-b border-gray-50 last:border-0">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-700">${pdf.name}</td>
-                            <td class="px-6 py-4">
-                                <button onclick="deletePDF(${pdf.id})" class="text-red-500 hover:text-red-700 p-2">
-                                    <i class="fas fa-trash-alt"></i>
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-8 py-5 text-sm font-bold text-slate-700">${pdf.name}</td>
+                            <td class="px-8 py-5 text-right">
+                                <button onclick="deletePDF(${pdf.id})" class="w-10 h-10 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                    <i class="fas fa-trash-can"></i>
                                 </button>
                             </td>
                         </tr>
@@ -191,50 +277,44 @@
             }
         }
 
-        // PDF Ekleme
+        function filterPDFs() {
+            const query = document.getElementById('search-bar').value;
+            renderLists(query);
+        }
+
         function addPDF() {
-            const name = document.getElementById('pdf-name').value;
-            let url = document.getElementById('pdf-url').value;
+            const nameInput = document.getElementById('pdf-name');
+            const urlInput = document.getElementById('pdf-url');
+            const name = nameInput.value.trim();
+            let url = urlInput.value.trim();
 
             if (!name || !url) {
                 showToast("Lütfen tüm alanları doldurun!");
                 return;
             }
 
-            const newPDF = {
-                id: Date.now(),
-                name: name,
-                url: url.trim()
-            };
-
-            pdfData.push(newPDF);
+            pdfData.push({ id: Date.now(), name, url });
             saveData();
-            document.getElementById('pdf-name').value = '';
-            document.getElementById('pdf-url').value = '';
-            showToast("Döküman başarıyla eklendi.");
+            nameInput.value = '';
+            urlInput.value = '';
+            showToast("Döküman kütüphaneye eklendi.");
             renderLists();
         }
 
-        // PDF Silme
         function deletePDF(id) {
             pdfData = pdfData.filter(p => p.id !== id);
             saveData();
             renderLists();
-            showToast("Döküman sistemden silindi.");
+            showToast("Döküman başarıyla silindi.");
         }
 
-        // Veri Kaydetme
         function saveData() {
             localStorage.setItem('my_pdfs', JSON.stringify(pdfData));
         }
 
-        // Login İşlemleri
         function showLogin() {
-            if(isAdmin) {
-                showPage('admin');
-            } else {
-                document.getElementById('login-modal').classList.remove('hidden');
-            }
+            if(isAdmin) showPage('admin');
+            else document.getElementById('login-modal').classList.remove('hidden');
         }
 
         function closeLogin() {
@@ -247,9 +327,9 @@
                 isAdmin = true;
                 closeLogin();
                 showPage('admin');
-                showToast("Hoşgeldiniz!");
+                showToast("Yönetici girişi başarılı.");
             } else {
-                showToast("Hatalı şifre!");
+                showToast("Geçersiz şifre!");
             }
             document.getElementById('admin-pass').value = '';
         }
@@ -257,20 +337,19 @@
         function logout() {
             isAdmin = false;
             showPage('home');
-            showToast("Çıkış yapıldı.");
+            showToast("Oturum kapatıldı.");
         }
 
-        // Toast Bildirimi
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.add('translate-y-24', 'opacity-0');
             }, 3000);
         }
 
-        window.onload = renderLists;
+        window.onload = () => renderLists();
     </script>
 </body>
 </html>
