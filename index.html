@@ -117,7 +117,7 @@
                 </div>
             </header>
 
-            <!-- Admin Paneli -->
+            <!-- Admin Paneli (Sadece yetkili kullanıcıya görünür) -->
             <div id="admin-panel" class="hidden bg-slate-950 p-10 rounded-[3rem] text-white shadow-3xl relative overflow-hidden group">
                 <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-600/20 rounded-full -mr-40 -mt-40 blur-[100px] group-hover:bg-indigo-600/30 transition-colors duration-700"></div>
                 
@@ -127,8 +127,8 @@
                             <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold tracking-tight">Yeni Kayıt Ekle</h3>
-                            <p class="text-slate-400 text-sm">Kütüphaneyi yeni bir belge ile güncelle</p>
+                            <h3 class="text-2xl font-bold tracking-tight">Yönetici Paneli</h3>
+                            <p class="text-slate-400 text-sm">Yeni dosya ekle ve kütüphaneyi yönet</p>
                         </div>
                     </div>
                     
@@ -170,6 +170,7 @@
             getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, getDoc 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Firebase Yapılandırması
         const firebaseConfig = {
             apiKey: "AIzaSyDoJmNT86J_GoBUG-X2TrGOHPtK258kaBM",
             authDomain: "aaa123-468db.firebaseapp.com",
@@ -182,6 +183,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        
+        // ÖZEL YÖNETİCİ E-POSTASI
         const ADMIN_EMAIL = "algiritmi@gmail.com";
 
         let allPdfs = [];
@@ -215,6 +218,7 @@
                 let errorMsg = "Hata oluştu.";
                 if(e.code === 'auth/email-already-in-use') errorMsg = "Bu e-posta zaten kullanımda.";
                 if(e.code === 'auth/wrong-password') errorMsg = "Hatalı şifre.";
+                if(e.code === 'auth/invalid-credential') errorMsg = "Hatalı e-posta veya şifre.";
                 showMessage(errorMsg);
             }
         };
@@ -223,6 +227,15 @@
             const term = document.getElementById('search-input').value.toLowerCase();
             const filtered = allPdfs.filter(pdf => pdf.name.toLowerCase().includes(term));
             renderPdfs(filtered);
+        }
+
+        // Dropbox linklerini indirme linkine çeviren yardımcı fonksiyon (dl=1)
+        function convertToDirectDownload(url) {
+            if (!url) return "#";
+            if (url.includes("dropbox.com")) {
+                return url.replace(/dl=0/g, "dl=1");
+            }
+            return url;
         }
 
         function renderPdfs(list) {
@@ -240,14 +253,20 @@
 
             list.forEach((data, index) => {
                 const delay = index * 50;
+                const downloadLink = convertToDirectDownload(data.link);
+                
                 pdfListDiv.innerHTML += `
                     <div class="pdf-card bg-white/70 backdrop-blur-sm p-8 rounded-[2.5rem] flex flex-col items-center text-center animate-in" style="animation-delay: ${delay}ms">
-                        <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-400">
+                        <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-400 relative">
                              <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+                             <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                             </div>
                         </div>
-                        <h4 class="font-extrabold text-slate-800 mb-6 text-sm leading-relaxed line-clamp-2 h-10 px-2">${data.name}</h4>
-                        <a href="${data.link}" target="_blank" class="w-full bg-slate-900 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 shadow-lg shadow-slate-100 transition-all">
-                            Görüntüle
+                        <h4 class="font-extrabold text-slate-800 mb-6 text-sm leading-relaxed line-clamp-2 h-10 px-2 uppercase tracking-tight">${data.name}</h4>
+                        <a href="${downloadLink}" download class="w-full bg-slate-900 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 shadow-lg shadow-slate-100 transition-all flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            İndir
                         </a>
                     </div>`;
             });
@@ -263,21 +282,36 @@
                 mainUi.classList.remove('hidden');
                 document.getElementById('user-info').innerText = user.email;
                 
-                if (user.email === ADMIN_EMAIL) adminPanel.classList.remove('hidden');
+                // Sadece belirtilen e-posta admin panelini görür
+                if (user.email === ADMIN_EMAIL) {
+                    adminPanel.classList.remove('hidden');
+                } else {
+                    adminPanel.classList.add('hidden');
+                }
                 
+                // Verileri dinle
                 const q = query(collection(db, "pdfs"), orderBy("createdAt", "desc"));
                 onSnapshot(q, (snapshot) => {
                     allPdfs = [];
                     snapshot.forEach(d => allPdfs.push(d.data()));
                     renderPdfs(allPdfs);
+                }, (error) => {
+                    console.error("Firebase Veri Hatası:", error);
                 });
             } else {
                 authUi.classList.remove('hidden');
                 mainUi.classList.add('hidden');
+                adminPanel.classList.add('hidden');
             }
         });
 
         window.addNewPdf = async () => {
+            // Güvenlik kontrolü (Sadece kod bazında değil, mantık bazında da)
+            if (auth.currentUser?.email !== ADMIN_EMAIL) {
+                showMessage("Bu işlemi yapmaya yetkiniz yok.");
+                return;
+            }
+
             const name = document.getElementById('pdf-name').value;
             const link = document.getElementById('pdf-link').value;
             if (!name || !link) return showMessage("Lütfen tüm alanları doldurun.");
