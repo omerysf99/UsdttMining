@@ -3,268 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Miner Dashboard</title>
+    <title>PDF İndirme Merkezi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800&display=swap');
-
-        body {
-            background-color: #0c0c0c;
-            color: #ffffff;
-            font-family: 'Lexend', sans-serif;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .card-bg {
-            background-color: #161616;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Arka Plan Neon Çizgileri */
-        .bg-curves {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
-                url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 400C150 350 250 150 400 0' stroke='%238b5cf6' stroke-width='1' fill='none' opacity='0.2'/%3E%3Cpath d='M0 200C200 150 300 50 400 -100' stroke='%238b5cf6' stroke-width='1' fill='none' opacity='0.1'/%3E%3C/svg%3E");
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Madenci Fanı Animasyonu */
-        @keyframes fan-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .miner-container {
-            position: relative;
-            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.3));
-        }
-
-        .miner-fan {
-            animation: fan-spin 4s linear infinite;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Buton Efektleri */
-        .btn-blue {
-            background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-        }
-
-        .btn-active:active {
-            transform: scale(0.96);
-        }
-
-        .nav-active {
-            color: #8b5cf6;
-            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-        }
-
-        .balance-text {
-            letter-spacing: -0.05em;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .pdf-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen max-w-md mx-auto relative px-4 pt-6 pb-24">
-
-    <!-- Arka Plan Görseli -->
-    <div class="bg-curves"></div>
-
-    <!-- Üst Bakiyeler (Sadece Claim edilenler görünür) -->
-    <div class="space-y-3 z-10">
-        <!-- SOL Kartı -->
-        <div class="card-bg rounded-[24px] p-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <!-- Siyahlık problemini gidermek için arka planı kaldırdım ve containment'ı iyileştirdim -->
-                <div class="w-11 h-11 rounded-full border border-white/10 overflow-hidden flex items-center justify-center bg-transparent">
-                    <img src="sol.jpg" class="w-full h-full object-contain" alt="SOL" onerror="this.src='https://cryptologos.cc/logos/solana-sol-logo.png'">
-                </div>
-                <div>
-                    <p class="text-[13px] font-bold text-white leading-tight">SOL</p>
-                    <p class="text-[12px] text-gray-400">Balance</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <p class="font-extrabold text-xl balance-text" id="sol-top">0.000000 SOL</p>
-                <button class="w-10 h-10 rounded-xl btn-blue flex items-center justify-center btn-active">
-                    <i class="fa-solid fa-wallet text-white text-sm"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- TON Kartı -->
-        <div class="card-bg rounded-[24px] p-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-full border border-white/10 overflow-hidden flex items-center justify-center bg-transparent">
-                    <img src="ton.jpg" class="w-full h-full object-contain" alt="TON" onerror="this.src='https://cryptologos.cc/logos/toncoin-ton-logo.png'">
-                </div>
-                <div>
-                    <p class="text-[13px] font-bold text-white leading-tight">TON</p>
-                    <p class="text-[12px] text-gray-400">Balance</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <p class="font-extrabold text-xl balance-text" id="ton-top">0.000000 TON</p>
-                <button class="w-10 h-10 rounded-xl btn-blue flex items-center justify-center btn-active">
-                    <i class="fa-solid fa-wallet text-white text-sm"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Madenci Alanı -->
-    <div class="flex-1 flex flex-col items-center justify-center z-10">
-        <div class="miner-container w-72 h-72 flex items-center justify-center mb-6">
-            <!-- Madenci Fan Görseli -->
-            <img src="fan2.jpg" class="miner-fan w-full h-full border-4 border-white/5" alt="Miner Fan" onerror="this.style.display='none'; document.getElementById('fallback-fan').style.display='block';">
-            
-            <div id="fallback-fan" style="display:none;" class="w-full h-full">
-                <svg class="miner-fan w-full h-full" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" fill="#4c1d95" />
-                    <path d="M50 10 L50 90 M10 50 L90 50" stroke="white" stroke-width="2" opacity="0.3"/>
-                </svg>
-            </div>
-            <!-- Miner ortası boş -->
-        </div>
-
-        <!-- Göstergeler (Aktif Madencilik) -->
-        <div class="text-center space-y-1">
-            <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Mining Progress</p>
-            <h1 class="text-4xl font-extrabold balance-text text-white" id="sol-pending">0.0000000000 SOL</h1>
-            <h2 class="text-2xl font-bold balance-text text-blue-400" id="ton-pending">0.0000000000 TON</h2>
-            
-            <div class="flex items-center justify-center gap-2 text-gray-400 text-[13px] font-bold mt-4">
-                <i class="fa-solid fa-circle-info opacity-50"></i>
-                <span id="speed-text">1 GH/s</span>
-                <i class="fa-solid fa-bolt text-orange-500"></i>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alt İşlemler -->
-    <div class="grid grid-cols-2 gap-4 mb-6 z-10">
-        <button id="claim-btn" class="btn-blue py-4 rounded-[22px] flex items-center justify-center gap-2 font-extrabold text-white btn-active">
-            <i class="fa-solid fa-coins"></i>
-            Claim
-        </button>
-        <!-- Boost butonu duruyor ancak işlevsiz -->
-        <button id="boost-btn" class="btn-blue py-4 rounded-[22px] flex items-center justify-center gap-2 font-extrabold text-white btn-active">
-            <i class="fa-solid fa-rocket"></i>
-            Boost
-        </button>
-    </div>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
 
     <!-- Navigasyon -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a]/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center py-3 z-20">
-        <button class="flex flex-col items-center gap-1 text-gray-500">
-            <i class="fa-solid fa-wallet text-xl"></i>
-            <span class="text-[10px] font-bold uppercase">Wallet</span>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-gray-500">
-            <i class="fa-solid fa-users text-xl"></i>
-            <span class="text-[10px] font-bold uppercase">Friends</span>
-        </button>
-        <button class="flex flex-col items-center gap-1 nav-active">
-            <i class="fa-solid fa-fan text-xl"></i>
-            <span class="text-[10px] font-bold uppercase">Home</span>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-gray-500 relative">
-            <i class="fa-solid fa-bullseye text-xl"></i>
-            <span class="text-[10px] font-bold uppercase">Missions</span>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></span>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-gray-500">
-            <i class="fa-solid fa-sliders text-xl"></i>
-            <span class="text-[10px] font-bold uppercase">More</span>
-        </button>
+    <nav class="glass sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+                <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
+                <span class="font-bold text-xl tracking-tight">PDF Depom</span>
+            </div>
+            <button onclick="showLogin()" class="text-gray-600 hover:text-red-600 font-medium transition">
+                <i class="fas fa-lock-open mr-1"></i> Yönetici Girişi
+            </button>
+        </div>
     </nav>
 
-    <!-- Toast Bildirimi -->
-    <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-all duration-300 pointer-events-none z-50 shadow-2xl text-center">
-        İşlem Başarılı!
+    <!-- Ana Sayfa (Ziyaretçi Görünümü) -->
+    <main id="home-page" class="max-w-6xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold mb-4">Döküman Arşivi</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Aşağıdaki listeden ihtiyacınız olan PDF dosyasını seçip tek tıkla cihazınıza indirebilirsiniz.</p>
+        </div>
+
+        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- PDF Kartları Buraya Gelecek -->
+        </div>
+
+        <div id="empty-state" class="hidden text-center py-20">
+            <i class="fas fa-folder-open text-gray-300 text-6xl mb-4"></i>
+            <p class="text-gray-500">Henüz yüklenmiş bir döküman bulunmuyor.</p>
+        </div>
+    </main>
+
+    <!-- Admin Paneli -->
+    <main id="admin-page" class="hidden max-w-4xl mx-auto px-4 py-12">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Yönetim Paneli</h2>
+            <button onclick="logout()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm transition">Güvenli Çıkış</button>
+        </div>
+
+        <!-- Yeni Ekleme Formu -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <h3 class="text-lg font-semibold mb-4">Yeni PDF Ekle</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Döküman Adı</label>
+                    <input type="text" id="pdf-name" placeholder="Örn: 2024 Kullanım Klavuzu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dropbox Paylaşım Linki</label>
+                    <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
+                </div>
+                <button onclick="addPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-red-200">
+                    Sisteme Kaydet
+                </button>
+            </div>
+        </div>
+
+        <!-- Mevcut Dosyaları Yönet -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-4 text-sm font-semibold">Dosya Adı</th>
+                        <th class="px-6 py-4 text-sm font-semibold">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-list">
+                    <!-- Yönetim Listesi -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6 text-center">Yönetici Girişi</h2>
+            <input type="password" id="admin-pass" placeholder="Şifre" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 outline-none focus:border-red-500">
+            <div class="flex space-x-3">
+                <button onclick="closeLogin()" class="flex-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">İptal</button>
+                <button onclick="login()" class="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">Giriş Yap</button>
+            </div>
+            <p class="text-xs text-gray-400 mt-4 text-center">Varsayılan şifre: 1234</p>
+        </div>
+    </div>
+
+    <!-- Bildirim Kutusu -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl z-[200]">
+        Mesaj buraya gelecek.
     </div>
 
     <script>
-        // Cüzdan Bakiyeleri (Claim edilenler)
-        let claimedSol = 0;
-        let claimedTon = 0;
+        // Veritabanı simülasyonu (LocalStorage)
+        let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [
+            { id: 1, name: 'Örnek Katalog.pdf', url: 'https://www.dropbox.com/s/sample/test.pdf?dl=1' }
+        ];
 
-        // Madencilik Bakiyeleri (Henüz toplanmamış olanlar)
-        let pendingSol = 0;
-        let pendingTon = 0;
+        const ADMIN_PASSWORD = "1234"; // Şifrenizi buradan değiştirebilirsiniz
+        let isAdmin = false;
 
-        // Hız Ayarları (Sabit 1 GH/s)
-        let speed = 1;
-        
-        // 1 GH/s = Günde 0.0001 birim
-        const DAILY_TARGET = 0.0001; 
-        const INTERVAL_MS = 100;
-        const INTERVALS_PER_DAY = (24 * 60 * 60 * 1000) / INTERVAL_MS; 
-        const INCREMENT_PER_UNIT_SPEED = DAILY_TARGET / INTERVALS_PER_DAY;
-
-        const updateDisplay = () => {
-            // Orta Alan (Bekleyen Madencilik)
-            document.getElementById('sol-pending').innerText = `${pendingSol.toFixed(10)} SOL`;
-            document.getElementById('ton-pending').innerText = `${pendingTon.toFixed(10)} TON`;
+        // Sayfa Değiştirme
+        function showPage(page) {
+            document.getElementById('home-page').classList.add('hidden');
+            document.getElementById('admin-page').classList.add('hidden');
             
-            // Üst Kartlar (Sadece Claim Edilenler)
-            document.getElementById('sol-top').innerText = `${claimedSol.toFixed(6)} SOL`;
-            document.getElementById('ton-top').innerText = `${claimedTon.toFixed(6)} TON`;
-            
-            document.getElementById('speed-text').innerText = `${speed} GH/s`;
-        };
-
-        // Madencilik Döngüsü
-        setInterval(() => {
-            if(speed > 0) {
-                pendingSol += INCREMENT_PER_UNIT_SPEED * speed;
-                pendingTon += INCREMENT_PER_UNIT_SPEED * speed;
-                updateDisplay();
-            }
-        }, INTERVAL_MS);
-
-        // Boost Butonu (Tıklandığında işlem yapmaz)
-        document.getElementById('boost-btn').onclick = () => {
-            showToast("Boost özelliği yakında!");
-        };
-
-        // Claim Butonu (Bekleyeni Cüzdana Aktar)
-        document.getElementById('claim-btn').onclick = () => {
-            if(pendingSol > 0 || pendingTon > 0) {
-                claimedSol += pendingSol;
-                claimedTon += pendingTon;
-
-                showToast(`${pendingSol.toFixed(6)} SOL & ${pendingTon.toFixed(6)} TON toplandı!`);
-                
-                pendingSol = 0;
-                pendingTon = 0;
-                
-                updateDisplay();
+            if (page === 'admin' && isAdmin) {
+                document.getElementById('admin-page').classList.remove('hidden');
             } else {
-                showToast("Henüz kazılmış bir bakiye yok.");
+                document.getElementById('home-page').classList.remove('hidden');
             }
-        };
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.opacity = '1';
-            t.style.transform = 'translate(-50%, 10px)';
-            setTimeout(() => {
-                t.style.opacity = '0';
-                t.style.transform = 'translate(-50%, 0px)';
-            }, 2000);
+            renderLists();
         }
 
-        window.onload = updateDisplay;
+        // Listeleri Render Etme
+        function renderLists() {
+            const list = document.getElementById('pdf-list');
+            const adminList = document.getElementById('admin-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            list.innerHTML = '';
+            adminList.innerHTML = '';
+
+            if (pdfData.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                pdfData.forEach(pdf => {
+                    // Dropbox linkini otomatik düzelt (dl=0 -> dl=1)
+                    const directUrl = pdf.url.replace('?dl=0', '?dl=1');
+                    if (!directUrl.includes('?dl=1') && !directUrl.includes('&dl=1')) {
+                        pdf.url += (pdf.url.includes('?') ? '&dl=1' : '?dl=1');
+                    }
+
+                    // Ana Sayfa Kartı
+                    list.innerHTML += `
+                        <div class="pdf-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div class="mb-4">
+                                <div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center mb-4">
+                                    <i class="fas fa-file-pdf text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-800 line-clamp-2">${pdf.name}</h3>
+                            </div>
+                            <a href="${directUrl}" download class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition group">
+                                <i class="fas fa-download mr-2 group-hover:bounce"></i> İndir
+                            </a>
+                        </div>
+                    `;
+
+                    // Admin Satırı
+                    adminList.innerHTML += `
+                        <tr class="border-b border-gray-50 last:border-0">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-700">${pdf.name}</td>
+                            <td class="px-6 py-4">
+                                <button onclick="deletePDF(${pdf.id})" class="text-red-500 hover:text-red-700 p-2">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // PDF Ekleme
+        function addPDF() {
+            const name = document.getElementById('pdf-name').value;
+            let url = document.getElementById('pdf-url').value;
+
+            if (!name || !url) {
+                showToast("Lütfen tüm alanları doldurun!");
+                return;
+            }
+
+            // Dropbox linkini direct linke çevirme mantığı
+            if (url.includes("dropbox.com")) {
+                url = url.split('?')[0] + "?dl=1";
+            }
+
+            const newPDF = {
+                id: Date.now(),
+                name: name,
+                url: url
+            };
+
+            pdfData.push(newPDF);
+            saveData();
+            document.getElementById('pdf-name').value = '';
+            document.getElementById('pdf-url').value = '';
+            showToast("Döküman başarıyla eklendi.");
+            renderLists();
+        }
+
+        // PDF Silme
+        function deletePDF(id) {
+            pdfData = pdfData.filter(p => p.id !== id);
+            saveData();
+            renderLists();
+            showToast("Döküman sistemden silindi.");
+        }
+
+        // Veri Kaydetme
+        function saveData() {
+            localStorage.setItem('my_pdfs', JSON.stringify(pdfData));
+        }
+
+        // Login İşlemleri
+        function showLogin() {
+            if(isAdmin) {
+                showPage('admin');
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function login() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                closeLogin();
+                showPage('admin');
+                showToast("Hoşgeldiniz!");
+            } else {
+                showToast("Hatalı şifre!");
+            }
+            document.getElementById('admin-pass').value = '';
+        }
+
+        function logout() {
+            isAdmin = false;
+            showPage('home');
+            showToast("Çıkış yapıldı.");
+        }
+
+        // Toast Bildirimi
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Başlangıç
+        window.onload = renderLists;
     </script>
 </body>
 </html>
