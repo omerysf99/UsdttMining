@@ -3,127 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Firebase Giriş Paneli</title>
+    <title>PDF Kütüphanesi | Giriş</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, #f8fafc, #f1f5f9);
+            background: #f8fafc;
         }
         .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
         .hidden { display: none; }
-        .loading-spinner {
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 2px solid #fff;
-            width: 18px;
-            height: 18px;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .btn-primary {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        .admin-badge {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 bg-slate-50">
 
-    <div class="glass-card w-full max-w-md p-10 rounded-3xl transition-all duration-500">
-        <!-- Auth Arayüzü -->
-        <div id="auth-ui">
+    <div class="w-full max-w-4xl">
+        <!-- Giriş Ekranı -->
+        <div id="auth-ui" class="glass-card max-w-md mx-auto p-10 rounded-3xl">
             <div class="text-center mb-10">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200 mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg mb-6">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Hoş Geldiniz</h1>
-                <p class="text-slate-500 mt-2 font-medium">Hesabınıza güvenli bir şekilde erişin</p>
+                <h1 class="text-3xl font-extrabold text-slate-900">PDF Kütüphanesi</h1>
+                <p class="text-slate-500 mt-2">Okumak için giriş yapın veya kayıt olun</p>
             </div>
 
             <div class="space-y-6">
-                <!-- Google Login Button -->
-                <button onclick="signInWithGoogle()" 
-                    id="google-btn"
-                    class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-semibold py-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] disabled:opacity-50">
-                    <span id="google-btn-content" class="flex items-center gap-3">
-                        <svg class="w-5 h-5" viewBox="0 0 48 48">
-                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-                        </svg>
-                        Google ile Giriş Yap
-                    </span>
-                    <span id="google-btn-loader" class="hidden"><div class="loading-spinner border-slate-400 border-t-slate-800"></div></span>
-                </button>
+                <div class="space-y-4">
+                    <input type="email" id="email" placeholder="E-posta" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="password" placeholder="Şifre" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500">
+                    
+                    <div class="flex gap-4">
+                        <button onclick="handleEmailAuth('signin')" id="signin-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">Giriş Yap</button>
+                        <button onclick="handleEmailAuth('signup')" id="signup-btn" class="flex-1 bg-white border border-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-50 transition-all">Kayıt Ol</button>
+                    </div>
+                </div>
 
                 <div class="relative flex items-center justify-center">
                     <div class="flex-grow border-t border-slate-200"></div>
-                    <span class="flex-shrink mx-4 text-xs font-bold text-slate-400 uppercase tracking-widest">veya</span>
+                    <span class="flex-shrink mx-4 text-xs font-bold text-slate-400 uppercase">veya</span>
                     <div class="flex-grow border-t border-slate-200"></div>
                 </div>
 
-                <!-- Email Form -->
-                <div class="space-y-4">
-                    <div class="space-y-1">
-                        <label class="text-sm font-semibold text-slate-700 ml-1">E-posta</label>
-                        <input type="email" id="email" placeholder="isim@sirket.com" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-sm font-semibold text-slate-700 ml-1">Şifre</label>
-                        <div class="relative">
-                            <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
-                            <button onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
-                                <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-4 pt-2">
-                        <button onclick="handleEmailAuth('signin')" class="btn-primary flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 active:scale-95">Giriş Yap</button>
-                        <button onclick="handleEmailAuth('signup')" class="btn-primary flex-1 bg-white border-2 border-slate-100 text-slate-800 py-3.5 rounded-xl font-bold hover:bg-slate-50 active:scale-95">Kayıt Ol</button>
-                    </div>
-                </div>
+                <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-slate-700 py-3 rounded-xl font-semibold hover:border-blue-400 transition-all">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+                    Google ile Giriş
+                </button>
             </div>
         </div>
 
-        <!-- Başarı Arayüzü -->
-        <div id="success-ui" class="hidden text-center py-4">
-            <div id="user-photo-container" class="relative inline-block mb-6"></div>
-            <h2 class="text-3xl font-extrabold text-slate-900" id="user-display-name">Hoş Geldiniz!</h2>
-            <p class="text-slate-500 mt-2 mb-10 font-medium" id="user-email-info"></p>
-            <button onclick="signOutUser()" class="w-full py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-red-50 hover:text-red-600 transition-all duration-300 active:scale-95">Oturumu Kapat</button>
+        <!-- Ana Uygulama Ekranı (PDF Listesi) -->
+        <div id="main-ui" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">PDF Arşivi</h2>
+                    <p id="user-info" class="text-sm text-slate-500"></p>
+                </div>
+                <button onclick="signOutUser()" class="px-6 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-red-50 hover:text-red-600 transition-all">Çıkış Yap</button>
+            </div>
+
+            <!-- Admin Paneli (Sadece algiritmi@gmail.com görür) -->
+            <div id="admin-panel" class="hidden bg-slate-900 p-8 rounded-3xl text-white shadow-xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="admin-badge px-3 py-1 rounded-full text-xs font-bold uppercase">Yönetici</span>
+                    <h3 class="text-xl font-bold">Yeni PDF Ekle</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="pdf-name" placeholder="PDF Adı (Örn: Matematik Notları)" class="bg-slate-800 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="pdf-link" placeholder="Dropbox Linki" class="bg-slate-800 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button onclick="addNewPdf()" class="mt-4 w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold transition-all">Kütüphaneye Ekle</button>
+            </div>
+
+            <!-- PDF Listesi -->
+            <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- PDF'ler buraya yüklenecek -->
+            </div>
         </div>
 
         <!-- Mesaj Kutusu -->
-        <div id="message-box" class="mt-8 p-4 rounded-2xl text-sm hidden transition-all duration-300 border"></div>
+        <div id="message-box" class="mt-4 p-4 rounded-2xl text-sm hidden transition-all duration-300 border fixed bottom-4 right-4 max-w-sm z-50"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signOut,
-            browserLocalPersistence,
-            setPersistence
+            getAuth, GoogleAuthProvider, signInWithPopup, 
+            createUserWithEmailAndPassword, signInWithEmailAndPassword,
+            onAuthStateChanged, signOut, sendEmailVerification
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, collection, addDoc, onSnapshot, query, orderBy 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDoJmNT86J_GoBUG-X2TrGOHPtK258kaBM",
@@ -131,116 +112,119 @@
             projectId: "aaa123-468db",
             storageBucket: "aaa123-468db.firebasestorage.app",
             messagingSenderId: "277639579187",
-            appId: "1:277639579187:web:f51052399a8d44f2308546",
-            measurementId: "G-8HXRVPPNHR"
+            appId: "1:277639579187:web:f51052399a8d44f2308546"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        auth.languageCode = 'tr';
-
-        window.togglePassword = () => {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('eye-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888" />';
-            } else {
-                input.type = 'password';
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
-            }
-        };
+        const db = getFirestore(app);
+        const ADMIN_EMAIL = "algiritmi@gmail.com";
 
         function showMessage(msg, type = 'error') {
             const box = document.getElementById('message-box');
-            box.className = 'mt-8 p-4 rounded-2xl text-sm transition-all duration-300 border';
-            
-            if (type === 'error') {
-                if (msg.toLowerCase().includes('unauthorized-domain')) {
-                    box.classList.add('bg-amber-50', 'text-amber-900', 'border-amber-100');
-                    box.innerHTML = `
-                        <div class="flex gap-3 text-left">
-                            <span class="text-amber-600">⚠️</span>
-                            <div>
-                                <strong class="block text-sm mb-1">Alan Adı İzni Gerekli</strong>
-                                <p class="text-[12px] opacity-90 mb-2">Bu Render adresini Firebase Console'a eklemelisiniz:</p>
-                                <code class="block p-2 bg-white/80 rounded-lg border border-amber-200 font-mono text-[11px] break-all select-all">usdttmining-0bjx.onrender.com</code>
-                            </div>
-                        </div>`;
-                } else {
-                    box.classList.add('bg-red-50', 'text-red-800', 'border-red-100');
-                    box.innerText = msg;
-                }
-            } else {
-                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-100');
-                box.innerText = msg;
-            }
+            box.innerText = msg;
+            box.className = `mt-4 p-4 rounded-2xl text-sm transition-all duration-300 border fixed bottom-4 right-4 max-w-sm z-50 ${type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`;
             box.classList.remove('hidden');
+            setTimeout(() => box.classList.add('hidden'), 5000);
         }
 
-        function updateUI(user) {
-            const authUi = document.getElementById('auth-ui');
-            const successUi = document.getElementById('success-ui');
-            const nameEl = document.getElementById('user-display-name');
-            const emailEl = document.getElementById('user-email-info');
-            const photoEl = document.getElementById('user-photo-container');
-
-            if (user) {
-                authUi.classList.add('hidden');
-                successUi.classList.remove('hidden');
-                document.getElementById('message-box').classList.add('hidden');
-                nameEl.innerText = user.displayName || 'Kullanıcı';
-                emailEl.innerText = user.email;
-                const photoSrc = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&background=3b82f6&color=fff&size=128`;
-                photoEl.innerHTML = `<div class="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl border-4 border-white"><img src="${photoSrc}" class="w-full h-full object-cover"></div>`;
-            } else {
-                authUi.classList.remove('hidden');
-                successUi.classList.add('hidden');
-            }
-        }
-
-        window.signInWithGoogle = async () => {
-            const btn = document.getElementById('google-btn');
-            const content = document.getElementById('google-btn-content');
-            const loader = document.getElementById('google-btn-loader');
-            btn.disabled = true;
-            content.classList.add('opacity-0');
-            loader.classList.remove('hidden');
-            
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
+        // PDF Ekleme (Admin)
+        window.addNewPdf = async () => {
+            const name = document.getElementById('pdf-name').value;
+            const link = document.getElementById('pdf-link').value;
+            if (!name || !link) return showMessage("Lütfen tüm alanları doldurun.");
 
             try {
-                await setPersistence(auth, browserLocalPersistence);
-                const result = await signInWithPopup(auth, provider);
-                updateUI(result.user);
-            } catch (error) {
-                showMessage(error.message, "error");
-            } finally {
-                btn.disabled = false;
-                content.classList.remove('opacity-0');
-                loader.classList.add('hidden');
+                await addDoc(collection(db, "pdfs"), {
+                    name: name,
+                    link: link,
+                    createdAt: new Date().getTime()
+                });
+                document.getElementById('pdf-name').value = "";
+                document.getElementById('pdf-link').value = "";
+                showMessage("PDF başarıyla eklendi!", "success");
+            } catch (e) {
+                showMessage("Ekleme hatası: " + e.message);
             }
         };
+
+        // PDF Listesini Dinleme
+        function loadPdfList() {
+            const pdfListDiv = document.getElementById('pdf-list');
+            const q = query(collection(db, "pdfs"), orderBy("createdAt", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                pdfListDiv.innerHTML = "";
+                if (snapshot.empty) {
+                    pdfListDiv.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">Henüz PDF eklenmemiş.</div>`;
+                    return;
+                }
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    pdfListDiv.innerHTML += `
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-4 line-clamp-2">${data.name}</h4>
+                            <a href="${data.link}" target="_blank" class="block w-full text-center py-2 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition-all">Dosyayı Oku</a>
+                        </div>
+                    `;
+                });
+            });
+        }
 
         window.handleEmailAuth = async (type) => {
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
-            if (!email || !pass) return showMessage("Lütfen bilgileri girin.", "error");
+            if (!email || !pass) return showMessage("Bilgileri girin.");
 
             try {
-                const result = (type === 'signup') 
-                    ? await createUserWithEmailAndPassword(auth, email, pass)
-                    : await signInWithEmailAndPassword(auth, email, pass);
-                updateUI(result.user);
-            } catch (error) {
-                showMessage(error.message, "error");
-            }
+                if (type === 'signup') {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                    await sendEmailVerification(userCredential.user);
+                    showMessage("Kayıt başarılı! Lütfen e-postanıza gelen onay linkine tıklayın.", "success");
+                } else {
+                    const result = await signInWithEmailAndPassword(auth, email, pass);
+                    if (!result.user.emailVerified && result.user.email !== ADMIN_EMAIL) {
+                        showMessage("Lütfen önce e-postanızı onaylayın!");
+                        await signOut(auth);
+                        return;
+                    }
+                }
+            } catch (e) { showMessage(e.message); }
         };
 
-        window.signOutUser = () => signOut(auth).then(() => location.reload());
+        window.signInWithGoogle = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+            catch (e) { showMessage(e.message); }
+        };
 
-        onAuthStateChanged(auth, updateUI);
+        window.signOutUser = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            const authUi = document.getElementById('auth-ui');
+            const mainUi = document.getElementById('main-ui');
+            const adminPanel = document.getElementById('admin-panel');
+            const userInfo = document.getElementById('user-info');
+
+            if (user) {
+                authUi.classList.add('hidden');
+                mainUi.classList.remove('hidden');
+                userInfo.innerText = user.email;
+                
+                // Admin kontrolü
+                if (user.email === ADMIN_EMAIL) {
+                    adminPanel.classList.remove('hidden');
+                } else {
+                    adminPanel.classList.add('hidden');
+                }
+                loadPdfList();
+            } else {
+                authUi.classList.remove('hidden');
+                mainUi.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
