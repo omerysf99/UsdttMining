@@ -3,224 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF İndirme Merkezi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(-45deg, #f8fafc, #fff1f2, #f0f9ff, #f8fafc);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        .glass-nav { 
-            background: rgba(255, 255, 255, 0.7); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-        }
-
-        .pdf-card {
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .pdf-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.15);
-            border-color: #ef4444;
-            background: white;
-        }
-
-        .btn-animate {
-            background: linear-gradient(90deg, #ef4444, #f87171, #ef4444);
-            background-size: 200% auto;
-            transition: 0.5s;
-        }
-
-        .btn-animate:hover {
-            background-position: right center;
-            transform: scale(1.03);
-        }
-
-        .search-input {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .search-input:focus {
-            background: white;
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-    </style>
+    <title>Firebase SMS Doğrulama</title>
 </head>
-<body class="min-h-screen text-slate-800">
+<body>
 
-    <!-- Navigasyon -->
-    <nav class="glass-nav sticky top-0 z-50 border-b border-white/40">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer group" onclick="showPage('home')">
-                <div class="w-11 h-11 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-12 transition-transform duration-300">
-                    <i class="fas fa-file-pdf text-white text-xl"></i>
-                </div>
-                <span class="font-extrabold text-2xl tracking-tight text-slate-900">PDF<span class="text-red-600">Arşiv</span></span>
-            </div>
-            <button onclick="showLogin()" class="flex items-center space-x-2 bg-white/80 hover:bg-white text-slate-700 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm border border-slate-200/50">
-                <i class="fab fa-telegram text-blue-500"></i>
-                <span>Yönetici Girişi</span>
-            </button>
-        </div>
-    </nav>
+    <h2>Firebase SMS Doğrulama</h2>
 
-    <!-- Ana Sayfa -->
-    <main id="home-page" class="max-w-7xl mx-auto px-6 py-20">
-        <div class="max-w-3xl mx-auto text-center mb-20 animate-fade-in">
-            <h1 class="text-6xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
-                Dökümanları <br/>
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-500">
-                    Hızla İndirin
-                </span>
-            </h1>
-            <p class="text-xl text-slate-500 leading-relaxed font-medium">Güvenli paylaşım, doğrudan erişim. Dosyalarınız için en hızlı çözüm.</p>
-            
-            <div class="mt-12 relative max-w-xl mx-auto group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-orange-400 rounded-3xl blur opacity-10 group-hover:opacity-25 transition duration-1000"></div>
-                <div class="relative">
-                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="search-bar" onkeyup="filterPDFs()" placeholder="İsme göre döküman ara..." 
-                           class="search-input w-full pl-14 pr-6 py-5 border border-slate-200/60 rounded-2xl outline-none text-slate-700 text-lg shadow-xl">
-                </div>
-            </div>
-        </div>
-
-        <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <!-- PDF Kartları JavaScript ile buraya gelecek -->
-        </div>
-
-        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-40">
-            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-8 shadow-inner">
-                <i class="fas fa-folder-open text-slate-200 text-5xl"></i>
-            </div>
-            <p class="text-2xl font-bold text-slate-400">Aradığınız dosya bulunamadı.</p>
-        </div>
-    </main>
-
-    <!-- Admin Paneli -->
-    <main id="admin-page" class="hidden max-w-6xl mx-auto px-6 py-20 animate-fade-in">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
-            <div>
-                <h2 class="text-4xl font-black text-slate-900">Yönetici Paneli</h2>
-                <p class="text-slate-500 text-lg mt-2" id="stats-text">Bulut tabanlı dosya yönetim sistemi.</p>
-            </div>
-            <button onclick="logout()" class="inline-flex items-center space-x-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-xl shadow-slate-200">
-                <i class="fas fa-power-off"></i>
-                <span>Oturumu Kapat</span>
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div class="lg:col-span-4">
-                <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 sticky top-32">
-                    <h3 class="text-2xl font-black mb-8 flex items-center text-slate-800">
-                        <i class="fas fa-circle-plus text-red-600 mr-3"></i>
-                        Buluta Ekle
-                    </h3>
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Döküman Adı</label>
-                            <input type="text" id="pdf-name" placeholder="Örn: 2024 Proje Detay" 
-                                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Dropbox Link</label>
-                            <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." 
-                                   class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
-                        </div>
-                        <button onclick="addPDF()" id="add-btn" class="btn-animate w-full text-white font-black py-5 rounded-2xl shadow-lg shadow-red-100 flex items-center justify-center space-x-3 text-lg">
-                            <i class="fas fa-cloud-arrow-up"></i>
-                            <span>Sisteme Yükle</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-8">
-                <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                    <div class="px-10 py-8 border-b border-slate-50 bg-slate-50/30">
-                        <h3 class="font-black text-xl text-slate-800">Bulut Dosyaları</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-slate-50/50">
-                                <tr>
-                                    <th class="px-10 py-5 text-left text-xs font-black uppercase tracking-widest text-slate-400">Dosya Bilgisi</th>
-                                    <th class="px-10 py-5 text-right text-xs font-black uppercase tracking-widest text-slate-400">İşlem</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-list" class="divide-y divide-slate-50">
-                                <!-- Kayıtlar -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-[3rem] p-12 max-w-md w-full shadow-2xl animate-fade-in border border-white/20">
-            <div class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
-                <i class="fab fa-telegram text-blue-600 text-4xl"></i>
-            </div>
-            <h2 class="text-3xl font-black mb-3 text-center text-slate-900 tracking-tight">Telegram Doğrulama</h2>
-            <p class="text-slate-500 text-center mb-10 font-medium">Lütfen Telegram üzerinden size iletilen 10 haneli yönetici kodunu girin.</p>
-            
-            <input type="text" id="admin-pass" placeholder="Doğrulama Kodu" 
-                   class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl mb-8 outline-none focus:ring-2 focus:ring-blue-600 text-center text-3xl tracking-widest transition-all shadow-inner font-bold">
-            
-            <div class="flex space-x-4">
-                <button onclick="closeLogin()" class="flex-1 px-6 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition">İptal</button>
-                <button onclick="login()" class="flex-1 px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-xl shadow-blue-100">Giriş Yap</button>
-            </div>
-        </div>
+    <div id="phone-container">
+        <input type="text" id="phoneNumber" placeholder="+905551234567">
+        <button onclick="sendOTP()">Kod Gönder</button>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 transform translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-10 py-5 rounded-3xl shadow-2xl z-[200] flex items-center space-x-4 border border-white/10">
-        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-info-circle text-xs text-white"></i>
-        </div>
-        <span id="toast-msg" class="font-bold tracking-wide">İşlem Başarılı</span>
+    <div id="recaptcha-container"></div>
+
+    <div id="verification-container" style="display:none; margin-top: 20px;">
+        <input type="text" id="verificationCode" placeholder="Gelen Kodu Girin">
+        <button onclick="verifyOTP()">Kodu Onayla</button>
     </div>
 
-    <!-- Firebase SDK -->
+    <p id="status"></p>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Firebase Yapılandırması
+        // Sizin Config Bilgileriniz
         const firebaseConfig = {
             apiKey: "AIzaSyDoJmNT86J_GoBUG-X2TrGOHPtK258kaBM",
             authDomain: "aaa123-468db.firebaseapp.com",
@@ -231,213 +38,46 @@
             measurementId: "G-8HXRVPPNHR"
         };
 
-        // Servisleri Başlat
+        // Firebase Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        auth.languageCode = 'tr'; // SMS dilini Türkçe yap
 
-        // Durumlar
-        let pdfData = [];
-        let user = null;
-        let isAdmin = false;
-        const ADMIN_CODE = "8392479231";
-
-        // Firebase Auth Başlatma (KURAL 3)
-        const initAuth = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth hatası:", error);
-            }
-        };
-
-        onAuthStateChanged(auth, (currentUser) => {
-            user = currentUser;
-            if (user) {
-                setupRealtimeListener();
+        // ReCaptcha Kurulumu
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'normal',
+            'callback': (response) => {
+                console.log("ReCaptcha tamamlandı.");
             }
         });
 
-        initAuth();
+        // SMS Gönderme Fonksiyonu
+        window.sendOTP = function() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const appVerifier = window.recaptchaVerifier;
 
-        // Firestore Realtime Dinleyici (KURAL 1 & 2)
-        function setupRealtimeListener() {
-            const publicCollection = collection(db, 'artifacts', appId, 'public', 'data', 'pdfs');
-            
-            onSnapshot(query(publicCollection), (snapshot) => {
-                pdfData = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                renderLists();
-            }, (error) => {
-                console.error("Firestore okuma hatası:", error);
-                showToast("Veri bağlantı hatası!");
-            });
+            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    document.getElementById('verification-container').style.display = 'block';
+                    document.getElementById('status').innerText = "Kod gönderildi!";
+                }).catch((error) => {
+                    console.error("Hata:", error);
+                    document.getElementById('status').innerText = "Hata: " + error.message;
+                });
         }
 
-        // Global Fonksiyonları window objesine ata
-        window.showPage = (page) => {
-            document.getElementById('home-page').classList.add('hidden');
-            document.getElementById('admin-page').classList.add('hidden');
+        // Kodu Doğrulama Fonksiyonu
+        window.verifyOTP = function() {
+            const code = document.getElementById('verificationCode').value;
             
-            if (page === 'admin' && isAdmin) {
-                document.getElementById('admin-page').classList.remove('hidden');
-            } else {
-                document.getElementById('home-page').classList.remove('hidden');
-            }
-            renderLists();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.formatDropboxUrl = (url) => {
-            if (!url.includes("dropbox.com")) return url;
-            if (url.includes("dl=1")) return url;
-            return url.replace(/dl=0/g, "dl=1").includes("?") ? 
-                   (url.includes("dl=") ? url.replace(/dl=\d/, "dl=1") : url + "&dl=1") : 
-                   url + "?dl=1";
-        };
-
-        window.renderLists = (filter = "") => {
-            const list = document.getElementById('pdf-list');
-            const adminList = document.getElementById('admin-list');
-            const emptyState = document.getElementById('empty-state');
-            const statsText = document.getElementById('stats-text');
-            
-            list.innerHTML = '';
-            adminList.innerHTML = '';
-            
-            const filteredData = pdfData.filter(pdf => 
-                pdf.name.toLowerCase().includes(filter.toLowerCase())
-            );
-
-            if (statsText) statsText.innerText = `Toplam ${pdfData.length} bulut dökümanı aktif.`;
-
-            if (filteredData.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                
-                filteredData.forEach((pdf, index) => {
-                    const directUrl = window.formatDropboxUrl(pdf.url);
-
-                    list.innerHTML += `
-                        <div class="pdf-card p-10 rounded-[3rem] animate-fade-in relative overflow-hidden group" style="animation-delay: ${index * 0.1}s">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-[5rem] -mr-10 -mt-10 transition-all group-hover:bg-red-100"></div>
-                            <div class="relative z-10">
-                                <div class="w-16 h-16 bg-white shadow-xl shadow-red-50 text-red-600 rounded-3xl flex items-center justify-center mb-10 transition-transform group-hover:scale-110">
-                                    <i class="fas fa-file-pdf text-3xl"></i>
-                                </div>
-                                <h3 class="text-2xl font-black text-slate-800 mb-8 leading-tight min-h-[4rem]">${pdf.name}</h3>
-                                <a href="${directUrl}" target="_blank" class="btn-animate w-full inline-flex items-center justify-center px-8 py-5 text-white rounded-[2rem] font-black text-lg shadow-xl shadow-red-100">
-                                    <i class="fas fa-download mr-3"></i> İndir
-                                </a>
-                            </div>
-                        </div>
-                    `;
-
-                    adminList.innerHTML += `
-                        <tr class="hover:bg-slate-50/80 transition-all group">
-                            <td class="px-10 py-7">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
-                                        <i class="fas fa-file-alt"></i>
-                                    </div>
-                                    <span class="font-bold text-slate-700 text-lg">${pdf.name}</span>
-                                </div>
-                            </td>
-                            <td class="px-10 py-7 text-right">
-                                <button onclick="deletePDF('${pdf.id}')" class="w-12 h-12 inline-flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
-                                    <i class="fas fa-trash-can text-lg"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        };
-
-        window.filterPDFs = () => {
-            const query = document.getElementById('search-bar').value;
-            window.renderLists(query);
-        };
-
-        window.addPDF = async () => {
-            if (!user) return;
-            const nameInput = document.getElementById('pdf-name');
-            const urlInput = document.getElementById('pdf-url');
-            const name = nameInput.value.trim();
-            const url = urlInput.value.trim();
-
-            if (!name || !url) {
-                window.showToast("Eksik bilgi!");
-                return;
-            }
-
-            try {
-                const publicCollection = collection(db, 'artifacts', appId, 'public', 'data', 'pdfs');
-                await addDoc(publicCollection, {
-                    name,
-                    url,
-                    createdAt: new Date().toISOString()
-                });
-                nameInput.value = '';
-                urlInput.value = '';
-                window.showToast("Buluta kaydedildi.");
-            } catch (e) {
-                console.error("Ekleme hatası:", e);
-                window.showToast("Kaydedilemedi (Yetki Hatası)");
-            }
-        };
-
-        window.deletePDF = async (id) => {
-            if (!user) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'pdfs', id);
-                await deleteDoc(docRef);
-                window.showToast("Buluttan silindi.");
-            } catch (e) {
-                window.showToast("Silme başarısız.");
-            }
-        };
-
-        window.showLogin = () => {
-            if(isAdmin) window.showPage('admin');
-            else document.getElementById('login-modal').classList.remove('hidden');
-        };
-
-        window.closeLogin = () => {
-            document.getElementById('login-modal').classList.add('hidden');
-        };
-
-        window.login = () => {
-            const code = document.getElementById('admin-pass').value.trim();
-            if (code === ADMIN_CODE) {
-                isAdmin = true;
-                window.closeLogin();
-                window.showPage('admin');
-                window.showToast("Yönetici doğrulaması başarılı.");
-            } else {
-                window.showToast("Geçersiz Telegram kodu!");
-            }
-            document.getElementById('admin-pass').value = '';
-        };
-
-        window.logout = () => {
-            isAdmin = false;
-            window.showPage('home');
-            window.showToast("Güvenli çıkış yapıldı.");
-        };
-
-        window.showToast = (msg) => {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-32', 'opacity-0');
-            }, 3000);
-        };
+            confirmationResult.confirm(code).then((result) => {
+                const user = result.user;
+                document.getElementById('status').innerText = "Giriş Başarılı! Kullanıcı ID: " + user.uid;
+            }).catch((error) => {
+                document.getElementById('status').innerText = "Hatalı Kod!";
+            });
+        }
     </script>
 </body>
 </html>
