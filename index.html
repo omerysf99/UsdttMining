@@ -103,7 +103,6 @@
             </h1>
             <p class="text-xl text-slate-500 leading-relaxed font-medium">Güvenli paylaşım, doğrudan erişim. Dosyalarınız için en hızlı çözüm.</p>
             
-            <!-- Arama Çubuğu -->
             <div class="mt-12 relative max-w-xl mx-auto group">
                 <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-orange-400 rounded-3xl blur opacity-10 group-hover:opacity-25 transition duration-1000"></div>
                 <div class="relative">
@@ -115,7 +114,7 @@
         </div>
 
         <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <!-- PDF Kartları -->
+            <!-- PDF Kartları JavaScript ile buraya gelecek -->
         </div>
 
         <div id="empty-state" class="hidden flex flex-col items-center justify-center py-40">
@@ -131,7 +130,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
             <div>
                 <h2 class="text-4xl font-black text-slate-900">Yönetici Paneli</h2>
-                <p class="text-slate-500 text-lg mt-2" id="stats-text font-semibold">Sistem aktif ve dökümanlar yayında.</p>
+                <p class="text-slate-500 text-lg mt-2" id="stats-text">Bulut tabanlı dosya yönetim sistemi.</p>
             </div>
             <button onclick="logout()" class="inline-flex items-center space-x-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-xl shadow-slate-200">
                 <i class="fas fa-power-off"></i>
@@ -140,12 +139,11 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <!-- Form -->
             <div class="lg:col-span-4">
                 <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 sticky top-32">
                     <h3 class="text-2xl font-black mb-8 flex items-center text-slate-800">
                         <i class="fas fa-circle-plus text-red-600 mr-3"></i>
-                        Yeni Ekle
+                        Buluta Ekle
                     </h3>
                     <div class="space-y-6">
                         <div>
@@ -158,7 +156,7 @@
                             <input type="text" id="pdf-url" placeholder="https://www.dropbox.com/s/..." 
                                    class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
                         </div>
-                        <button onclick="addPDF()" class="btn-animate w-full text-white font-black py-5 rounded-2xl shadow-lg shadow-red-100 flex items-center justify-center space-x-3 text-lg">
+                        <button onclick="addPDF()" id="add-btn" class="btn-animate w-full text-white font-black py-5 rounded-2xl shadow-lg shadow-red-100 flex items-center justify-center space-x-3 text-lg">
                             <i class="fas fa-cloud-arrow-up"></i>
                             <span>Sisteme Yükle</span>
                         </button>
@@ -166,11 +164,10 @@
                 </div>
             </div>
 
-            <!-- Liste -->
             <div class="lg:col-span-8">
                 <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
                     <div class="px-10 py-8 border-b border-slate-50 bg-slate-50/30">
-                        <h3 class="font-black text-xl text-slate-800">Dosya Yönetimi</h3>
+                        <h3 class="font-black text-xl text-slate-800">Bulut Dosyaları</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -197,9 +194,9 @@
                 <i class="fab fa-telegram text-blue-600 text-4xl"></i>
             </div>
             <h2 class="text-3xl font-black mb-3 text-center text-slate-900 tracking-tight">Telegram Doğrulama</h2>
-            <p class="text-slate-500 text-center mb-10 font-medium">Yönetici paneline erişmek için Telegram üzerinden size iletilen kodu girin.</p>
+            <p class="text-slate-500 text-center mb-10 font-medium">Lütfen Telegram üzerinden size iletilen 10 haneli yönetici kodunu girin.</p>
             
-            <input type="text" id="admin-pass" placeholder="Kod Giriniz" 
+            <input type="text" id="admin-pass" placeholder="Doğrulama Kodu" 
                    class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl mb-8 outline-none focus:ring-2 focus:ring-blue-600 text-center text-3xl tracking-widest transition-all shadow-inner font-bold">
             
             <div class="flex space-x-4">
@@ -211,19 +208,77 @@
 
     <!-- Toast -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 transform translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-10 py-5 rounded-3xl shadow-2xl z-[200] flex items-center space-x-4 border border-white/10">
-        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
             <i class="fas fa-info-circle text-xs text-white"></i>
         </div>
         <span id="toast-msg" class="font-bold tracking-wide">İşlem Başarılı</span>
     </div>
 
-    <script>
-        let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [];
-        // Yeni Yönetici Numarası/Kodu
-        const ADMIN_CODE = "8392479231"; 
-        let isAdmin = false;
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        function showPage(page) {
+        // Firebase Yapılandırması
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoJmNT86J_GoBUG-X2TrGOHPtK258kaBM",
+            authDomain: "aaa123-468db.firebaseapp.com",
+            projectId: "aaa123-468db",
+            storageBucket: "aaa123-468db.firebasestorage.app",
+            messagingSenderId: "277639579187",
+            appId: "1:277639579187:web:f51052399a8d44f2308546",
+            measurementId: "G-8HXRVPPNHR"
+        };
+
+        // Servisleri Başlat
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Durumlar
+        let pdfData = [];
+        let user = null;
+        let isAdmin = false;
+        const ADMIN_CODE = "8392479231";
+
+        // Firebase Auth Başlatma (KURAL 3)
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Auth hatası:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, (currentUser) => {
+            user = currentUser;
+            if (user) {
+                setupRealtimeListener();
+            }
+        });
+
+        initAuth();
+
+        // Firestore Realtime Dinleyici (KURAL 1 & 2)
+        function setupRealtimeListener() {
+            const publicCollection = collection(db, 'artifacts', appId, 'public', 'data', 'pdfs');
+            
+            onSnapshot(query(publicCollection), (snapshot) => {
+                pdfData = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                renderLists();
+            }, (error) => {
+                console.error("Firestore okuma hatası:", error);
+                showToast("Veri bağlantı hatası!");
+            });
+        }
+
+        // Global Fonksiyonları window objesine ata
+        window.showPage = (page) => {
             document.getElementById('home-page').classList.add('hidden');
             document.getElementById('admin-page').classList.add('hidden');
             
@@ -234,23 +289,17 @@
             }
             renderLists();
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        };
 
-        function formatDropboxUrl(url) {
+        window.formatDropboxUrl = (url) => {
             if (!url.includes("dropbox.com")) return url;
-            try {
-                let cleanUrl = url.split('?')[0];
-                let urlObj = new URL(url);
-                let params = new URLSearchParams(urlObj.search);
-                params.set('dl', '1');
-                return cleanUrl + "?" + params.toString();
-            } catch (e) {
-                if (url.includes("dl=0")) return url.replace("dl=0", "dl=1");
-                return url + (url.includes("?") ? "&dl=1" : "?dl=1");
-            }
-        }
+            if (url.includes("dl=1")) return url;
+            return url.replace(/dl=0/g, "dl=1").includes("?") ? 
+                   (url.includes("dl=") ? url.replace(/dl=\d/, "dl=1") : url + "&dl=1") : 
+                   url + "?dl=1";
+        };
 
-        function renderLists(filter = "") {
+        window.renderLists = (filter = "") => {
             const list = document.getElementById('pdf-list');
             const adminList = document.getElementById('admin-list');
             const emptyState = document.getElementById('empty-state');
@@ -263,7 +312,7 @@
                 pdf.name.toLowerCase().includes(filter.toLowerCase())
             );
 
-            if (statsText) statsText.innerText = `Toplam ${pdfData.length} döküman yayında.`;
+            if (statsText) statsText.innerText = `Toplam ${pdfData.length} bulut dökümanı aktif.`;
 
             if (filteredData.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -271,7 +320,7 @@
                 emptyState.classList.add('hidden');
                 
                 filteredData.forEach((pdf, index) => {
-                    const directUrl = formatDropboxUrl(pdf.url);
+                    const directUrl = window.formatDropboxUrl(pdf.url);
 
                     list.innerHTML += `
                         <div class="pdf-card p-10 rounded-[3rem] animate-fade-in relative overflow-hidden group" style="animation-delay: ${index * 0.1}s">
@@ -299,7 +348,7 @@
                                 </div>
                             </td>
                             <td class="px-10 py-7 text-right">
-                                <button onclick="deletePDF(${pdf.id})" class="w-12 h-12 inline-flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
+                                <button onclick="deletePDF('${pdf.id}')" class="w-12 h-12 inline-flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all">
                                     <i class="fas fa-trash-can text-lg"></i>
                                 </button>
                             </td>
@@ -307,81 +356,88 @@
                     `;
                 });
             }
-        }
+        };
 
-        function filterPDFs() {
+        window.filterPDFs = () => {
             const query = document.getElementById('search-bar').value;
-            renderLists(query);
-        }
+            window.renderLists(query);
+        };
 
-        function addPDF() {
+        window.addPDF = async () => {
+            if (!user) return;
             const nameInput = document.getElementById('pdf-name');
             const urlInput = document.getElementById('pdf-url');
             const name = nameInput.value.trim();
-            let url = urlInput.value.trim();
+            const url = urlInput.value.trim();
 
             if (!name || !url) {
-                showToast("Lütfen eksik alan bırakmayın!");
+                window.showToast("Eksik bilgi!");
                 return;
             }
 
-            pdfData.push({ id: Date.now(), name, url });
-            saveData();
-            nameInput.value = '';
-            urlInput.value = '';
-            showToast("Döküman başarıyla eklendi.");
-            renderLists();
-        }
+            try {
+                const publicCollection = collection(db, 'artifacts', appId, 'public', 'data', 'pdfs');
+                await addDoc(publicCollection, {
+                    name,
+                    url,
+                    createdAt: new Date().toISOString()
+                });
+                nameInput.value = '';
+                urlInput.value = '';
+                window.showToast("Buluta kaydedildi.");
+            } catch (e) {
+                console.error("Ekleme hatası:", e);
+                window.showToast("Kaydedilemedi (Yetki Hatası)");
+            }
+        };
 
-        function deletePDF(id) {
-            pdfData = pdfData.filter(p => p.id !== id);
-            saveData();
-            renderLists();
-            showToast("Dosya sistemden silindi.");
-        }
+        window.deletePDF = async (id) => {
+            if (!user) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'pdfs', id);
+                await deleteDoc(docRef);
+                window.showToast("Buluttan silindi.");
+            } catch (e) {
+                window.showToast("Silme başarısız.");
+            }
+        };
 
-        function saveData() {
-            localStorage.setItem('my_pdfs', JSON.stringify(pdfData));
-        }
-
-        function showLogin() {
-            if(isAdmin) showPage('admin');
+        window.showLogin = () => {
+            if(isAdmin) window.showPage('admin');
             else document.getElementById('login-modal').classList.remove('hidden');
-        }
+        };
 
-        function closeLogin() {
+        window.closeLogin = () => {
             document.getElementById('login-modal').classList.add('hidden');
-        }
+        };
 
-        function login() {
+        window.login = () => {
             const code = document.getElementById('admin-pass').value.trim();
             if (code === ADMIN_CODE) {
                 isAdmin = true;
-                closeLogin();
-                showPage('admin');
-                showToast("Telegram doğrulaması başarılı.");
+                window.closeLogin();
+                window.showPage('admin');
+                window.showToast("Yönetici doğrulaması başarılı.");
             } else {
-                showToast("Geçersiz Telegram kodu!");
+                window.showToast("Geçersiz Telegram kodu!");
             }
             document.getElementById('admin-pass').value = '';
-        }
+        };
 
-        function logout() {
+        window.logout = () => {
             isAdmin = false;
-            showPage('home');
-            showToast("Oturum kapatıldı.");
-        }
+            window.showPage('home');
+            window.showToast("Güvenli çıkış yapıldı.");
+        };
 
-        function showToast(msg) {
+        window.showToast = (msg) => {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             toast.classList.remove('translate-y-32', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-32', 'opacity-0');
             }, 3000);
-        }
-
-        window.onload = () => renderLists();
+        };
     </script>
 </body>
 </html>
