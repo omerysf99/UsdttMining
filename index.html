@@ -93,7 +93,7 @@
             <input type="password" id="admin-pass" placeholder="Şifre" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 outline-none focus:border-red-500">
             <div class="flex space-x-3">
                 <button onclick="closeLogin()" class="flex-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">İptal</button>
-                <button onclick="login()" class="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">Giriş Yap</button>
+                <button onclick="login()" class="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-800 transition">Giriş Yap</button>
             </div>
             <p class="text-xs text-gray-400 mt-4 text-center">Varsayılan şifre: 1234</p>
         </div>
@@ -106,11 +106,9 @@
 
     <script>
         // Veritabanı simülasyonu (LocalStorage)
-        let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [
-            { id: 1, name: 'Örnek Katalog.pdf', url: 'https://www.dropbox.com/s/sample/test.pdf?dl=1' }
-        ];
+        let pdfData = JSON.parse(localStorage.getItem('my_pdfs')) || [];
 
-        const ADMIN_PASSWORD = "1234"; // Şifrenizi buradan değiştirebilirsiniz
+        const ADMIN_PASSWORD = "1234"; 
         let isAdmin = false;
 
         // Sayfa Değiştirme
@@ -124,6 +122,26 @@
                 document.getElementById('home-page').classList.remove('hidden');
             }
             renderLists();
+        }
+
+        // Dropbox linkini direct linke çevirme fonksiyonu
+        function formatDropboxUrl(url) {
+            if (!url.includes("dropbox.com")) return url;
+            
+            try {
+                let cleanUrl = url.split('?')[0]; // URL'in ana kısmını al
+                let urlObj = new URL(url);
+                let params = new URLSearchParams(urlObj.search);
+                
+                // Mevcut tüm parametreleri koru ama dl'yi 1 yap
+                params.set('dl', '1');
+                
+                return cleanUrl + "?" + params.toString();
+            } catch (e) {
+                // Hata durumunda manuel değişim yap
+                if (url.includes("dl=0")) return url.replace("dl=0", "dl=1");
+                return url + (url.includes("?") ? "&dl=1" : "?dl=1");
+            }
         }
 
         // Listeleri Render Etme
@@ -141,11 +159,7 @@
                 emptyState.classList.add('hidden');
                 
                 pdfData.forEach(pdf => {
-                    // Dropbox linkini otomatik düzelt (dl=0 -> dl=1)
-                    const directUrl = pdf.url.replace('?dl=0', '?dl=1');
-                    if (!directUrl.includes('?dl=1') && !directUrl.includes('&dl=1')) {
-                        pdf.url += (pdf.url.includes('?') ? '&dl=1' : '?dl=1');
-                    }
+                    const directUrl = formatDropboxUrl(pdf.url);
 
                     // Ana Sayfa Kartı
                     list.innerHTML += `
@@ -156,7 +170,7 @@
                                 </div>
                                 <h3 class="font-bold text-gray-800 line-clamp-2">${pdf.name}</h3>
                             </div>
-                            <a href="${directUrl}" download class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition group">
+                            <a href="${directUrl}" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition group">
                                 <i class="fas fa-download mr-2 group-hover:bounce"></i> İndir
                             </a>
                         </div>
@@ -187,15 +201,10 @@
                 return;
             }
 
-            // Dropbox linkini direct linke çevirme mantığı
-            if (url.includes("dropbox.com")) {
-                url = url.split('?')[0] + "?dl=1";
-            }
-
             const newPDF = {
                 id: Date.now(),
                 name: name,
-                url: url
+                url: url.trim()
             };
 
             pdfData.push(newPDF);
@@ -261,7 +270,6 @@
             }, 3000);
         }
 
-        // Başlangıç
         window.onload = renderLists;
     </script>
 </body>
