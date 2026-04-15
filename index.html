@@ -3,31 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase SMS Doğrulama</title>
+    <title>Firebase Google ile Giriş</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
-    <h2>Firebase SMS Doğrulama</h2>
+    <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">Hoş Geldiniz</h1>
+            <p class="text-slate-500 mt-2">Devam etmek için Google hesabınızı kullanın</p>
+        </div>
 
-    <div id="phone-container">
-        <input type="text" id="phoneNumber" placeholder="+905551234567">
-        <button onclick="sendOTP()">Kod Gönder</button>
+        <div class="space-y-4">
+            <!-- Google Login Button -->
+            <button onclick="signInWithGoogle()" 
+                id="login-btn"
+                class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-xl transition-all shadow-sm active:scale-95">
+                <svg class="w-6 h-6" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                Google ile Giriş Yap
+            </button>
+        </div>
+
+        <!-- Durum Mesajları -->
+        <div id="message-box" class="mt-6 p-4 rounded-xl text-sm hidden text-center"></div>
     </div>
 
-    <div id="recaptcha-container"></div>
-
-    <div id="verification-container" style="display:none; margin-top: 20px;">
-        <input type="text" id="verificationCode" placeholder="Gelen Kodu Girin">
-        <button onclick="verifyOTP()">Kodu Onayla</button>
-    </div>
-
-    <p id="status"></p>
-
+    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Sizin Config Bilgileriniz
+        // Senin verdiğin Config
         const firebaseConfig = {
             apiKey: "AIzaSyDoJmNT86J_GoBUG-X2TrGOHPtK258kaBM",
             authDomain: "aaa123-468db.firebaseapp.com",
@@ -38,46 +56,63 @@
             measurementId: "G-8HXRVPPNHR"
         };
 
-        // Firebase Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        auth.languageCode = 'tr'; // SMS dilini Türkçe yap
+        const provider = new GoogleAuthProvider();
 
-        // ReCaptcha Kurulumu
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'normal',
-            'callback': (response) => {
-                console.log("ReCaptcha tamamlandı.");
-            }
-        });
-
-        // SMS Gönderme Fonksiyonu
-        window.sendOTP = function() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const appVerifier = window.recaptchaVerifier;
-
-            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-                .then((confirmationResult) => {
-                    window.confirmationResult = confirmationResult;
-                    document.getElementById('verification-container').style.display = 'block';
-                    document.getElementById('status').innerText = "Kod gönderildi!";
-                }).catch((error) => {
-                    console.error("Hata:", error);
-                    document.getElementById('status').innerText = "Hata: " + error.message;
-                });
+        function showMessage(msg, isError = false) {
+            const box = document.getElementById('message-box');
+            box.innerText = msg;
+            box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-700');
+            box.classList.add(isError ? 'bg-red-100' : 'bg-emerald-100');
+            box.classList.add(isError ? 'text-red-700' : 'text-emerald-700');
         }
 
-        // Kodu Doğrulama Fonksiyonu
-        window.verifyOTP = function() {
-            const code = document.getElementById('verificationCode').value;
-            
-            confirmationResult.confirm(code).then((result) => {
+        window.signInWithGoogle = async function() {
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            showMessage("Google penceresi açılıyor...");
+
+            try {
+                const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                document.getElementById('status').innerText = "Giriş Başarılı! Kullanıcı ID: " + user.uid;
-            }).catch((error) => {
-                document.getElementById('status').innerText = "Hatalı Kod!";
-            });
-        }
+                
+                showMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
+
+                setTimeout(() => {
+                    document.body.innerHTML = `
+                        <div class="glass-card p-10 rounded-2xl text-center max-w-md mx-auto mt-20 shadow-2xl">
+                            <div class="mb-6">
+                                <img src="${user.photoURL}" alt="Profile" class="w-24 h-24 rounded-full mx-auto border-4 border-emerald-500 shadow-lg">
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Hoş Geldin, ${user.displayName}</h2>
+                            <p class="mt-2 text-slate-600">${user.email}</p>
+                            <div class="bg-slate-50 p-4 rounded-xl mt-6 text-left text-xs font-mono break-all text-slate-500">
+                                UID: ${user.uid}
+                            </div>
+                            <button onclick="location.reload()" class="mt-8 w-full py-3 bg-slate-800 text-white rounded-xl font-semibold shadow-lg hover:bg-slate-700 transition-all">Çıkış Yap</button>
+                        </div>
+                    `;
+                }, 1000);
+
+            } catch (error) {
+                console.error("Giriş Hatası:", error);
+                let errorMsg = "Giriş yapılamadı.";
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMsg = "Giriş penceresi kapatıldı.";
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    errorMsg = "İşlem iptal edildi.";
+                } else {
+                    errorMsg += " (" + error.code + ")";
+                }
+                
+                showMessage(errorMsg, true);
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            }
+        };
     </script>
 </body>
 </html>
