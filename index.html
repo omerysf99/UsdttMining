@@ -3,62 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Giriş Paneli</title>
+    <title>Modern Firebase Giriş Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #f8fafc, #f1f5f9);
+        }
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
         }
         .hidden { display: none; }
         .loading-spinner {
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top: 3px solid #fff;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
+            border-top: 2px solid #fff;
+            width: 18px;
+            height: 18px;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .btn-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl">
-        <!-- Giriş Arayüzü -->
+    <div class="glass-card w-full max-w-md p-10 rounded-3xl transition-all duration-500">
+        <!-- Auth Arayüzü -->
         <div id="auth-ui">
-            <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-slate-800">Hoş Geldiniz</h1>
-                <p class="text-slate-500 mt-2">Uygulamaya devam etmek için giriş yapın</p>
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200 mb-6">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Hoş Geldiniz</h1>
+                <p class="text-slate-500 mt-2 font-medium">Hesabınıza güvenli bir şekilde erişin</p>
             </div>
 
-            <div class="space-y-4">
-                <!-- Google Giriş Düğmesi -->
+            <div class="space-y-6">
+                <!-- Google Login Button -->
                 <button onclick="signInWithGoogle()" 
                     id="google-btn"
-                    class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 font-semibold py-3 rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-semibold py-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] disabled:opacity-50">
                     <span id="google-btn-content" class="flex items-center gap-3">
                         <svg class="w-5 h-5" viewBox="0 0 48 48">
-                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
                         </svg>
-                        Google ile Devam Et
+                        Google ile Giriş Yap
                     </span>
-                    <span id="google-btn-loader" class="hidden"><div class="loading-spinner"></div></span>
+                    <span id="google-btn-loader" class="hidden"><div class="loading-spinner border-slate-400 border-t-slate-800"></div></span>
                 </button>
 
-                <div class="relative py-2">
-                    <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-200"></span></div>
-                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400">Veya</span></div>
+                <div class="relative flex items-center justify-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-4 text-xs font-bold text-slate-400 uppercase tracking-widest">veya</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
                 </div>
 
-                <!-- E-posta Formu -->
-                <div class="space-y-3">
-                    <input type="email" id="email" placeholder="E-posta adresi" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <input type="password" id="password" placeholder="Şifre" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <div class="flex gap-3">
-                        <button onclick="handleEmailAuth('signin')" class="flex-1 bg-slate-800 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition-all active:scale-95">Giriş Yap</button>
-                        <button onclick="handleEmailAuth('signup')" class="flex-1 border border-slate-800 text-slate-800 py-3 rounded-xl font-semibold hover:bg-slate-50 transition-all active:scale-95">Kayıt Ol</button>
+                <!-- Email Form -->
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-sm font-semibold text-slate-700 ml-1">E-posta</label>
+                        <input type="email" id="email" placeholder="isim@sirket.com" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-sm font-semibold text-slate-700 ml-1">Şifre</label>
+                        <div class="relative">
+                            <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                            <button onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 pt-2">
+                        <button onclick="handleEmailAuth('signin')" class="btn-primary flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 active:scale-95">Giriş Yap</button>
+                        <button onclick="handleEmailAuth('signup')" class="btn-primary flex-1 bg-white border-2 border-slate-100 text-slate-800 py-3.5 rounded-xl font-bold hover:bg-slate-50 active:scale-95">Kayıt Ol</button>
                     </div>
                 </div>
             </div>
@@ -66,14 +101,14 @@
 
         <!-- Başarı Arayüzü -->
         <div id="success-ui" class="hidden text-center py-4">
-            <div id="user-photo-container" class="mb-6"></div>
-            <h2 class="text-2xl font-bold text-slate-800" id="user-display-name">Hoş Geldiniz!</h2>
-            <p class="text-slate-500 mt-1 mb-8" id="user-email-info"></p>
-            <button onclick="signOutUser()" class="w-full py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-all active:scale-95">Güvenli Çıkış Yap</button>
+            <div id="user-photo-container" class="relative inline-block mb-6"></div>
+            <h2 class="text-3xl font-extrabold text-slate-900" id="user-display-name">Hoş Geldiniz!</h2>
+            <p class="text-slate-500 mt-2 mb-10 font-medium" id="user-email-info"></p>
+            <button onclick="signOutUser()" class="w-full py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-red-50 hover:text-red-600 transition-all duration-300 active:scale-95">Oturumu Kapat</button>
         </div>
 
         <!-- Mesaj Kutusu -->
-        <div id="message-box" class="mt-6 p-4 rounded-xl text-sm hidden text-center"></div>
+        <div id="message-box" class="mt-8 p-4 rounded-2xl text-sm hidden transition-all duration-300 border"></div>
     </div>
 
     <script type="module">
@@ -100,41 +135,49 @@
             measurementId: "G-8HXRVPPNHR"
         };
 
-        // Firebase Başlatma
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         auth.languageCode = 'tr';
 
-        // Mesaj Gösterme Fonksiyonu
+        window.togglePassword = () => {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.888 9.888L3 3m18 18l-6.888-6.888" />';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+            }
+        };
+
         function showMessage(msg, type = 'error') {
             const box = document.getElementById('message-box');
-            box.innerHTML = '';
-            box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-700', 'bg-amber-100', 'text-amber-800');
+            box.className = 'mt-8 p-4 rounded-2xl text-sm transition-all duration-300 border';
             
             if (type === 'error') {
                 if (msg.toLowerCase().includes('unauthorized-domain')) {
-                    const currentHostname = window.location.hostname;
-                    box.classList.add('bg-amber-100', 'text-amber-800');
+                    box.classList.add('bg-amber-50', 'text-amber-900', 'border-amber-100');
                     box.innerHTML = `
-                        <div class="text-left">
-                            <strong class="block mb-1 font-bold">⚠️ Alan Adı Yetkisiz!</strong>
-                            <p class="mb-2 text-[12px]">Google girişi için bu adresi Firebase'e ekleyin:</p>
-                            <code class="block p-2 bg-white/60 rounded border border-amber-300 mb-2 font-mono text-[10px] break-all select-all">${currentHostname}</code>
-                            <p class="text-[10px] opacity-70 italic font-medium">Authentication > Settings > Authorized Domains</p>
-                        </div>
-                    `;
+                        <div class="flex gap-3 text-left">
+                            <span class="text-amber-600">⚠️</span>
+                            <div>
+                                <strong class="block text-sm mb-1">Alan Adı İzni Gerekli</strong>
+                                <p class="text-[12px] opacity-90 mb-2">Bu Render adresini Firebase Console'a eklemelisiniz:</p>
+                                <code class="block p-2 bg-white/80 rounded-lg border border-amber-200 font-mono text-[11px] break-all select-all">usdttmining-0bjx.onrender.com</code>
+                            </div>
+                        </div>`;
                 } else {
-                    box.classList.add('bg-red-100', 'text-red-700');
+                    box.classList.add('bg-red-50', 'text-red-800', 'border-red-100');
                     box.innerText = msg;
                 }
             } else {
-                box.classList.add('bg-emerald-100', 'text-emerald-700');
+                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-100');
                 box.innerText = msg;
             }
             box.classList.remove('hidden');
         }
 
-        // Arayüz Güncelleme
         function updateUI(user) {
             const authUi = document.getElementById('auth-ui');
             const successUi = document.getElementById('success-ui');
@@ -147,64 +190,43 @@
                 successUi.classList.remove('hidden');
                 document.getElementById('message-box').classList.add('hidden');
                 nameEl.innerText = user.displayName || 'Kullanıcı';
-                emailEl.innerText = user.email || 'E-posta tanımlı değil';
-                
-                if (user.photoURL) {
-                    photoEl.innerHTML = `<img src="${user.photoURL}" class="w-24 h-24 rounded-full mx-auto shadow-xl border-4 border-white object-cover">`;
-                } else {
-                    photoEl.innerHTML = `<div class="w-24 h-24 bg-slate-200 rounded-full mx-auto flex items-center justify-center text-3xl text-slate-400">👤</div>`;
-                }
+                emailEl.innerText = user.email;
+                const photoSrc = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&background=3b82f6&color=fff&size=128`;
+                photoEl.innerHTML = `<div class="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl border-4 border-white"><img src="${photoSrc}" class="w-full h-full object-cover"></div>`;
             } else {
                 authUi.classList.remove('hidden');
                 successUi.classList.add('hidden');
             }
         }
 
-        // --- GELİŞTİRİLMİŞ GOOGLE GİRİŞİ ---
         window.signInWithGoogle = async () => {
             const btn = document.getElementById('google-btn');
             const content = document.getElementById('google-btn-content');
             const loader = document.getElementById('google-btn-loader');
-
-            // Görsel durumu güncelle
             btn.disabled = true;
-            content.classList.add('hidden');
+            content.classList.add('opacity-0');
             loader.classList.remove('hidden');
             
             const provider = new GoogleAuthProvider();
-            // Kullanıcıya her zaman hesap seçtirme
             provider.setCustomParameters({ prompt: 'select_account' });
 
             try {
-                // Oturum kalıcılığını ayarla
                 await setPersistence(auth, browserLocalPersistence);
                 const result = await signInWithPopup(auth, provider);
                 updateUI(result.user);
-                showMessage("Hoş geldiniz, giriş yapıldı!", "success");
             } catch (error) {
-                console.error("Giriş Hatası:", error);
-                
-                let errorMsg = error.message;
-                if (error.code === 'auth/popup-closed-by-user') errorMsg = "Giriş penceresi kullanıcı tarafından kapatıldı.";
-                else if (error.code === 'auth/cancelled-popup-request') errorMsg = "Giriş işlemi iptal edildi.";
-                
-                showMessage(errorMsg, "error");
+                showMessage(error.message, "error");
             } finally {
                 btn.disabled = false;
-                content.classList.remove('hidden');
+                content.classList.remove('opacity-0');
                 loader.classList.add('hidden');
             }
         };
 
-        // --- E-POSTA GİRİŞİ ---
         window.handleEmailAuth = async (type) => {
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
-
-            if (!email || !pass) {
-                showMessage("Lütfen e-posta ve şifrenizi girin.", "error");
-                return;
-            }
+            if (!email || !pass) return showMessage("Lütfen bilgileri girin.", "error");
 
             try {
                 const result = (type === 'signup') 
@@ -216,14 +238,8 @@
             }
         };
 
-        // --- ÇIKIŞ ---
-        window.signOutUser = () => {
-            signOut(auth).then(() => {
-                location.reload();
-            });
-        };
+        window.signOutUser = () => signOut(auth).then(() => location.reload());
 
-        // Oturum durumunu sürekli takip et
         onAuthStateChanged(auth, updateUI);
     </script>
 </body>
